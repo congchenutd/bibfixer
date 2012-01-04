@@ -4,6 +4,7 @@
 #include "ui_DlgSettings.h"
 #include "MySetting.h"
 
+class UserSetting;
 class DlgSettings : public QDialog
 {
 	Q_OBJECT
@@ -18,10 +19,13 @@ private slots:
 private:
 	void loadFields();
 	void saveFields();
+	void loadAbbreviationRules();
+	void saveAbbreviationRules();
 
 private:
 	Ui::DlgSettings ui;
 	QFont font;
+	UserSetting* setting;
 };
 
 
@@ -35,6 +39,9 @@ public:
 
 	QStringList getFields() const;
 	void setFields(const QString& fileData);
+
+	QStringList getAbbreviationRules() const;
+	void setAbbreviationRules(const QString& data);
 
 private:
 	void loadDefaults();
