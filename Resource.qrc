@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Images/Uppercase.png</file>
+        <file>Images/Abbreviation.png</file>
+        <file>Images/Settings.png</file>
+        <file>Images/Save.png</file>
+        <file>Images/Checked.png</file>
+        <file>Images/UnChecked.png</file>
+        <file>Images/Clean.png</file>
+        <file>Images/Fix.png</file>
+        <file>Images/About.png</file>
+        <file>Images/Protect.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,29 @@
+American	Am.	TRUE
+Annual	Ann.	TRUE
+Association	Assoc.	TRUE
+Bulletin	Bull.	TRUE
+Communications (of)	Comm.	TRUE
+Computer Society	CS	TRUE
+Conference (on)	Conf.	TRUE
+Department (of)	Dept.	TRUE
+Engineering	Eng.	TRUE
+Federal	Fed.	TRUE
+Government	Govt.	TRUE
+Institute	Inst.	TRUE
+International	Int'l	TRUE
+Journal (of)	J.	TRUE
+Mathematical	Math.	TRUE
+Mathematics	Math.	TRUE
+National	Nat'l	TRUE
+Number	no.	TRUE
+Proceedings (of)	Proc.	TRUE
+Quarterly	Q.	TRUE
+Review	Rev.	TRUE
+Society	Soc.	TRUE
+Symposium (of)	Symp.	TRUE
+Symposium (on)	Symp.	TRUE
+Transactions (on)	Trans.	TRUE
+University	Univ.	TRUE
+Volume	vol.	TRUE
+edition	ed.	TRUE
+editor	ed.	TRUE
