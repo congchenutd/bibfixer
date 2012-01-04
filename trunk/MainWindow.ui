@@ -30,7 +30,7 @@
      <x>0</x>
      <y>0</y>
      <width>459</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -48,6 +48,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpen"/>
+   <addaction name="actionRunAll"/>
    <addaction name="actionClean"/>
    <addaction name="actionCapitalize"/>
    <addaction name="actionProtect"/>
@@ -126,6 +127,15 @@
    </property>
    <property name="text">
     <string>Protect</string>
+   </property>
+  </action>
+  <action name="actionRunAll">
+   <property name="icon">
+    <iconset resource="Resource.qrc">
+     <normaloff>:/Images/Run.png</normaloff>:/Images/Run.png</iconset>
+   </property>
+   <property name="text">
+    <string>Run All</string>
    </property>
   </action>
  </widget>

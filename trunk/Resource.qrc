@@ -10,5 +10,6 @@
         <file>Images/Fix.png</file>
         <file>Images/About.png</file>
         <file>Images/Protect.png</file>
+        <file>Images/Run.png</file>
     </qresource>
 </RCC>

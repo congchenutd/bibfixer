@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 	connect(ui.actionOpen,       SIGNAL(triggered()), this, SLOT(onOpen()));
 	connect(ui.actionSave,       SIGNAL(triggered()), this, SLOT(onSave()));
 	connect(ui.actionSettings,   SIGNAL(triggered()), this, SLOT(onSettings()));
+	connect(ui.actionRunAll,     SIGNAL(triggered()), this, SLOT(onRunAll()));
 	connect(ui.actionClean,      SIGNAL(triggered()), this, SLOT(onClean()));
 	connect(ui.actionCapitalize, SIGNAL(triggered()), this, SLOT(onCapitalize()));
 	connect(ui.actionProtect,    SIGNAL(triggered()), this, SLOT(onProtect()));
@@ -38,6 +39,14 @@ void MainWindow::onOpen()
 		ui.teOutput->setPlainText(file.readAll());
 		updateButtons(OPEN);
 	}
+}
+
+void MainWindow::onRunAll()
+{
+	onClean();
+	onCapitalize();
+	onProtect();
+	onAbbreviate();
 }
 
 void MainWindow::onSave()
@@ -126,8 +135,8 @@ void MainWindow::onAbbreviate()
 
 void MainWindow::onAbout() {
 	QMessageBox::about(this, tr("About"),
-					   tr("<h3><b>BibFixer: Fixing BibTex output</b></h3>"
-						  "2011/12/23"
+					   tr("<h3><b>BibFixer: Fixing BibTex files</b></h3>"
+						  "2012/1/3"
 						  "<p><a href=mailto:CongChenUTD@Gmail.com>CongChenUTD@Gmail.com</a></p>"));
 }
 
