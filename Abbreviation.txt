@@ -16,7 +16,8 @@ Mathematical	Math.	TRUE
 Mathematics	Math.	TRUE
 National	Nat'l	TRUE
 Number	no.	TRUE
-Proceedings (of)	Proc.	TRUE
+Proceedings of	Proc.	true
+Proceedings of the	Proc.	TRUE
 Quarterly	Q.	TRUE
 Review	Rev.	TRUE
 Society	Soc.	TRUE
@@ -26,4 +27,4 @@ Transactions (on)	Trans.	TRUE
 University	Univ.	TRUE
 Volume	vol.	TRUE
 edition	ed.	TRUE
-editor	ed.	TRUE
+editor	ed.	true

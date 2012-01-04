@@ -14,6 +14,7 @@ public:
 
 private slots:
 	void onOpen();
+	void onRunAll();
 	void onClean();
 	void onCapitalize();
 	void onProtect();
