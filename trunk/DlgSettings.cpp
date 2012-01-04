@@ -1,21 +1,25 @@
 #include "DlgSettings.h"
 #include <QFontDialog>
 #include <QApplication>
+#include <QDebug>
 
 DlgSettings::DlgSettings(QWidget *parent) :
 	QDialog(parent)
 {
 	ui.setupUi(this);
-	font = UserSetting::getInstance()->getFont();
+	setting = UserSetting::getInstance();
+	font = setting->getFont();
 	loadFields();
+	loadAbbreviationRules();
 
 	connect(ui.btFont, SIGNAL(clicked()), this, SLOT(onFont()));
 }
 
 void DlgSettings::accept()
 {
-	UserSetting::getInstance()->setFont(font);
+	setting->setFont(font);
 	saveFields();
+	saveAbbreviationRules();
 
 	QDialog::accept();
 }
@@ -29,11 +33,19 @@ void DlgSettings::onFont()
 }
 
 void DlgSettings::loadFields() {
-	ui.teFields->setPlainText(UserSetting::getInstance()->getFields().join("\r\n"));
+	ui.teFields->setPlainText(setting->getFields().join("\r\n"));
 }
 
 void DlgSettings::saveFields() {
-	UserSetting::getInstance()->setFields(ui.teFields->toPlainText());
+	setting->setFields(ui.teFields->toPlainText());
+}
+
+void DlgSettings::loadAbbreviationRules() {
+	ui.teAbbreviation->setPlainText(setting->getAbbreviationRules().join("\r\n"));
+}
+
+void DlgSettings::saveAbbreviationRules() {
+	setting->setAbbreviationRules(ui.teAbbreviation->toPlainText());
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -69,4 +81,41 @@ QStringList UserSetting::getFields() const
 
 void UserSetting::setFields(const QString& fileData) {
 	setValue("Fields", fileData.toLower());
+}
+
+QStringList UserSetting::getAbbreviationRules() const
+{
+	QStringList rules = value("AbbreviationRules").toString().split('#');
+	QStringList result;
+	foreach(QString rule, rules)
+	{
+		QStringList sections = rule.split('\t');
+		if(sections.size() == 3 && sections[2].toLower() == "true")
+			result << rule;
+	}
+	return result;
+}
+
+void UserSetting::setAbbreviationRules(const QString& data)
+{
+	QString input = data;
+	QMap<QString, QString> rules;
+	QStringList ruleNames;
+	QTextStream is(&input);
+	while(!is.atEnd())
+	{
+		QStringList sections = is.readLine().split('\t');
+		if(sections.size() == 3)
+		{
+			rules.insert(sections[0], sections.join("\t"));
+			ruleNames << sections[0];
+		}
+	}
+
+	// qmap does not support reverse traverse
+	QStringList result;
+	for(int i = ruleNames.size() - 1; i >= 0; --i)
+		result << rules[ruleNames.at(i)];
+
+	setValue("AbbreviationRules", result.join("\n"));
 }

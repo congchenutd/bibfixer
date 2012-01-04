@@ -46,7 +46,7 @@ void MainWindow::onRunAll()
 	onClean();
 	onCapitalize();
 	onProtect();
-	onAbbreviate();
+	onAbbreviate(false);
 }
 
 void MainWindow::onSave()
@@ -113,11 +113,14 @@ void MainWindow::onProtect()
 	updateButtons(PROTECT);
 }
 
-void MainWindow::onAbbreviate()
+void MainWindow::onAbbreviate(bool needConfirm)
 {
-	DlgAbbreviation dlg(this);
-	if(dlg.exec() != QDialog::Accepted)
-		return;
+	if(needConfirm)
+	{
+		DlgAbbreviation dlg(this);
+		if(dlg.exec() != QDialog::Accepted)
+			return;
+	}
 
 	references.clearChangedValues();
 	references.abbreviate("journal");
