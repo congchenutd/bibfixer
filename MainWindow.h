@@ -18,7 +18,7 @@ private slots:
 	void onClean();
 	void onCapitalize();
 	void onProtect();
-	void onAbbreviate(bool needConfirm = true);
+	void onAbbreviate();
 	void onSave();
 	void onSettings();
 	void onAbout();

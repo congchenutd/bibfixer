@@ -6,55 +6,28 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>595</width>
-    <height>479</height>
+    <width>507</width>
+    <height>559</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Settings</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
-   <property name="spacing">
-    <number>5</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QSplitter" name="splitter">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <widget class="QWidget" name="layoutWidget">
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Valid fields</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPlainTextEdit" name="teFields"/>
-       </item>
-      </layout>
+     <widget class="WidgetValidFields" name="tabValidFields">
+      <attribute name="title">
+       <string>Valid fields</string>
+      </attribute>
      </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Abbreviation rules</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPlainTextEdit" name="teAbbreviation"/>
-       </item>
-      </layout>
+     <widget class="WidgetAbbreviation" name="tabAbbreviationRules">
+      <attribute name="title">
+       <string>Abbreviation rules</string>
+      </attribute>
      </widget>
     </widget>
    </item>
@@ -97,6 +70,20 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WidgetAbbreviation</class>
+   <extends>QWidget</extends>
+   <header>WidgetAbbreviation.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WidgetValidFields</class>
+   <extends>QWidget</extends>
+   <header>WidgetValidFields.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

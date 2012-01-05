@@ -1,4 +1,5 @@
 #include "Convertor.h"
+#include "DlgSettings.h"
 #include <QTextStream>
 #include <QFile>
 #include <QRegExp>
@@ -107,23 +108,11 @@ QString ProtectionConvertor::toFirstCharProtected(const QString &word) const
 }
 
 ///////////////////////////////////////////////////////////////////////
-AbbreviationConvertor::AbbreviationConvertor(const QString& rulesFileName, QObject* parent) : Convertor(parent)
-{
-	QFile file(rulesFileName);
-	if(file.open(QFile::ReadOnly))
-	{
-		QTextStream is(&file);
-		while(!is.atEnd())
-		{
-			QStringList sections = is.readLine().split('\t');
-			if(sections.size() == 3 && sections[2].toLower() == "true")
-				rules << sections[0] + ";" + sections[1];
-		}
-	}
-}
+AbbreviationConvertor::AbbreviationConvertor(QObject* parent) : Convertor(parent) {}
 
 QString AbbreviationConvertor::convert(const QString& input) const
 {
+	QStringList rules = UserSetting::getInstance()->getSelectedAbbreviationRules();
 	QString result = input;
 	for(int i = rules.size()-1; i >=0; --i)      // reverse order: long rule first
 	{

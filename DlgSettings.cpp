@@ -9,8 +9,6 @@ DlgSettings::DlgSettings(QWidget *parent) :
 	ui.setupUi(this);
 	setting = UserSetting::getInstance();
 	font = setting->getFont();
-	loadFields();
-	loadAbbreviationRules();
 
 	connect(ui.btFont, SIGNAL(clicked()), this, SLOT(onFont()));
 }
@@ -18,8 +16,8 @@ DlgSettings::DlgSettings(QWidget *parent) :
 void DlgSettings::accept()
 {
 	setting->setFont(font);
-	saveFields();
-	saveAbbreviationRules();
+	ui.tabValidFields      ->save();
+	ui.tabAbbreviationRules->save();
 
 	QDialog::accept();
 }
@@ -32,21 +30,6 @@ void DlgSettings::onFont()
 		font = f;
 }
 
-void DlgSettings::loadFields() {
-	ui.teFields->setPlainText(setting->getFields().join("\r\n"));
-}
-
-void DlgSettings::saveFields() {
-	setting->setFields(ui.teFields->toPlainText());
-}
-
-void DlgSettings::loadAbbreviationRules() {
-	ui.teAbbreviation->setPlainText(setting->getAbbreviationRules().join("\r\n"));
-}
-
-void DlgSettings::saveAbbreviationRules() {
-	setting->setAbbreviationRules(ui.teAbbreviation->toPlainText());
-}
 
 //////////////////////////////////////////////////////////////////////////
 // Setting
@@ -74,48 +57,40 @@ void UserSetting::setFont(const QFont& font) {
 
 QStringList UserSetting::getFields() const
 {
-	QStringList result = value("Fields").toString().split("\n");
-	result.sort();
-	return result;
+	// empty string.split() will produce a stringlist with one empty entry
+	QString content = value("Fields").toString();
+	return content.isEmpty() ? QStringList() : content.split(";");
 }
 
-void UserSetting::setFields(const QString& fileData) {
-	setValue("Fields", fileData.toLower());
+void UserSetting::setFields(const QStringList& fields) {
+	setValue("Fields", fields.join(";").toLower());
 }
 
 QStringList UserSetting::getAbbreviationRules() const
 {
-	QStringList rules = value("AbbreviationRules").toString().split('#');
-	QStringList result;
-	foreach(QString rule, rules)
+	// empty string.split() will produce a stringlist with one empty entry
+	QString content = value("AbbreviationRules").toString();
+	return content.isEmpty() ? QStringList() : content.split("#");
+}
+
+QStringList UserSetting::getSelectedAbbreviationRules() const
+{
+	QStringList allRules = getAbbreviationRules();
+	QStringList selectedRules;
+	foreach(const QString& rule, allRules)
 	{
-		QStringList sections = rule.split('\t');
+		QStringList sections = rule.split(";");
 		if(sections.size() == 3 && sections[2].toLower() == "true")
-			result << rule;
+			selectedRules << sections[0] + ";" + sections[1];
 	}
+
+	// reverse the order, ensuring the longer is before the shorter
+	QStringList result;
+	for(int i = selectedRules.size() - 1; i >= 0; -- i)
+		result << selectedRules.at(i);
 	return result;
 }
 
-void UserSetting::setAbbreviationRules(const QString& data)
-{
-	QString input = data;
-	QMap<QString, QString> rules;
-	QStringList ruleNames;
-	QTextStream is(&input);
-	while(!is.atEnd())
-	{
-		QStringList sections = is.readLine().split('\t');
-		if(sections.size() == 3)
-		{
-			rules.insert(sections[0], sections.join("\t"));
-			ruleNames << sections[0];
-		}
-	}
-
-	// qmap does not support reverse traverse
-	QStringList result;
-	for(int i = ruleNames.size() - 1; i >= 0; --i)
-		result << rules[ruleNames.at(i)];
-
-	setValue("AbbreviationRules", result.join("\n"));
+void UserSetting::setAbbreviationRules(const QStringList& rules) {
+	setValue("AbbreviationRules", rules.join("#"));
 }
