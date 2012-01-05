@@ -1,18 +1,19 @@
 #ifndef DLGABBREVIATION_H
 #define DLGABBREVIATION_H
 
-#include "ui_DlgAbbreviation.h"
+#include "ui_WidgetAbbreviation.h"
 #include <QStandardItemModel>
 
 // edit abbreviation rules
-class DlgAbbreviation : public QDialog
+class UserSetting;
+class WidgetAbbreviation : public QWidget
 {
 	Q_OBJECT
 
 public:
-	DlgAbbreviation(QWidget *parent = 0);
-	virtual void accept();
+	WidgetAbbreviation(QWidget* parent = 0);
 	QStringList getSelectedRules() const;  // fullName;abbreviatedName
+	void save();
 
 private slots:
 	void onCurrentRowChanged(const QModelIndex& idx);
@@ -21,13 +22,13 @@ private slots:
 
 private:
 	void load();    // data saved in Abbreviation.txt
-	void save();
 
 private:
-	Ui::DlgAbbreviation ui;
+	Ui::WidgetAbbreviation ui;
 	QStandardItemModel model;
 	int currentRow;
 	enum {FULL, ABBR, SELECT};
+	UserSetting* setting;
 };
 
 #endif // DLGABBREVIATION_H

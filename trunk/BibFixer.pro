@@ -19,28 +19,31 @@ mac {
 SOURCES += main.cpp\
 		MainWindow.cpp \
 	DlgSettings.cpp \
-	DlgAbbreviation.cpp \
 	Convertor.cpp \
 	TextEdit.cpp \
 	Parser.cpp \
 	Reference.cpp \
     ../ImageColorBoolModel/ImageColorBoolProxy.cpp \
-    ../ImageColorBoolModel/ImageColorBoolDelegate.cpp
+    ../ImageColorBoolModel/ImageColorBoolDelegate.cpp \
+    WidgetAbbreviation.cpp \
+    WidgetValidFields.cpp
 
 HEADERS  += MainWindow.h \
 	DlgSettings.h \
 	MySetting.h \
-	DlgAbbreviation.h \
 	Convertor.h \
 	TextEdit.h \
 	Parser.h \
 	Reference.h \
     ../ImageColorBoolModel/ImageColorBoolProxy.h \
-    ../ImageColorBoolModel/ImageColorBoolDelegate.h
+    ../ImageColorBoolModel/ImageColorBoolDelegate.h \
+    WidgetAbbreviation.h \
+    WidgetValidFields.h
 
 FORMS    += MainWindow.ui \
 	DlgSettings.ui \
-	DlgAbbreviation.ui
+    WidgetAbbreviation.ui \
+    WidgetValidFields.ui
 
 RESOURCES += \
 	Resource.qrc

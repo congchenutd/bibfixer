@@ -17,12 +17,6 @@ private slots:
 	void onFont();
 
 private:
-	void loadFields();
-	void saveFields();
-	void loadAbbreviationRules();
-	void saveAbbreviationRules();
-
-private:
 	Ui::DlgSettings ui;
 	QFont font;
 	UserSetting* setting;
@@ -38,10 +32,11 @@ public:
 	void setFont(const QFont& font);
 
 	QStringList getFields() const;
-	void setFields(const QString& fileData);
+	void setFields(const QStringList& fields);
 
 	QStringList getAbbreviationRules() const;
-	void setAbbreviationRules(const QString& data);
+	QStringList getSelectedAbbreviationRules() const;
+	void setAbbreviationRules(const QStringList& rules);
 
 private:
 	void loadDefaults();

@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 #include "DlgSettings.h"
-#include "DlgAbbreviation.h"
+#include "WidgetAbbreviation.h"
 #include "Parser.h"
 #include <QScrollBar>
 #include <QStyle>
@@ -46,7 +46,7 @@ void MainWindow::onRunAll()
 	onClean();
 	onCapitalize();
 	onProtect();
-	onAbbreviate(false);
+	onAbbreviate();
 }
 
 void MainWindow::onSave()
@@ -113,15 +113,8 @@ void MainWindow::onProtect()
 	updateButtons(PROTECT);
 }
 
-void MainWindow::onAbbreviate(bool needConfirm)
+void MainWindow::onAbbreviate()
 {
-	if(needConfirm)
-	{
-		DlgAbbreviation dlg(this);
-		if(dlg.exec() != QDialog::Accepted)
-			return;
-	}
-
 	references.clearChangedValues();
 	references.abbreviate("journal");
 	references.abbreviate("booktitle");
@@ -139,7 +132,7 @@ void MainWindow::onAbbreviate(bool needConfirm)
 void MainWindow::onAbout() {
 	QMessageBox::about(this, tr("About"),
 					   tr("<h3><b>BibFixer: Fixing BibTex files</b></h3>"
-						  "2012/1/3"
+						  "2012/1/4"
 						  "<p><a href=mailto:CongChenUTD@Gmail.com>CongChenUTD@Gmail.com</a></p>"));
 }
 
@@ -153,6 +146,7 @@ void MainWindow::updateOutput() {
 
 void MainWindow::updateButtons(OperationStatus status)
 {
+	ui.actionRunAll    ->setEnabled(status == OPEN);
 	ui.actionClean     ->setEnabled(status == OPEN);
 	ui.actionCapitalize->setEnabled(status >= CLEAN);
 	ui.actionProtect   ->setEnabled(status >= CLEAN);

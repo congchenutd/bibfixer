@@ -48,7 +48,7 @@ private:
 class AbbreviationConvertor : public Convertor
 {
 public:
-	AbbreviationConvertor(const QString& rulesFileName, QObject* parent = 0);
+	AbbreviationConvertor(QObject* parent = 0);
 	virtual QString convert(const QString& input) const;
 
 private:
