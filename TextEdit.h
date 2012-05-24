@@ -4,6 +4,7 @@
 #include <QPlainTextEdit>
 #include <QMap>
 
+// A text edit that can highlight certain lines
 class TextEdit : public QPlainTextEdit
 {
 	Q_OBJECT
