@@ -16,7 +16,7 @@ mac {
 	ICON = Images/Fix.icns
 }
 
-SOURCES += main.cpp\
+SOURCES +=\
 		MainWindow.cpp \
 	DlgSettings.cpp \
 	Convertor.cpp \
@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     ../ImageColorBoolModel/ImageColorBoolProxy.cpp \
     ../ImageColorBoolModel/ImageColorBoolDelegate.cpp \
     WidgetAbbreviation.cpp \
-    WidgetValidFields.cpp
+    WidgetValidFields.cpp \
+    Main.cpp
 
 HEADERS  += MainWindow.h \
 	DlgSettings.h \
