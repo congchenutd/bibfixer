@@ -2,6 +2,8 @@
 #define COMMANDS_H
 
 #include <QUndoCommand>
+#include <QColor>
+#include "Reference.h"
 
 class ReferenceList;
 class TextEdit;
@@ -9,40 +11,50 @@ class TextEdit;
 class Command : public QUndoCommand
 {
 public:
-    Command(ReferenceList* references, TextEdit* edit, QUndoCommand* parent = 0);
-    void highlightChanged();
+	Command(ReferenceList* refs, TextEdit* textEdit, QUndoCommand* parent = 0);
+	void highlightChanged(const QColor& color);
+	void undo();
 
 protected:
-    QString        originalText;
-    ReferenceList* referenceList;
-    TextEdit*      textEdit;
+	ReferenceList* refCurrent;
+	ReferenceList  refBackup;
+	TextEdit*      edit;
 };
 
 class CleanCommand : public Command
 {
 public:
-    CleanCommand(ReferenceList* references, TextEdit* edit, QUndoCommand* parent = 0);
+	CleanCommand(const QString& text, ReferenceList* refs, TextEdit* edit, QUndoCommand* parent = 0);
 
-    void undo();
+	void undo();
     void redo();
+
+private:
+	QString originalText;
 };
 
 class CapitalizeCommand : public Command
 {
 public:
-    CapitalizeCommand(ReferenceList* references, TextEdit* edit, QUndoCommand* parent = 0);
+	CapitalizeCommand(ReferenceList* refs, TextEdit* edit, QUndoCommand* parent = 0);
 
-    void undo();
     void redo();
 };
 
 class ProtectCommand : public Command
 {
 public:
-    ProtectCommand(ReferenceList* references, TextEdit* edit, QUndoCommand* parent = 0);
+	ProtectCommand(ReferenceList* refs, TextEdit* edit, QUndoCommand* parent = 0);
 
-    void undo();
     void redo();
+};
+
+class AbbreviateCommand : public Command
+{
+public:
+	AbbreviateCommand(ReferenceList* refs, TextEdit* edit, QUndoCommand* parent = 0);
+
+	void redo();
 };
 
 #endif // COMMANDS_H

@@ -15,10 +15,6 @@ void ReferenceRecord::convert(const QString& fieldName, const Convertor& convert
     }
 }
 
-bool ReferenceRecord::convertible(const QString& fieldName, const Convertor &convertor) const {
-    return fields.contains(fieldName) && convertor.convertible(fields[fieldName]);
-}
-
 QString ReferenceRecord::toString() const
 {
 	QString result;
@@ -99,14 +95,5 @@ void ReferenceList::abbreviate(const QString& fieldName)
     AbbreviationConvertor convertor;
 	for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
         it->convert(fieldName, convertor);
-}
-
-bool ReferenceList::canCapitalize(const QString& fieldName) const
-{
-    CaseConvertor convertor;
-    for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
-        if(it->convertible(fieldName, convertor))
-            return true;
-    return false;
 }
 
