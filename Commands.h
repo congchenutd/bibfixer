@@ -2,30 +2,33 @@
 #define COMMANDS_H
 
 #include <QUndoCommand>
-#include <QColor>
 #include "Reference.h"
 
-class ReferenceList;
+class MainWindow;
 class TextEdit;
 
 class Command : public QUndoCommand
 {
 public:
-    Command(TextEdit* textEdit, QUndoCommand* parent = 0);
+	Command(MainWindow* mainWindow, QUndoCommand* parent = 0);
+	virtual ~Command() {}
     void highlightChanged();
 	void undo();
 
 protected:
-    ReferenceList refBackup;
-    TextEdit*     edit;
+	void output(const QString& text);
 
-    static ReferenceList refCurrent;
+protected:
+	ReferenceList refBackup;           // each command object keeps a version
+	MainWindow*   mainWnd;
+
+	static ReferenceList refCurrent;   // current version
 };
 
 class CleanCommand : public Command
 {
 public:
-    CleanCommand(const QString& text, TextEdit* edit, QUndoCommand* parent = 0);
+	CleanCommand(const QString& text, MainWindow* mainWindow, QUndoCommand* parent = 0);
 
 	void undo();
     void redo();
@@ -37,24 +40,27 @@ private:
 class CapitalizeCommand : public Command
 {
 public:
-    CapitalizeCommand(TextEdit* edit, QUndoCommand* parent = 0);
+	CapitalizeCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
 
+	void undo();
     void redo();
 };
 
 class ProtectCommand : public Command
 {
 public:
-    ProtectCommand(TextEdit* edit, QUndoCommand* parent = 0);
+	ProtectCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
 
+	void undo();
     void redo();
 };
 
 class AbbreviateCommand : public Command
 {
 public:
-    AbbreviateCommand(TextEdit* edit, QUndoCommand* parent = 0);
+	AbbreviateCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
 
+	void undo();
 	void redo();
 };
 

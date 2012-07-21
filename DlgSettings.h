@@ -38,6 +38,8 @@ public:
 	QStringList getSelectedAbbreviationRules() const;
 	void setAbbreviationRules(const QStringList& rules);
 
+	QString getCompileDate() const;
+
 private:
 	void loadDefaults();
 };

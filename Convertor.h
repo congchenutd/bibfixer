@@ -13,8 +13,6 @@ public:
 	virtual ~Convertor() {}
     virtual QString convert(const QString& input) const = 0;
 
-    bool convertible(const QString& input) const;
-
 signals:
 	void converted(const QString& input, const QString& output) const;
 };
