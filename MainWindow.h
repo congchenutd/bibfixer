@@ -27,7 +27,6 @@ private slots:
 private:
     void createActions();
 	QString getContent() const;
-	void updateOutput();
 	void updateButtons(OperationStatus status);
 
 private:

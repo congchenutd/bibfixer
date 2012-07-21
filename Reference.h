@@ -4,6 +4,7 @@
 #include <QMap>
 #include <QString>
 #include <QStringList>
+#include <QColor>
 
 class Convertor;
 class ReferenceRecord
@@ -45,11 +46,15 @@ public:
 	void abbreviate(const QString& fieldName);
 
 	QString toString() const;
+
 	QStringList getChangedValues() const;   // for hightlighting
 	void clearChangedValues();
+    QColor getHighlightColor() const { return highlightColor; }
+    void setHighlightColor(const QColor& clr) { highlightColor = clr; }
 
 private:
 	Records records;
+    QColor  highlightColor;
 };
 
 

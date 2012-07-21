@@ -11,20 +11,21 @@ class TextEdit;
 class Command : public QUndoCommand
 {
 public:
-	Command(ReferenceList* refs, TextEdit* textEdit, QUndoCommand* parent = 0);
-	void highlightChanged(const QColor& color);
+    Command(TextEdit* textEdit, QUndoCommand* parent = 0);
+    void highlightChanged();
 	void undo();
 
 protected:
-	ReferenceList* refCurrent;
-	ReferenceList  refBackup;
-	TextEdit*      edit;
+    ReferenceList refBackup;
+    TextEdit*     edit;
+
+    static ReferenceList refCurrent;
 };
 
 class CleanCommand : public Command
 {
 public:
-	CleanCommand(const QString& text, ReferenceList* refs, TextEdit* edit, QUndoCommand* parent = 0);
+    CleanCommand(const QString& text, TextEdit* edit, QUndoCommand* parent = 0);
 
 	void undo();
     void redo();
@@ -36,7 +37,7 @@ private:
 class CapitalizeCommand : public Command
 {
 public:
-	CapitalizeCommand(ReferenceList* refs, TextEdit* edit, QUndoCommand* parent = 0);
+    CapitalizeCommand(TextEdit* edit, QUndoCommand* parent = 0);
 
     void redo();
 };
@@ -44,7 +45,7 @@ public:
 class ProtectCommand : public Command
 {
 public:
-	ProtectCommand(ReferenceList* refs, TextEdit* edit, QUndoCommand* parent = 0);
+    ProtectCommand(TextEdit* edit, QUndoCommand* parent = 0);
 
     void redo();
 };
@@ -52,7 +53,7 @@ public:
 class AbbreviateCommand : public Command
 {
 public:
-	AbbreviateCommand(ReferenceList* refs, TextEdit* edit, QUndoCommand* parent = 0);
+    AbbreviateCommand(TextEdit* edit, QUndoCommand* parent = 0);
 
 	void redo();
 };
