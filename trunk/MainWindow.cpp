@@ -2,6 +2,7 @@
 #include "DlgSettings.h"
 #include "WidgetAbbreviation.h"
 #include "Parser.h"
+#include "Commands.h"
 #include <QScrollBar>
 #include <QStyle>
 #include <QTextStream>
@@ -11,7 +12,7 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
-	ui.actionOpen->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+    createActions();
 	ui.teOutput->setFont(UserSetting::getInstance()->getFont());
 	updateButtons(INIT);
 
@@ -20,10 +21,26 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 	connect(ui.actionSettings,   SIGNAL(triggered()), this, SLOT(onSettings()));
 	connect(ui.actionRunAll,     SIGNAL(triggered()), this, SLOT(onRunAll()));
 	connect(ui.actionClean,      SIGNAL(triggered()), this, SLOT(onClean()));
-	connect(ui.actionCapitalize, SIGNAL(triggered()), this, SLOT(onCapitalize()));
+    connect(ui.actionCapitalize, SIGNAL(triggered()), this, SLOT(onCapitalize()));
 	connect(ui.actionProtect,    SIGNAL(triggered()), this, SLOT(onProtect()));
 	connect(ui.actionAbbreviate, SIGNAL(triggered()), this, SLOT(onAbbreviate()));
 	connect(ui.actionAbout,      SIGNAL(triggered()), this, SLOT(onAbout()));
+}
+
+void MainWindow::createActions()
+{
+    ui.actionOpen->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+
+    QAction* undoAction = undoStack.createUndoAction(this, tr("Undo"));
+    undoAction->setIcon(QIcon(":/Images/Undo.png"));
+    undoAction->setShortcuts(QKeySequence::Undo);
+    ui.mainToolBar->insertAction(ui.actionSettings, undoAction);
+
+    QAction* redoAction = undoStack.createRedoAction(this, tr("Redo"));
+    redoAction->setIcon(QIcon(":/Images/Redo.png"));
+    redoAction->setShortcuts(QKeySequence::Redo);
+    ui.mainToolBar->insertAction(ui.actionSettings, redoAction);
+    ui.mainToolBar->insertSeparator(ui.actionSettings);
 }
 
 void MainWindow::onOpen()
@@ -44,7 +61,7 @@ void MainWindow::onOpen()
 void MainWindow::onRunAll()
 {
 	onClean();
-	onCapitalize();
+    onCapitalize();
 	onProtect();
 	onAbbreviate();
 }
@@ -67,50 +84,35 @@ void MainWindow::onSave()
 	}
 }
 
+void MainWindow::onSettings()
+{
+    DlgSettings dlg(this);
+    if(dlg.exec() == QDialog::Accepted)
+        ui.teOutput->setFont(UserSetting::getInstance()->getFont());
+}
+
 void MainWindow::onClean()
 {
 	BibParser parser;
 	references = parser.parse(getContent());
-	updateOutput();
-	updateButtons(CLEAN);
-}
+    updateButtons(CLEAN);
 
-void MainWindow::onSettings()
-{
-	DlgSettings dlg(this);
-	if(dlg.exec() == QDialog::Accepted)
-		ui.teOutput->setFont(UserSetting::getInstance()->getFont());
+    CleanCommand* cleanCommand = new CleanCommand(&references, ui.teOutput);
+    undoStack.push(cleanCommand);
 }
 
 void MainWindow::onCapitalize()
 {
-	references.capitalize("title");
-	references.capitalize("journal");
-	references.capitalize("booktitle");
-
-	// highlight changed lines
-	QStringList toBeHighlighted = references.getChangedValues();
-	foreach(const QString& line, toBeHighlighted)
-		ui.teOutput->addHighlightedLine(line, Qt::yellow);
-
-	updateOutput();
-	ui.teOutput->highlightLines();
-	updateButtons(CAPITALIZE);
+    CapitalizeCommand* capitalizeCommand = new CapitalizeCommand(&references, ui.teOutput);
+    undoStack.push(capitalizeCommand);
+    updateButtons(CAPITALIZE);
 }
 
 void MainWindow::onProtect()
 {
-	references.clearChangedValues();
-	references.protect("title");
-
-	// highlight changed lines
-	QStringList toBeHighlighted = references.getChangedValues();
-	foreach(const QString& line, toBeHighlighted)
-		ui.teOutput->addHighlightedLine(line, Qt::yellow);
-
-	updateOutput();
-	ui.teOutput->highlightLines();
-	updateButtons(PROTECT);
+    ProtectCommand* protectCommand = new ProtectCommand(&references, ui.teOutput);
+    undoStack.push(protectCommand);
+    updateButtons(PROTECT);
 }
 
 void MainWindow::onAbbreviate()
@@ -118,15 +120,14 @@ void MainWindow::onAbbreviate()
 	references.clearChangedValues();
 	references.abbreviate("journal");
 	references.abbreviate("booktitle");
+    updateOutput();
+    updateButtons(ABBREVIATE);
 
 	// highlight changed lines
 	QStringList toBeHighlighted = references.getChangedValues();
 	foreach(const QString& line, toBeHighlighted)
 		ui.teOutput->addHighlightedLine(line, Qt::green);
-
-	updateOutput();
 	ui.teOutput->highlightLines();
-	updateButtons(ABBREVIATE);
 }
 
 void MainWindow::onAbout() {
@@ -151,5 +152,7 @@ void MainWindow::updateButtons(OperationStatus status)
 	ui.actionCapitalize->setEnabled(status >= CLEAN);
 	ui.actionProtect   ->setEnabled(status >= CLEAN);
 	ui.actionAbbreviate->setEnabled(status >= CLEAN);
-	ui.actionSave      ->setEnabled(status >= CLEAN);
+    ui.actionSave      ->setEnabled(status >= CLEAN);
+
+//    ui.actionCapitalize->setChecked(!canCapitalize());
 }

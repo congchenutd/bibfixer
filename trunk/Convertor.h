@@ -11,7 +11,9 @@ class Convertor : public QObject
 public:
 	Convertor(QObject* parent = 0) : QObject(parent) {}
 	virtual ~Convertor() {}
-	virtual QString convert(const QString& input) const = 0;
+    virtual QString convert(const QString& input) const = 0;
+
+    bool convertible(const QString& input) const;
 
 signals:
 	void converted(const QString& input, const QString& output) const;
@@ -22,7 +24,7 @@ class CaseConvertor : public Convertor
 	Q_OBJECT
 public:
 	CaseConvertor(QObject* parent = 0);
-	virtual QString convert(const QString& input) const;
+    virtual QString convert(const QString& input) const;
 
 private:
 	QString toFirstCharUpperCase(const QString& word) const;
@@ -36,7 +38,7 @@ class ProtectionConvertor : public Convertor
 	Q_OBJECT
 public:
 	ProtectionConvertor(QObject* parent = 0);
-	virtual QString convert(const QString& input) const;
+    virtual QString convert(const QString& input) const;
 
 private:
 	QString toFirstCharProtected(const QString& word) const;

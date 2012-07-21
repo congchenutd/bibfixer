@@ -6,6 +6,11 @@
 #include <QtAlgorithms>
 #include <QDebug>
 
+bool Convertor::convertible(const QString& input) const {
+    return convert(input) != input;
+}
+
+//////////////////////////////////////////////////////////////////
 CaseConvertor::CaseConvertor(QObject* parent) : Convertor(parent)
 {
 	// Prepositions
@@ -51,7 +56,7 @@ QString CaseConvertor::convert(const QString& input) const
 	// the first char of the sentence must be upper case
 	QString result = toFirstCharUpperCase(convertedWords.join(" "));
 	emit converted(input, result);
-	return result;
+    return result;
 }
 
 QString CaseConvertor::toFirstCharUpperCase(const QString& word) const
@@ -74,10 +79,10 @@ QString ProtectionConvertor::convert(const QString& input) const
 
 	QString result = convertedWords.join(" ");
 	emit converted(input, result);
-	return result;
+    return result;
 }
 
-QString ProtectionConvertor::toFirstCharProtected(const QString &word) const
+QString ProtectionConvertor::toFirstCharProtected(const QString& word) const
 {
 	if(word.isEmpty())
 		return word;

@@ -10,15 +10,14 @@ class TextEdit : public QPlainTextEdit
 	Q_OBJECT
 
 	typedef QMap<QString, QColor> HighLightedLines;
-	typedef QList<QTextEdit::ExtraSelection> Selections;
 
 public:
 	TextEdit(QWidget* parent = 0);
 	void addHighlightedLine(const QString& line, const QColor& color);
 	void highlightLines();
+    void unHighlightLines();
 
 private:
-	Selections       lineSelections;
 	HighLightedLines highlightedLines;
 };
 
