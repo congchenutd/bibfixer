@@ -27,7 +27,8 @@ SOURCES +=\
     ../ImageColorBoolModel/ImageColorBoolDelegate.cpp \
     WidgetAbbreviation.cpp \
     WidgetValidFields.cpp \
-    Main.cpp
+    Main.cpp \
+    Commands.cpp
 
 HEADERS  += MainWindow.h \
 	DlgSettings.h \
@@ -39,7 +40,8 @@ HEADERS  += MainWindow.h \
     ../ImageColorBoolModel/ImageColorBoolProxy.h \
     ../ImageColorBoolModel/ImageColorBoolDelegate.h \
     WidgetAbbreviation.h \
-    WidgetValidFields.h
+    WidgetValidFields.h \
+    Commands.h
 
 FORMS    += MainWindow.ui \
 	DlgSettings.ui \

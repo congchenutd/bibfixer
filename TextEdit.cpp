@@ -9,7 +9,7 @@ void TextEdit::addHighlightedLine(const QString& line, const QColor& color) {
 
 void TextEdit::highlightLines()
 {
-	lineSelections.clear();
+    QList<QTextEdit::ExtraSelection> lineSelections;
 	for(HighLightedLines::Iterator it = highlightedLines.begin(); it != highlightedLines.end(); ++it)
 	{
 		QTextCursor cursor = textCursor();
@@ -24,5 +24,9 @@ void TextEdit::highlightLines()
 			cursor = document()->find(it.key(), cursor);
 		}
 	}
-	setExtraSelections(lineSelections);
+    setExtraSelections(lineSelections);
+}
+
+void TextEdit::unHighlightLines() {
+    setExtraSelections(QList<QTextEdit::ExtraSelection>());
 }

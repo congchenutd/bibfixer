@@ -3,16 +3,20 @@
 #include <QTextStream>
 
 //////////////////////////////////////////////////////////////////////////////
-void ReferenceRecord::convert(const QString& fieldName, Convertor* convertor)
+void ReferenceRecord::convert(const QString& fieldName, const Convertor& convertor)
 {
 	if(!fields.contains(fieldName))
 		return;
-	QString converted = convertor->convert(fields[fieldName]);
+    QString converted = convertor.convert(fields[fieldName]);
 	if(converted != fields[fieldName])
 	{
 		fields[fieldName] = converted;
 		changedValues << fields[fieldName];
-	}
+    }
+}
+
+bool ReferenceRecord::convertible(const QString& fieldName, const Convertor &convertor) const {
+    return fields.contains(fieldName) && convertor.convertible(fields[fieldName]);
 }
 
 QString ReferenceRecord::toString() const
@@ -76,18 +80,33 @@ void ReferenceList::clear() {
 	records.clear();
 }
 
-void ReferenceList::capitalize(const QString& fieldName) {
+void ReferenceList::capitalize(const QString& fieldName)
+{
+    CaseConvertor convertor;
 	for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
-		it->convert(fieldName, new CaseConvertor);
+        it->convert(fieldName, convertor);
 }
 
-void ReferenceList::protect(const QString& fieldName) {
+void ReferenceList::protect(const QString& fieldName)
+{
+    ProtectionConvertor convertor;
 	for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
-		it->convert(fieldName, new ProtectionConvertor);
+        it->convert(fieldName, convertor);
 }
 
-void ReferenceList::abbreviate(const QString& fieldName) {
+void ReferenceList::abbreviate(const QString& fieldName)
+{
+    AbbreviationConvertor convertor;
 	for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
-		it->convert(fieldName, new AbbreviationConvertor);
+        it->convert(fieldName, convertor);
+}
+
+bool ReferenceList::canCapitalize(const QString& fieldName) const
+{
+    CaseConvertor convertor;
+    for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
+        if(it->convertible(fieldName, convertor))
+            return true;
+    return false;
 }
 

@@ -18,7 +18,8 @@ public:
 	QString getID()   const { return id;   }
 	void addField(const QString& fieldName, const QString& fieldValue);
 
-	void convert(const QString& fieldName, Convertor* convertor);
+    void convert    (const QString& fieldName, const Convertor& convertor);
+    bool convertible(const QString& fieldName, const Convertor& convertor) const;
 	QString toString() const;
 
 	// for highlighting
@@ -43,6 +44,9 @@ public:
 	void capitalize(const QString& fieldName);
 	void protect   (const QString& fieldName);
 	void abbreviate(const QString& fieldName);
+
+    bool canCapitalize(const QString& fieldName) const;
+
 	QString toString() const;
 	QStringList getChangedValues() const;   // for hightlighting
 	void clearChangedValues();

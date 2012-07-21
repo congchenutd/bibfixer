@@ -3,6 +3,7 @@
 
 #include "ui_MainWindow.h"
 #include "Reference.h"
+#include <QUndoStack>
 
 class MainWindow : public QMainWindow
 {
@@ -16,7 +17,7 @@ private slots:
 	void onOpen();
 	void onRunAll();
 	void onClean();
-	void onCapitalize();
+    void onCapitalize();
 	void onProtect();
 	void onAbbreviate();
 	void onSave();
@@ -24,6 +25,7 @@ private slots:
 	void onAbout();
 
 private:
+    void createActions();
 	QString getContent() const;
 	void updateOutput();
 	void updateButtons(OperationStatus status);
@@ -31,6 +33,7 @@ private:
 private:
 	Ui::MainWindow ui;
 	ReferenceList references;
+    QUndoStack undoStack;
 };
 
 #endif // MAINWINDOW_H
