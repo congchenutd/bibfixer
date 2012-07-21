@@ -2,76 +2,88 @@
 #include "TextEdit.h"
 #include "Parser.h"
 
-Command::Command(ReferenceList* refs, TextEdit* textEdit, QUndoCommand* parent)
-	: QUndoCommand(parent), refCurrent(refs), edit(textEdit) {}
+Command::Command(TextEdit* textEdit, QUndoCommand* parent)
+    : QUndoCommand(parent), edit(textEdit) {}
 
 void Command::undo()
 {
-	*refCurrent = refBackup;
-	edit->setPlainText(refCurrent->toString());
+    refCurrent = refBackup;
+    edit->setPlainText(refCurrent.toString());
+    highlightChanged();
 }
 
-void Command::highlightChanged(const QColor& color)
+void Command::highlightChanged()
 {
-	QStringList toBeHighlighted = refCurrent->getChangedValues();
+    edit->unHighlightLines();
+    QStringList toBeHighlighted = refCurrent.getChangedValues();
     foreach(const QString& line, toBeHighlighted)
-		edit->addHighlightedLine(line, color);
+        edit->addHighlightedLine(line, refCurrent.getHighlightColor());
 	edit->highlightLines();
 }
 
+ReferenceList Command::refCurrent;
+
+
 //////////////////////////////////////////////////////////////////////////////////////////
-CleanCommand::CleanCommand(const QString& text, ReferenceList* refs, TextEdit* edit, QUndoCommand* parent)
-	: Command(refs, edit, parent), originalText(text) {}
+CleanCommand::CleanCommand(const QString& text, TextEdit* edit, QUndoCommand* parent)
+    : Command(edit, parent), originalText(text) {}
 
 void CleanCommand::undo() {
-	edit->setPlainText(originalText);
+    edit->setPlainText(originalText);
 }
 
 void CleanCommand::redo()
 {
 	BibParser parser;
-	*refCurrent = parser.parse(originalText);
-	edit->setPlainText(refCurrent->toString());
+    refCurrent = parser.parse(originalText);
+    refCurrent.clearChangedValues();
+    edit->setPlainText(refCurrent.toString());
 }
 
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-CapitalizeCommand::CapitalizeCommand(ReferenceList* refs, TextEdit* edit, QUndoCommand* parent)
-	: Command(refs, edit, parent) {}
+CapitalizeCommand::CapitalizeCommand(TextEdit* edit, QUndoCommand* parent)
+    : Command(edit, parent) {}
 
 void CapitalizeCommand::redo()
 {
-	refBackup = *refCurrent;
-	refCurrent->capitalize("title");
-	refCurrent->capitalize("journal");
-	refCurrent->capitalize("booktitle");
-	edit->setPlainText(refCurrent->toString());
-	highlightChanged(Qt::yellow);
+    refBackup = refCurrent;
+    refCurrent.clearChangedValues();
+    refCurrent.capitalize("title");
+    refCurrent.capitalize("journal");
+    refCurrent.capitalize("booktitle");
+    refCurrent.setHighlightColor(Qt::yellow);
+    edit->setPlainText(refCurrent.toString());
+    highlightChanged();
 }
 
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-ProtectCommand::ProtectCommand(ReferenceList* refs, TextEdit* edit, QUndoCommand* parent)
-	: Command(refs, edit, parent) {}
+ProtectCommand::ProtectCommand(TextEdit* edit, QUndoCommand* parent)
+    : Command(edit, parent) {}
 
 void ProtectCommand::redo()
 {
-	refBackup = *refCurrent;
-	refCurrent->clearChangedValues();
-	refCurrent->protect("title");
-	edit->setPlainText(refCurrent->toString());
-	highlightChanged(Qt::yellow);
+    refBackup = refCurrent;
+    refCurrent.clearChangedValues();
+    refCurrent.protect("title");
+    refCurrent.setHighlightColor(Qt::yellow);
+    edit->setPlainText(refCurrent.toString());
+    highlightChanged();
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-AbbreviateCommand::AbbreviateCommand(ReferenceList* refs, TextEdit* edit, QUndoCommand* parent)
-	: Command(refs, edit, parent) {}
+AbbreviateCommand::AbbreviateCommand(TextEdit* edit, QUndoCommand* parent)
+    : Command(edit, parent) {}
 
 void AbbreviateCommand::redo()
 {
-	refBackup = *refCurrent;
-	refCurrent->clearChangedValues();
-	refCurrent->abbreviate("journal");
-	refCurrent->abbreviate("booktitle");
-	edit->setPlainText(refCurrent->toString());
-	highlightChanged(Qt::green);
+    refBackup = refCurrent;
+    refCurrent.clearChangedValues();
+    refCurrent.abbreviate("journal");
+    refCurrent.abbreviate("booktitle");
+    refCurrent.setHighlightColor(Qt::green);
+    edit->setPlainText(refCurrent.toString());
+    highlightChanged();
 }

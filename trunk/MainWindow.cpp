@@ -93,28 +93,28 @@ void MainWindow::onSettings()
 
 void MainWindow::onClean()
 {
-	CleanCommand* cleanCommand = new CleanCommand(getContent(), &references, ui.teOutput);
+    CleanCommand* cleanCommand = new CleanCommand(getContent(), ui.teOutput);
     undoStack.push(cleanCommand);
 	updateButtons(CLEAN);
 }
 
 void MainWindow::onCapitalize()
 {
-    CapitalizeCommand* capitalizeCommand = new CapitalizeCommand(&references, ui.teOutput);
+    CapitalizeCommand* capitalizeCommand = new CapitalizeCommand(ui.teOutput);
     undoStack.push(capitalizeCommand);
     updateButtons(CAPITALIZE);
 }
 
 void MainWindow::onProtect()
 {
-    ProtectCommand* protectCommand = new ProtectCommand(&references, ui.teOutput);
+    ProtectCommand* protectCommand = new ProtectCommand(ui.teOutput);
     undoStack.push(protectCommand);
     updateButtons(PROTECT);
 }
 
 void MainWindow::onAbbreviate()
 {
-	AbbreviateCommand* abbreviateCommand = new AbbreviateCommand(&references, ui.teOutput);
+    AbbreviateCommand* abbreviateCommand = new AbbreviateCommand(ui.teOutput);
 	undoStack.push(abbreviateCommand);
     updateButtons(ABBREVIATE);
 }
@@ -130,10 +130,6 @@ QString MainWindow::getContent() const {
 	return ui.teOutput->toPlainText();
 }
 
-void MainWindow::updateOutput() {
-	ui.teOutput->setPlainText(references.toString());
-}
-
 void MainWindow::updateButtons(OperationStatus status)
 {
 	ui.actionRunAll    ->setEnabled(status == OPEN);
@@ -142,6 +138,4 @@ void MainWindow::updateButtons(OperationStatus status)
 	ui.actionProtect   ->setEnabled(status >= CLEAN);
 	ui.actionAbbreviate->setEnabled(status >= CLEAN);
     ui.actionSave      ->setEnabled(status >= CLEAN);
-
-//    ui.actionCapitalize->setChecked(!canCapitalize());
 }

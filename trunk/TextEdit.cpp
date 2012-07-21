@@ -27,6 +27,8 @@ void TextEdit::highlightLines()
     setExtraSelections(lineSelections);
 }
 
-void TextEdit::unHighlightLines() {
-    setExtraSelections(QList<QTextEdit::ExtraSelection>());
+void TextEdit::unHighlightLines()
+{
+    highlightedLines.clear();
+    highlightLines();
 }
