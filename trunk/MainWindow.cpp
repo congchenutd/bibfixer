@@ -93,12 +93,9 @@ void MainWindow::onSettings()
 
 void MainWindow::onClean()
 {
-	BibParser parser;
-	references = parser.parse(getContent());
-    updateButtons(CLEAN);
-
-    CleanCommand* cleanCommand = new CleanCommand(&references, ui.teOutput);
+	CleanCommand* cleanCommand = new CleanCommand(getContent(), &references, ui.teOutput);
     undoStack.push(cleanCommand);
+	updateButtons(CLEAN);
 }
 
 void MainWindow::onCapitalize()
@@ -117,17 +114,9 @@ void MainWindow::onProtect()
 
 void MainWindow::onAbbreviate()
 {
-	references.clearChangedValues();
-	references.abbreviate("journal");
-	references.abbreviate("booktitle");
-    updateOutput();
+	AbbreviateCommand* abbreviateCommand = new AbbreviateCommand(&references, ui.teOutput);
+	undoStack.push(abbreviateCommand);
     updateButtons(ABBREVIATE);
-
-	// highlight changed lines
-	QStringList toBeHighlighted = references.getChangedValues();
-	foreach(const QString& line, toBeHighlighted)
-		ui.teOutput->addHighlightedLine(line, Qt::green);
-	ui.teOutput->highlightLines();
 }
 
 void MainWindow::onAbout() {
