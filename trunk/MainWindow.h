@@ -3,15 +3,17 @@
 
 #include "ui_MainWindow.h"
 #include "Reference.h"
+#include "Commands.h"
 #include <QUndoStack>
 
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
-	typedef enum {INIT, OPEN, CLEAN, CAPITALIZE, PROTECT, ABBREVIATE} OperationStatus;
 
 public:
 	MainWindow(QWidget* parent = 0);
+	void setActionStatus(bool open, bool clean, bool capitalize, bool protect, bool abbreviate, bool save);
+	TextEdit* getTextEdit() const { return ui.teOutput; }
 
 private slots:
 	void onOpen();
@@ -27,12 +29,10 @@ private slots:
 private:
     void createActions();
 	QString getContent() const;
-	void updateButtons(OperationStatus status);
 
 private:
 	Ui::MainWindow ui;
-	ReferenceList references;
-    QUndoStack undoStack;
+	QUndoStack undoStack;
 };
 
 #endif // MAINWINDOW_H

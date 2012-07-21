@@ -6,10 +6,6 @@
 #include <QtAlgorithms>
 #include <QDebug>
 
-bool Convertor::convertible(const QString& input) const {
-    return convert(input) != input;
-}
-
 //////////////////////////////////////////////////////////////////
 CaseConvertor::CaseConvertor(QObject* parent) : Convertor(parent)
 {

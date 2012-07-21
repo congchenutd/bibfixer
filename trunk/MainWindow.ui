@@ -30,7 +30,7 @@
      <x>0</x>
      <y>0</y>
      <width>567</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -59,6 +59,9 @@
    <addaction name="actionAbout"/>
   </widget>
   <action name="actionCapitalize">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="Resource.qrc">
      <normaloff>:/Images/Uppercase.png</normaloff>:/Images/Uppercase.png</iconset>
@@ -71,6 +74,9 @@
    </property>
   </action>
   <action name="actionAbbreviate">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="Resource.qrc">
      <normaloff>:/Images/Abbreviation.png</normaloff>:/Images/Abbreviation.png</iconset>
@@ -94,6 +100,9 @@
    </property>
   </action>
   <action name="actionSave">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="Resource.qrc">
      <normaloff>:/Images/Save.png</normaloff>:/Images/Save.png</iconset>
@@ -103,6 +112,9 @@
    </property>
   </action>
   <action name="actionClean">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="Resource.qrc">
      <normaloff>:/Images/Clean.png</normaloff>:/Images/Clean.png</iconset>
@@ -121,6 +133,9 @@
    </property>
   </action>
   <action name="actionProtect">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="Resource.qrc">
      <normaloff>:/Images/Protect.png</normaloff>:/Images/Protect.png</iconset>

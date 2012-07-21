@@ -14,7 +14,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 	ui.setupUi(this);
     createActions();
 	ui.teOutput->setFont(UserSetting::getInstance()->getFont());
-	updateButtons(INIT);
 
 	connect(ui.actionOpen,       SIGNAL(triggered()), this, SLOT(onOpen()));
 	connect(ui.actionSave,       SIGNAL(triggered()), this, SLOT(onSave()));
@@ -25,6 +24,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 	connect(ui.actionProtect,    SIGNAL(triggered()), this, SLOT(onProtect()));
 	connect(ui.actionAbbreviate, SIGNAL(triggered()), this, SLOT(onAbbreviate()));
 	connect(ui.actionAbout,      SIGNAL(triggered()), this, SLOT(onAbout()));
+}
+
+void MainWindow::setActionStatus(bool open, bool clean, bool capitalize, bool protect, bool abbreviate, bool save)
+{
+	ui.actionOpen      ->setEnabled(open);
+	ui.actionClean     ->setEnabled(clean);
+	ui.actionCapitalize->setEnabled(capitalize);
+	ui.actionProtect   ->setEnabled(protect);
+	ui.actionAbbreviate->setEnabled(abbreviate);
+	ui.actionSave      ->setEnabled(save);
 }
 
 void MainWindow::createActions()
@@ -54,7 +63,6 @@ void MainWindow::onOpen()
 	if(file.open(QFile::ReadOnly))
 	{
 		ui.teOutput->setPlainText(file.readAll());
-		updateButtons(OPEN);
 	}
 }
 
@@ -93,49 +101,44 @@ void MainWindow::onSettings()
 
 void MainWindow::onClean()
 {
-    CleanCommand* cleanCommand = new CleanCommand(getContent(), ui.teOutput);
+	QString undoText = undoStack.undoText();
+	CleanCommand* cleanCommand = new CleanCommand(getContent(), this);
     undoStack.push(cleanCommand);
-	updateButtons(CLEAN);
 }
 
 void MainWindow::onCapitalize()
 {
-    CapitalizeCommand* capitalizeCommand = new CapitalizeCommand(ui.teOutput);
+	if(undoStack.undoText() == "Capitalize")
+		return;
+	CapitalizeCommand* capitalizeCommand = new CapitalizeCommand(this);
     undoStack.push(capitalizeCommand);
-    updateButtons(CAPITALIZE);
 }
 
 void MainWindow::onProtect()
 {
-    ProtectCommand* protectCommand = new ProtectCommand(ui.teOutput);
+	if(undoStack.undoText() == "Protect")
+		return;
+	ProtectCommand* protectCommand = new ProtectCommand(this);
     undoStack.push(protectCommand);
-    updateButtons(PROTECT);
 }
 
 void MainWindow::onAbbreviate()
 {
-    AbbreviateCommand* abbreviateCommand = new AbbreviateCommand(ui.teOutput);
+	if(undoStack.undoText() == "Abbreviate")
+		return;
+	AbbreviateCommand* abbreviateCommand = new AbbreviateCommand(this);
 	undoStack.push(abbreviateCommand);
-    updateButtons(ABBREVIATE);
 }
 
 void MainWindow::onAbout() {
-	QMessageBox::about(this, tr("About"),
-					   tr("<h3><b>BibFixer: Fixing BibTex files</b></h3>"
-						  "2012/1/4"
-						  "<p><a href=mailto:CongChenUTD@Gmail.com>CongChenUTD@Gmail.com</a></p>"));
+	QMessageBox::about(this, "About",
+		tr("<h3><b>BibFixer: Fixing BibTex files</b></h3>"
+		   "<p>Built on %1</p>"
+		   "<p><a href=mailto:CongChenUTD@Gmail.com>CongChenUTD@Gmail.com</a></p>")
+					   .arg(UserSetting::getInstance()->getCompileDate()));
+
 }
 
 QString MainWindow::getContent() const {
 	return ui.teOutput->toPlainText();
-}
-
-void MainWindow::updateButtons(OperationStatus status)
-{
-	ui.actionRunAll    ->setEnabled(status == OPEN);
-	ui.actionClean     ->setEnabled(status == OPEN);
-	ui.actionCapitalize->setEnabled(status >= CLEAN);
-	ui.actionProtect   ->setEnabled(status >= CLEAN);
-	ui.actionAbbreviate->setEnabled(status >= CLEAN);
-    ui.actionSave      ->setEnabled(status >= CLEAN);
 }

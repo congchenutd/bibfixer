@@ -1,35 +1,45 @@
 #include "Commands.h"
 #include "TextEdit.h"
 #include "Parser.h"
+#include "MainWindow.h"
 
-Command::Command(TextEdit* textEdit, QUndoCommand* parent)
-    : QUndoCommand(parent), edit(textEdit) {}
+Command::Command(MainWindow* mainWindow, QUndoCommand* parent)
+	: QUndoCommand(parent), mainWnd(mainWindow) {}
 
 void Command::undo()
 {
     refCurrent = refBackup;
-    edit->setPlainText(refCurrent.toString());
-    highlightChanged();
+	output(refCurrent.toString());
+	highlightChanged();
+}
+
+void Command::output(const QString& text) {
+	mainWnd->getTextEdit()->setPlainText(text);
 }
 
 void Command::highlightChanged()
 {
-    edit->unHighlightLines();
+	mainWnd->getTextEdit()->unHighlightLines();
     QStringList toBeHighlighted = refCurrent.getChangedValues();
     foreach(const QString& line, toBeHighlighted)
-        edit->addHighlightedLine(line, refCurrent.getHighlightColor());
-	edit->highlightLines();
+		mainWnd->getTextEdit()->addHighlightedLine(line, refCurrent.getHighlightColor());
+	mainWnd->getTextEdit()->highlightLines();
 }
 
 ReferenceList Command::refCurrent;
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
-CleanCommand::CleanCommand(const QString& text, TextEdit* edit, QUndoCommand* parent)
-    : Command(edit, parent), originalText(text) {}
+CleanCommand::CleanCommand(const QString& text, MainWindow* mainWindow, QUndoCommand* parent)
+	: Command(mainWindow, parent), originalText(text)
+{
+	setText("Clean");
+}
 
-void CleanCommand::undo() {
-    edit->setPlainText(originalText);
+void CleanCommand::undo()
+{
+	output(originalText);
+	mainWnd->setActionStatus(true, true, false, false, false, false);
 }
 
 void CleanCommand::redo()
@@ -37,13 +47,23 @@ void CleanCommand::redo()
 	BibParser parser;
     refCurrent = parser.parse(originalText);
     refCurrent.clearChangedValues();
-    edit->setPlainText(refCurrent.toString());
+	output(refCurrent.toString());
+	mainWnd->setActionStatus(true, false, true, false, true, true);
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-CapitalizeCommand::CapitalizeCommand(TextEdit* edit, QUndoCommand* parent)
-    : Command(edit, parent) {}
+CapitalizeCommand::CapitalizeCommand(MainWindow* mainWindow, QUndoCommand* parent)
+	: Command(mainWindow, parent)
+{
+	setText("Capitalize");
+}
+
+void CapitalizeCommand::undo()
+{
+	Command::undo();
+	mainWnd->setActionStatus(true, false, true, false, true, true);
+}
 
 void CapitalizeCommand::redo()
 {
@@ -53,29 +73,49 @@ void CapitalizeCommand::redo()
     refCurrent.capitalize("journal");
     refCurrent.capitalize("booktitle");
     refCurrent.setHighlightColor(Qt::yellow);
-    edit->setPlainText(refCurrent.toString());
+	output(refCurrent.toString());
     highlightChanged();
+	mainWnd->setActionStatus(true, false, false, true, true, true);
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-ProtectCommand::ProtectCommand(TextEdit* edit, QUndoCommand* parent)
-    : Command(edit, parent) {}
+ProtectCommand::ProtectCommand(MainWindow* mainWindow, QUndoCommand* parent)
+	: Command(mainWindow, parent)
+{
+	setText("Protect");
+}
+
+void ProtectCommand::undo()
+{
+	Command::undo();
+	mainWnd->setActionStatus(true, false, false, true, true, true);
+}
 
 void ProtectCommand::redo()
 {
     refBackup = refCurrent;
     refCurrent.clearChangedValues();
     refCurrent.protect("title");
-    refCurrent.setHighlightColor(Qt::yellow);
-    edit->setPlainText(refCurrent.toString());
+	refCurrent.setHighlightColor(Qt::cyan);
+	output(refCurrent.toString());
     highlightChanged();
+	mainWnd->setActionStatus(true, false, false, false, true, true);
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-AbbreviateCommand::AbbreviateCommand(TextEdit* edit, QUndoCommand* parent)
-    : Command(edit, parent) {}
+AbbreviateCommand::AbbreviateCommand(MainWindow* mainWindow, QUndoCommand* parent)
+	: Command(mainWindow, parent)
+{
+	setText("Abbreviate");
+}
+
+void AbbreviateCommand::undo()
+{
+	Command::undo();
+	mainWnd->setActionStatus(true, false, false, false, true, true);
+}
 
 void AbbreviateCommand::redo()
 {
@@ -84,6 +124,7 @@ void AbbreviateCommand::redo()
     refCurrent.abbreviate("journal");
     refCurrent.abbreviate("booktitle");
     refCurrent.setHighlightColor(Qt::green);
-    edit->setPlainText(refCurrent.toString());
+	output(refCurrent.toString());
     highlightChanged();
+	mainWnd->setActionStatus(true, false, true, false, false, true);
 }

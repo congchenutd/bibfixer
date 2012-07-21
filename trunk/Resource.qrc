@@ -13,5 +13,6 @@
         <file>Images/Run.png</file>
         <file>Images/Redo.png</file>
         <file>Images/Undo.png</file>
+        <file>CompileDate.txt</file>
     </qresource>
 </RCC>
