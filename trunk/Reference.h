@@ -13,13 +13,14 @@ public:
 	typedef QMap<QString, QString> Fields;
 
 public:
-	void setType(const QString& t) { type = t; }
-	void setID  (const QString& i) { id   = i; }
+    void setType (const QString& t) { type = t; }
+    void setKey  (const QString& k) { key  = k; }
 	QString getType() const { return type; }
-	QString getID()   const { return id;   }
+    QString getKey()  const { return key;  }
 	void addField(const QString& fieldName, const QString& fieldValue);
 
 	void convert(const QString& fieldName, const Convertor& convertor);
+    void generateKey();
 	QString toString() const;
 
 	// for highlighting
@@ -28,7 +29,7 @@ public:
 
 private:
 	QString type;
-	QString id;
+    QString key;
 	Fields  fields;
 	QStringList changedValues;
 };
@@ -39,11 +40,12 @@ public:
 	typedef QMap<QString, ReferenceRecord> Records;
 
 public:
+    void clear();
 	void addRecord(const ReferenceRecord& record);
-	void clear();
 	void capitalize(const QString& fieldName);
 	void protect   (const QString& fieldName);
 	void abbreviate(const QString& fieldName);
+    void generateKeys();
 
 	QString toString() const;
 

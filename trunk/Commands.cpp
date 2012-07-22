@@ -33,7 +33,7 @@ ReferenceList Command::refCurrent;
 CleanCommand::CleanCommand(MainWindow* mainWindow, QUndoCommand* parent)
     : Command(mainWindow, parent)
 {
-    originalText = mainWnd->getTextEdit()->toPlainText();
+    originalText = mainWindow->getTextEdit()->toPlainText();
     setText("Clean");
 }
 
@@ -125,4 +125,28 @@ void AbbreviateCommand::redo()
 	output(refCurrent.toString());
     highlightChanged();
     mainWnd->setActionStatus(MainWindow::Abbreviated, true);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+GenerateKeysCommand::GenerateKeysCommand(MainWindow* mainWindow, QUndoCommand* parent)
+    : Command(mainWindow, parent) {
+    setText("Generate keys");
+}
+
+void GenerateKeysCommand::undo()
+{
+    Command::undo();
+    mainWnd->setActionStatus(MainWindow::KeysGenerated, false);
+}
+
+void GenerateKeysCommand::redo()
+{
+    refBackup = refCurrent;
+    refCurrent.clearChangedValues();
+    refCurrent.generateKeys();
+    refCurrent.setHighlightColor(Qt::magenta);
+    output(refCurrent.toString());
+    highlightChanged();
+    mainWnd->setActionStatus(MainWindow::KeysGenerated, true);
 }
