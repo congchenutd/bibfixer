@@ -12,9 +12,6 @@ public:
 	Convertor(QObject* parent = 0) : QObject(parent) {}
 	virtual ~Convertor() {}
     virtual QString convert(const QString& input) const = 0;
-
-signals:
-	void converted(const QString& input, const QString& output) const;
 };
 
 class CaseConvertor : public Convertor
