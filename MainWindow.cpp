@@ -13,41 +13,45 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
     createActions();
+    initActionStatuses();
 	ui.teOutput->setFont(UserSetting::getInstance()->getFont());
 
-    setActionStatus(Init,        true);
-    setActionStatus(Opened,      false);
-    setActionStatus(Cleaned,     false);
-    setActionStatus(Capitalized, false);
-    setActionStatus(Protected,   false);
-    setActionStatus(Abbreviated, false);
-    setActionStatus(RunAll,      false);
-    setActionStatus(Save,        false);
+    connect(ui.actionOpen,         SIGNAL(triggered()), this, SLOT(onOpen()));
+    connect(ui.actionSave,         SIGNAL(triggered()), this, SLOT(onSave()));
+    connect(ui.actionSettings,     SIGNAL(triggered()), this, SLOT(onSettings()));
+    connect(ui.actionRunAll,       SIGNAL(triggered()), this, SLOT(onRunAll()));
+    connect(ui.actionClean,        SIGNAL(triggered()), this, SLOT(onClean()));
+    connect(ui.actionCapitalize,   SIGNAL(triggered()), this, SLOT(onCapitalize()));
+    connect(ui.actionProtect,      SIGNAL(triggered()), this, SLOT(onProtect()));
+    connect(ui.actionAbbreviate,   SIGNAL(triggered()), this, SLOT(onAbbreviate()));
+    connect(ui.actionGenerateKeys, SIGNAL(triggered()), this, SLOT(onGenerateKeys()));
+    connect(ui.actionAbout,        SIGNAL(triggered()), this, SLOT(onAbout()));
+}
 
-	connect(ui.actionOpen,       SIGNAL(triggered()), this, SLOT(onOpen()));
-	connect(ui.actionSave,       SIGNAL(triggered()), this, SLOT(onSave()));
-	connect(ui.actionSettings,   SIGNAL(triggered()), this, SLOT(onSettings()));
-	connect(ui.actionRunAll,     SIGNAL(triggered()), this, SLOT(onRunAll()));
-	connect(ui.actionClean,      SIGNAL(triggered()), this, SLOT(onClean()));
-    connect(ui.actionCapitalize, SIGNAL(triggered()), this, SLOT(onCapitalize()));
-	connect(ui.actionProtect,    SIGNAL(triggered()), this, SLOT(onProtect()));
-	connect(ui.actionAbbreviate, SIGNAL(triggered()), this, SLOT(onAbbreviate()));
-    connect(ui.actionAbout,      SIGNAL(triggered()), this, SLOT(onAbout()));
+void MainWindow::initActionStatuses()
+{
+    setActionStatus(Init,          true);
+    setActionStatus(Opened,        false);
+    setActionStatus(Cleaned,       false);
+    setActionStatus(Capitalized,   false);
+    setActionStatus(Protected,     false);
+    setActionStatus(Abbreviated,   false);
+    setActionStatus(KeysGenerated, false);
+    setActionStatus(RunAll,        false);
+    setActionStatus(Save,          false);
 }
 
 void MainWindow::setActionStatus(MainWindow::ActionStatus status, bool value)
 {
     actionStatuses[status] = value;
-    ui.actionOpen      ->setEnabled(actionStatuses[Init]);
-    ui.actionClean     ->setEnabled(actionStatuses[Opened]      && !actionStatuses[Cleaned]);
-    ui.actionCapitalize->setEnabled(actionStatuses[Cleaned]     && !actionStatuses[Capitalized]);
-    ui.actionProtect   ->setEnabled(actionStatuses[Capitalized] && !actionStatuses[Protected]);
-    ui.actionAbbreviate->setEnabled(actionStatuses[Cleaned]     && !actionStatuses[Abbreviated]);
-    ui.actionSave      ->setEnabled(actionStatuses[Opened]);
-    ui.actionRunAll    ->setEnabled(actionStatuses[Opened] && !actionStatuses[RunAll] &&
-                                    (!actionStatuses[Capitalized] ||
-                                     !actionStatuses[Protected]   ||
-                                     !actionStatuses[Abbreviated]));
+    ui.actionOpen        ->setEnabled(isOpenEnabled());
+    ui.actionClean       ->setEnabled(isCleanEnabled());
+    ui.actionCapitalize  ->setEnabled(isCapitalizeEnabled());
+    ui.actionProtect     ->setEnabled(isProtectEnabled());
+    ui.actionAbbreviate  ->setEnabled(isAbbreviateEnabled());
+    ui.actionGenerateKeys->setEnabled(isGenerateKeysEnabled());
+    ui.actionSave        ->setEnabled(isSaveEnabled());
+    ui.actionRunAll      ->setEnabled(isRunAllEnabled());
 }
 
 void MainWindow::createActions()
@@ -77,6 +81,8 @@ void MainWindow::onOpen()
 	if(file.open(QFile::ReadOnly))
 	{
 		ui.teOutput->setPlainText(file.readAll());
+        undoStack.clear();
+        initActionStatuses();
         setActionStatus(Opened, true);
 	}
 }
@@ -107,19 +113,28 @@ void MainWindow::onSettings()
 }
 
 void MainWindow::onClean() {
-    undoStack.push(new CleanCommand(this));
+    if(isCleanEnabled())
+        undoStack.push(new CleanCommand(this));
 }
 
 void MainWindow::onCapitalize() {
-    undoStack.push(new CapitalizeCommand(this));
+    if(isCapitalizeEnabled())
+        undoStack.push(new CapitalizeCommand(this));
 }
 
 void MainWindow::onProtect() {
-    undoStack.push(new ProtectCommand(this));
+    if(isProtectEnabled())
+        undoStack.push(new ProtectCommand(this));
 }
 
 void MainWindow::onAbbreviate() {
-    undoStack.push(new AbbreviateCommand(this));
+    if(isAbbreviateEnabled())
+        undoStack.push(new AbbreviateCommand(this));
+}
+
+void MainWindow::onGenerateKeys() {
+    if(isGenerateKeysEnabled())
+        undoStack.push(new GenerateKeysCommand(this));
 }
 
 void MainWindow::onRunAll()
@@ -128,6 +143,7 @@ void MainWindow::onRunAll()
     onCapitalize();
     onProtect();
     onAbbreviate();
+    onGenerateKeys();
 }
 
 void MainWindow::onAbout() {

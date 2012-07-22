@@ -14,5 +14,6 @@
         <file>Images/Redo.png</file>
         <file>Images/Undo.png</file>
         <file>CompileDate.txt</file>
+        <file>Images/Key.png</file>
     </qresource>
 </RCC>

@@ -64,4 +64,13 @@ public:
 	void redo();
 };
 
+class GenerateKeysCommand : public Command
+{
+public:
+    GenerateKeysCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
+
+    void undo();
+    void redo();
+};
+
 #endif // COMMANDS_H

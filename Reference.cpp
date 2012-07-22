@@ -1,5 +1,6 @@
 #include "Reference.h"
 #include "Convertor.h"
+#include "../EnglishName/EnglishName.h"
 #include <QTextStream>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -15,13 +16,40 @@ void ReferenceRecord::convert(const QString& fieldName, const Convertor& convert
     }
 }
 
+void ReferenceRecord::generateKey()
+{
+    if(!fields.contains("author"))
+        return;
+
+    QStringList authors = fields["author"].split(" and ");
+    if(authors.size() < 1)
+        return;
+
+    QString firstAuthor = authors[0];
+    QString lastName = EnglishName(firstAuthor).getLastName().remove(" ");
+
+    QString year = fields.contains("year") ? fields["year"] : "0000";
+    setKey(lastName + year);
+
+    changedValues << getKey();
+}
+
 QString ReferenceRecord::toString() const
 {
 	QString result;
 	QTextStream os(&result);
-	os << "@" << type << "{" << id << ",\r\n";
-	for(Fields::const_iterator it = fields.constBegin(); it != fields.constEnd(); ++it)
-		os << "\t" << it.key() << " = " << "{" << it.value() << "},\r\n";
+    os << "@" << getType() << "{" << getKey() << ",\r\n";
+
+    QStringList keys = fields.keys();
+    for(int i = 0; i < keys.size(); ++i)
+    {
+        os << "\t" << keys.at(i) << " = " << "{" << fields[keys.at(i)];
+        if(i < keys.size() - 1)
+            os << "},\r\n";
+        else
+            os << "}\r\n";
+    }
+
 	os << "}";
 	return result;
 }
@@ -69,7 +97,7 @@ void ReferenceList::clearChangedValues() {
 }
 
 void ReferenceList::addRecord(const ReferenceRecord& record) {
-	records.insert(record.getID(), record);
+    records.insert(record.getKey(), record);
 }
 
 void ReferenceList::clear() {
@@ -95,5 +123,16 @@ void ReferenceList::abbreviate(const QString& fieldName)
     AbbreviationConvertor convertor;
 	for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
         it->convert(fieldName, convertor);
+}
+
+void ReferenceList::generateKeys()
+{
+    for(Records::Iterator it = records.begin(); it != records.end();)
+    {
+        ReferenceRecord ref = it.value();
+        ref.generateKey();
+        it = records.erase(it);
+        records.insert(ref.getKey(), ref);
+    }
 }
 

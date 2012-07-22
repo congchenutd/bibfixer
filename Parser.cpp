@@ -28,7 +28,7 @@ ReferenceRecord BibParser::parseRecord(const QString& content) const
 	if(idxTypeAndID > -1)
 	{
 		result.setType(rxTypeAndID.cap(1));
-		result.setID  (rxTypeAndID.cap(2));
+        result.setKey (rxTypeAndID.cap(2));
 	}
 
 	// fields

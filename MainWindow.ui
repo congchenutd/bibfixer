@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>567</width>
-    <height>406</height>
+    <width>662</width>
+    <height>438</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>567</width>
+     <width>662</width>
      <height>26</height>
     </rect>
    </property>
@@ -37,6 +37,12 @@
   <widget class="QToolBar" name="mainToolBar">
    <property name="windowTitle">
     <string>Toolbar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>64</width>
+     <height>32</height>
+    </size>
    </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -53,6 +59,7 @@
    <addaction name="actionCapitalize"/>
    <addaction name="actionProtect"/>
    <addaction name="actionAbbreviate"/>
+   <addaction name="actionGenerateKeys"/>
    <addaction name="actionSave"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
@@ -136,6 +143,18 @@
    </property>
    <property name="text">
     <string>Run All</string>
+   </property>
+  </action>
+  <action name="actionGenerateKeys">
+   <property name="icon">
+    <iconset resource="Resource.qrc">
+     <normaloff>:/Images/Key.png</normaloff>:/Images/Key.png</iconset>
+   </property>
+   <property name="text">
+    <string>Generate keys</string>
+   </property>
+   <property name="toolTip">
+    <string>Generate keys</string>
    </property>
   </action>
  </widget>
