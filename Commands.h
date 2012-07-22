@@ -28,7 +28,7 @@ protected:
 class CleanCommand : public Command
 {
 public:
-	CleanCommand(const QString& text, MainWindow* mainWindow, QUndoCommand* parent = 0);
+    CleanCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
 
 	void undo();
     void redo();

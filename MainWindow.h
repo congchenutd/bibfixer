@@ -12,27 +12,29 @@ class MainWindow : public QMainWindow
 
 public:
 	MainWindow(QWidget* parent = 0);
-	void setActionStatus(bool open, bool clean, bool capitalize, bool protect, bool abbreviate, bool save);
 	TextEdit* getTextEdit() const { return ui.teOutput; }
+
+    typedef enum {Init, Opened, Cleaned, Capitalized, Protected, Abbreviated, RunAll, Save} ActionStatus;
+    void setActionStatus(ActionStatus status, bool value);
 
 private slots:
 	void onOpen();
-	void onRunAll();
 	void onClean();
     void onCapitalize();
 	void onProtect();
 	void onAbbreviate();
+    void onRunAll();
 	void onSave();
 	void onSettings();
 	void onAbout();
 
 private:
     void createActions();
-	QString getContent() const;
 
 private:
 	Ui::MainWindow ui;
 	QUndoStack undoStack;
+    bool actionStatuses[Save+1];
 };
 
 #endif // MAINWINDOW_H

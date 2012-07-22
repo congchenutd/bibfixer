@@ -30,16 +30,17 @@ ReferenceList Command::refCurrent;
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
-CleanCommand::CleanCommand(const QString& text, MainWindow* mainWindow, QUndoCommand* parent)
-	: Command(mainWindow, parent), originalText(text)
+CleanCommand::CleanCommand(MainWindow* mainWindow, QUndoCommand* parent)
+    : Command(mainWindow, parent)
 {
-	setText("Clean");
+    originalText = mainWnd->getTextEdit()->toPlainText();
+    setText("Clean");
 }
 
 void CleanCommand::undo()
 {
 	output(originalText);
-	mainWnd->setActionStatus(true, true, false, false, false, false);
+    mainWnd->setActionStatus(MainWindow::Cleaned, false);
 }
 
 void CleanCommand::redo()
@@ -48,21 +49,20 @@ void CleanCommand::redo()
     refCurrent = parser.parse(originalText);
     refCurrent.clearChangedValues();
 	output(refCurrent.toString());
-	mainWnd->setActionStatus(true, false, true, false, true, true);
+    mainWnd->setActionStatus(MainWindow::Cleaned, true);
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 CapitalizeCommand::CapitalizeCommand(MainWindow* mainWindow, QUndoCommand* parent)
-	: Command(mainWindow, parent)
-{
-	setText("Capitalize");
+    : Command(mainWindow, parent) {
+    setText("Capitalize");
 }
 
 void CapitalizeCommand::undo()
 {
 	Command::undo();
-	mainWnd->setActionStatus(true, false, true, false, true, true);
+    mainWnd->setActionStatus(MainWindow::Capitalized, false);
 }
 
 void CapitalizeCommand::redo()
@@ -75,21 +75,20 @@ void CapitalizeCommand::redo()
     refCurrent.setHighlightColor(Qt::yellow);
 	output(refCurrent.toString());
     highlightChanged();
-	mainWnd->setActionStatus(true, false, false, true, true, true);
+    mainWnd->setActionStatus(MainWindow::Capitalized, true);
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 ProtectCommand::ProtectCommand(MainWindow* mainWindow, QUndoCommand* parent)
-	: Command(mainWindow, parent)
-{
-	setText("Protect");
+    : Command(mainWindow, parent) {
+    setText("Protect");
 }
 
 void ProtectCommand::undo()
 {
 	Command::undo();
-	mainWnd->setActionStatus(true, false, false, true, true, true);
+    mainWnd->setActionStatus(MainWindow::Protected, false);
 }
 
 void ProtectCommand::redo()
@@ -100,21 +99,20 @@ void ProtectCommand::redo()
 	refCurrent.setHighlightColor(Qt::cyan);
 	output(refCurrent.toString());
     highlightChanged();
-	mainWnd->setActionStatus(true, false, false, false, true, true);
+    mainWnd->setActionStatus(MainWindow::Protected, true);
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 AbbreviateCommand::AbbreviateCommand(MainWindow* mainWindow, QUndoCommand* parent)
-	: Command(mainWindow, parent)
-{
-	setText("Abbreviate");
+    : Command(mainWindow, parent) {
+    setText("Abbreviate");
 }
 
 void AbbreviateCommand::undo()
 {
 	Command::undo();
-	mainWnd->setActionStatus(true, false, false, false, true, true);
+    mainWnd->setActionStatus(MainWindow::Abbreviated, false);
 }
 
 void AbbreviateCommand::redo()
@@ -126,5 +124,5 @@ void AbbreviateCommand::redo()
     refCurrent.setHighlightColor(Qt::green);
 	output(refCurrent.toString());
     highlightChanged();
-	mainWnd->setActionStatus(true, false, true, false, false, true);
+    mainWnd->setActionStatus(MainWindow::Abbreviated, true);
 }
