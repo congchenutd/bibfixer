@@ -44,7 +44,8 @@ private:
     bool isRunAllEnabled()       const { return actionStatuses[Opened] && !actionStatuses[RunAll] &&
                                         (!actionStatuses[Capitalized] ||
                                          !actionStatuses[Protected]   ||
-                                         !actionStatuses[Abbreviated]); }
+                                         !actionStatuses[Abbreviated] ||
+                                         !actionStatuses[KeysGenerated]); }
 
 private:
 	Ui::MainWindow ui;
