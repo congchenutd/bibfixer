@@ -50,9 +50,7 @@ QString CaseConvertor::convert(const QString& input) const
 	}
 
 	// the first char of the sentence must be upper case
-	QString result = toFirstCharUpperCase(convertedWords.join(" "));
-	emit converted(input, result);
-    return result;
+    return toFirstCharUpperCase(convertedWords.join(" "));
 }
 
 QString CaseConvertor::toFirstCharUpperCase(const QString& word) const
@@ -73,9 +71,7 @@ QString ProtectionConvertor::convert(const QString& input) const
 	foreach(QString word, words)
 		convertedWords << toFirstCharProtected(word);   // convert
 
-	QString result = convertedWords.join(" ");
-	emit converted(input, result);
-    return result;
+    return convertedWords.join(" ");
 }
 
 QString ProtectionConvertor::toFirstCharProtected(const QString& word) const
@@ -139,8 +135,6 @@ QString AbbreviationConvertor::convert(const QString& input) const
 		}
 	}
 
-	if(input != result)
-		emit converted(input, result);
 	return result;
 }
 
