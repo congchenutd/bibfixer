@@ -18,6 +18,8 @@ public:
                   Abbreviated, KeysGenerated, RunAll, Save} ActionStatus;
     void setActionStatus(ActionStatus status, bool value);
 
+    void open(const QString& filePath);
+
 private slots:
 	void onOpen();
 	void onClean();
