@@ -15,6 +15,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     createActions();
 	ui.teOutput->setFont(UserSetting::getInstance()->getFont());
 
+    setActionStatus(Init,        true);
+    setActionStatus(Opened,      false);
+    setActionStatus(Cleaned,     false);
+    setActionStatus(Capitalized, false);
+    setActionStatus(Protected,   false);
+    setActionStatus(Abbreviated, false);
+    setActionStatus(RunAll,      false);
+    setActionStatus(Save,        false);
+
 	connect(ui.actionOpen,       SIGNAL(triggered()), this, SLOT(onOpen()));
 	connect(ui.actionSave,       SIGNAL(triggered()), this, SLOT(onSave()));
 	connect(ui.actionSettings,   SIGNAL(triggered()), this, SLOT(onSettings()));
@@ -23,17 +32,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui.actionCapitalize, SIGNAL(triggered()), this, SLOT(onCapitalize()));
 	connect(ui.actionProtect,    SIGNAL(triggered()), this, SLOT(onProtect()));
 	connect(ui.actionAbbreviate, SIGNAL(triggered()), this, SLOT(onAbbreviate()));
-	connect(ui.actionAbout,      SIGNAL(triggered()), this, SLOT(onAbout()));
+    connect(ui.actionAbout,      SIGNAL(triggered()), this, SLOT(onAbout()));
 }
 
-void MainWindow::setActionStatus(bool open, bool clean, bool capitalize, bool protect, bool abbreviate, bool save)
+void MainWindow::setActionStatus(MainWindow::ActionStatus status, bool value)
 {
-	ui.actionOpen      ->setEnabled(open);
-	ui.actionClean     ->setEnabled(clean);
-	ui.actionCapitalize->setEnabled(capitalize);
-	ui.actionProtect   ->setEnabled(protect);
-	ui.actionAbbreviate->setEnabled(abbreviate);
-	ui.actionSave      ->setEnabled(save);
+    actionStatuses[status] = value;
+    ui.actionOpen      ->setEnabled(actionStatuses[Init]);
+    ui.actionClean     ->setEnabled(actionStatuses[Opened]      && !actionStatuses[Cleaned]);
+    ui.actionCapitalize->setEnabled(actionStatuses[Cleaned]     && !actionStatuses[Capitalized]);
+    ui.actionProtect   ->setEnabled(actionStatuses[Capitalized] && !actionStatuses[Protected]);
+    ui.actionAbbreviate->setEnabled(actionStatuses[Cleaned]     && !actionStatuses[Abbreviated]);
+    ui.actionSave      ->setEnabled(actionStatuses[Opened]);
+    ui.actionRunAll    ->setEnabled(actionStatuses[Opened] && !actionStatuses[RunAll] &&
+                                    (!actionStatuses[Capitalized] ||
+                                     !actionStatuses[Protected]   ||
+                                     !actionStatuses[Abbreviated]));
 }
 
 void MainWindow::createActions()
@@ -63,15 +77,8 @@ void MainWindow::onOpen()
 	if(file.open(QFile::ReadOnly))
 	{
 		ui.teOutput->setPlainText(file.readAll());
+        setActionStatus(Opened, true);
 	}
-}
-
-void MainWindow::onRunAll()
-{
-	onClean();
-    onCapitalize();
-	onProtect();
-	onAbbreviate();
 }
 
 void MainWindow::onSave()
@@ -88,7 +95,7 @@ void MainWindow::onSave()
 	if(file.open(QFile::WriteOnly))
 	{
 		QTextStream os(&file);
-		os << getContent();
+        os << ui.teOutput->toPlainText();
 	}
 }
 
@@ -99,35 +106,28 @@ void MainWindow::onSettings()
         ui.teOutput->setFont(UserSetting::getInstance()->getFont());
 }
 
-void MainWindow::onClean()
-{
-	QString undoText = undoStack.undoText();
-	CleanCommand* cleanCommand = new CleanCommand(getContent(), this);
-    undoStack.push(cleanCommand);
+void MainWindow::onClean() {
+    undoStack.push(new CleanCommand(this));
 }
 
-void MainWindow::onCapitalize()
-{
-	if(undoStack.undoText() == "Capitalize")
-		return;
-	CapitalizeCommand* capitalizeCommand = new CapitalizeCommand(this);
-    undoStack.push(capitalizeCommand);
+void MainWindow::onCapitalize() {
+    undoStack.push(new CapitalizeCommand(this));
 }
 
-void MainWindow::onProtect()
-{
-	if(undoStack.undoText() == "Protect")
-		return;
-	ProtectCommand* protectCommand = new ProtectCommand(this);
-    undoStack.push(protectCommand);
+void MainWindow::onProtect() {
+    undoStack.push(new ProtectCommand(this));
 }
 
-void MainWindow::onAbbreviate()
+void MainWindow::onAbbreviate() {
+    undoStack.push(new AbbreviateCommand(this));
+}
+
+void MainWindow::onRunAll()
 {
-	if(undoStack.undoText() == "Abbreviate")
-		return;
-	AbbreviateCommand* abbreviateCommand = new AbbreviateCommand(this);
-	undoStack.push(abbreviateCommand);
+    onClean();
+    onCapitalize();
+    onProtect();
+    onAbbreviate();
 }
 
 void MainWindow::onAbout() {
@@ -137,8 +137,4 @@ void MainWindow::onAbout() {
 		   "<p><a href=mailto:CongChenUTD@Gmail.com>CongChenUTD@Gmail.com</a></p>")
 					   .arg(UserSetting::getInstance()->getCompileDate()));
 
-}
-
-QString MainWindow::getContent() const {
-	return ui.teOutput->toPlainText();
 }
