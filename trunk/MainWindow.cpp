@@ -70,21 +70,26 @@ void MainWindow::createActions()
     ui.mainToolBar->insertSeparator(ui.actionSettings);
 }
 
-void MainWindow::onOpen()
+void MainWindow::open(const QString& filePath)
 {
-	QString inputFileName = QFileDialog::getOpenFileName(this,
-		tr("Open Bibtex file"), ".", tr("Bibtex (*.bib);;All files (*.*)"));
-	if(inputFileName.isEmpty())
-		return;
-
-	QFile file(inputFileName);
-	if(file.open(QFile::ReadOnly))
-	{
-		ui.teOutput->setPlainText(file.readAll());
+    QFile file(filePath);
+    if(file.open(QFile::ReadOnly))
+    {
+        ui.teOutput->setPlainText(file.readAll());
         undoStack.clear();
         initActionStatuses();
         setActionStatus(Opened, true);
-	}
+    }
+}
+
+void MainWindow::onOpen()
+{
+    QString filePath = QFileDialog::getOpenFileName(this,
+		tr("Open Bibtex file"), ".", tr("Bibtex (*.bib);;All files (*.*)"));
+    if(filePath.isEmpty())
+		return;
+
+    open(filePath);
 }
 
 void MainWindow::onSave()
