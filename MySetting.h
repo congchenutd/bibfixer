@@ -57,12 +57,13 @@ T* MySetting<T>::getInstance(const QString& name)
 #endif
 	}
 
+//	if(!QFileInfo(fileName).isAbsolute())
+//		fileName = QApplication::applicationDirPath() + "/" + fileName;
+
 	typename Manager::iterator it = settingManager.find(fileName);
 	if(it != settingManager.end())
 		return it->second;
 
-    if(!QFileInfo(fileName).isAbsolute())
-        fileName = QApplication::applicationDirPath() + "/" + fileName;
 	T* setting = new T(fileName);
 	settingManager.insert(std::make_pair(fileName, setting));
 	return setting;
