@@ -7,7 +7,7 @@
 #include <QDebug>
 
 //////////////////////////////////////////////////////////////////
-CaseConvertor::CaseConvertor(QObject* parent) : Convertor(parent)
+CaseConvertor::CaseConvertor()
 {
 	// Prepositions
 	lowercaseWords << "about" << "above" << "across" << "after" <<
@@ -49,7 +49,7 @@ QString CaseConvertor::convert(const QString& input) const
 		lastWord = word;
 	}
 
-	// the first char of the sentence must be upper case
+	// the first char of a sentence must be upper case
     return toFirstCharUpperCase(convertedWords.join(" "));
 }
 
@@ -62,8 +62,6 @@ QString CaseConvertor::toFirstCharUpperCase(const QString& word) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProtectionConvertor::ProtectionConvertor(QObject* parent) : Convertor(parent) {}
-
 QString ProtectionConvertor::convert(const QString& input) const
 {
 	QStringList convertedWords;
@@ -105,8 +103,6 @@ QString ProtectionConvertor::toFirstCharProtected(const QString& word) const
 }
 
 ///////////////////////////////////////////////////////////////////////
-AbbreviationConvertor::AbbreviationConvertor(QObject* parent) : Convertor(parent) {}
-
 QString AbbreviationConvertor::convert(const QString& input) const
 {
 	QStringList rules = UserSetting::getInstance()->getSelectedAbbreviationRules();

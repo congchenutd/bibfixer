@@ -8,9 +8,24 @@ Command::Command(MainWindow* mainWindow, QUndoCommand* parent)
 
 void Command::undo()
 {
-    refCurrent = refBackup;
-	output(refCurrent.toString());
+	refCurrent = refBackup;                              // restore backup
+	output(refCurrent.toString());                       // restore output
+	highlightChanged();                                  // restore highlighting
+	mainWnd->setActionStatus(getActionStatus(), false);  // restore action status
+}
+
+void Command::redo()
+{
+	refBackup = refCurrent;                              // backup
+	refCurrent.clearChangedValues();                     // clear highlighting
+
+	runCommand();                                        // template method
+
+	output(refCurrent.toString());                       // output
+	refCurrent.setHighlightColor(getHighlightColor());   // highlight
 	highlightChanged();
+
+	mainWnd->setActionStatus(getActionStatus(), true);   // update action status
 }
 
 void Command::output(const QString& text) {
@@ -19,11 +34,12 @@ void Command::output(const QString& text) {
 
 void Command::highlightChanged()
 {
-	mainWnd->getTextEdit()->unHighlightLines();
+	TextEdit* edit = mainWnd->getTextEdit();
+	edit->unHighlightLines();
     QStringList toBeHighlighted = refCurrent.getChangedValues();
     foreach(const QString& line, toBeHighlighted)
-		mainWnd->getTextEdit()->addHighlightedLine(line, refCurrent.getHighlightColor());
-	mainWnd->getTextEdit()->highlightLines();
+		edit->addHighlightedLine(line, refCurrent.getHighlightColor());
+	edit->highlightLines();
 }
 
 ReferenceList Command::refCurrent;
@@ -43,13 +59,8 @@ void CleanCommand::undo()
     mainWnd->setActionStatus(MainWindow::Cleaned, false);
 }
 
-void CleanCommand::redo()
-{
-	BibParser parser;
-    refCurrent = parser.parse(originalText);
-    refCurrent.clearChangedValues();
-	output(refCurrent.toString());
-    mainWnd->setActionStatus(MainWindow::Cleaned, true);
+void CleanCommand::runCommand() {
+	refCurrent = BibParser().parse(originalText);
 }
 
 
@@ -59,23 +70,11 @@ CapitalizeCommand::CapitalizeCommand(MainWindow* mainWindow, QUndoCommand* paren
     setText("Capitalize");
 }
 
-void CapitalizeCommand::undo()
+void CapitalizeCommand::runCommand()
 {
-	Command::undo();
-    mainWnd->setActionStatus(MainWindow::Capitalized, false);
-}
-
-void CapitalizeCommand::redo()
-{
-    refBackup = refCurrent;
-    refCurrent.clearChangedValues();
     refCurrent.capitalize("title");
     refCurrent.capitalize("journal");
     refCurrent.capitalize("booktitle");
-    refCurrent.setHighlightColor(Qt::yellow);
-	output(refCurrent.toString());
-    highlightChanged();
-    mainWnd->setActionStatus(MainWindow::Capitalized, true);
 }
 
 
@@ -85,21 +84,8 @@ ProtectCommand::ProtectCommand(MainWindow* mainWindow, QUndoCommand* parent)
     setText("Protect");
 }
 
-void ProtectCommand::undo()
-{
-	Command::undo();
-    mainWnd->setActionStatus(MainWindow::Protected, false);
-}
-
-void ProtectCommand::redo()
-{
-    refBackup = refCurrent;
-    refCurrent.clearChangedValues();
+void ProtectCommand::runCommand() {
     refCurrent.protect("title");
-	refCurrent.setHighlightColor(Qt::cyan);
-	output(refCurrent.toString());
-    highlightChanged();
-    mainWnd->setActionStatus(MainWindow::Protected, true);
 }
 
 
@@ -109,22 +95,10 @@ AbbreviateCommand::AbbreviateCommand(MainWindow* mainWindow, QUndoCommand* paren
     setText("Abbreviate");
 }
 
-void AbbreviateCommand::undo()
+void AbbreviateCommand::runCommand()
 {
-	Command::undo();
-    mainWnd->setActionStatus(MainWindow::Abbreviated, false);
-}
-
-void AbbreviateCommand::redo()
-{
-    refBackup = refCurrent;
-    refCurrent.clearChangedValues();
     refCurrent.abbreviate("journal");
     refCurrent.abbreviate("booktitle");
-    refCurrent.setHighlightColor(Qt::green);
-	output(refCurrent.toString());
-    highlightChanged();
-    mainWnd->setActionStatus(MainWindow::Abbreviated, true);
 }
 
 
@@ -134,19 +108,6 @@ GenerateKeysCommand::GenerateKeysCommand(MainWindow* mainWindow, QUndoCommand* p
     setText("Generate keys");
 }
 
-void GenerateKeysCommand::undo()
-{
-    Command::undo();
-    mainWnd->setActionStatus(MainWindow::KeysGenerated, false);
-}
-
-void GenerateKeysCommand::redo()
-{
-    refBackup = refCurrent;
-    refCurrent.clearChangedValues();
+void GenerateKeysCommand::runCommand() {
     refCurrent.generateKeys();
-    refCurrent.setHighlightColor(Qt::magenta);
-    output(refCurrent.toString());
-    highlightChanged();
-    mainWnd->setActionStatus(MainWindow::KeysGenerated, true);
 }

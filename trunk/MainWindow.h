@@ -3,7 +3,6 @@
 
 #include "ui_MainWindow.h"
 #include "Reference.h"
-#include "Commands.h"
 #include <QUndoStack>
 
 class MainWindow : public QMainWindow
