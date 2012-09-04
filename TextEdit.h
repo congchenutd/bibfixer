@@ -17,6 +17,12 @@ public:
 	void highlightLines();
     void unHighlightLines();
 
+protected:
+    void insertFromMimeData(const QMimeData* source);
+
+signals:
+    void pasted();
+
 private:
 	HighLightedLines highlightedLines;
 };

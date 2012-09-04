@@ -21,6 +21,7 @@ public:
 
 private slots:
 	void onOpen();
+    void onPaste();
 	void onClean();
     void onCapitalize();
 	void onProtect();
