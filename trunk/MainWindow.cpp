@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 	ui.teOutput->setFont(UserSetting::getInstance()->getFont());
 
     connect(ui.actionOpen,         SIGNAL(triggered()), this, SLOT(onOpen()));
+    connect(ui.teOutput,           SIGNAL(pasted()),    this, SLOT(onPaste()));
     connect(ui.actionSave,         SIGNAL(triggered()), this, SLOT(onSave()));
     connect(ui.actionSettings,     SIGNAL(triggered()), this, SLOT(onSettings()));
     connect(ui.actionRunAll,       SIGNAL(triggered()), this, SLOT(onRunAll()));
@@ -90,6 +91,10 @@ void MainWindow::onOpen()
 		return;
 
     open(filePath);
+}
+
+void MainWindow::onPaste() {
+    setActionStatus(Opened, !ui.teOutput->toPlainText().isEmpty());
 }
 
 void MainWindow::onSave()

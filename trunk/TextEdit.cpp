@@ -32,3 +32,9 @@ void TextEdit::unHighlightLines()
     highlightedLines.clear();
     highlightLines();
 }
+
+void TextEdit::insertFromMimeData(const QMimeData* source)
+{
+    QPlainTextEdit::insertFromMimeData(source);
+    emit pasted();
+}
