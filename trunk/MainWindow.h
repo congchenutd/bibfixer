@@ -20,6 +20,7 @@ public:
     void open(const QString& filePath);
 
 private slots:
+	void onNewFile();
 	void onOpen();
     void onPaste();
 	void onClean();

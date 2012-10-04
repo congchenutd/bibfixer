@@ -15,5 +15,6 @@
         <file>Images/Undo.png</file>
         <file>CompileDate.txt</file>
         <file>Images/Key.png</file>
+        <file>Images/New.png</file>
     </qresource>
 </RCC>

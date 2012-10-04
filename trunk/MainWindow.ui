@@ -53,6 +53,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
    <addaction name="actionRunAll"/>
    <addaction name="actionClean"/>
@@ -155,6 +156,15 @@
    </property>
    <property name="toolTip">
     <string>Generate keys</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="icon">
+    <iconset resource="Resource.qrc">
+     <normaloff>:/Images/New.png</normaloff>:/Images/New.png</iconset>
+   </property>
+   <property name="text">
+    <string>New</string>
    </property>
   </action>
  </widget>
