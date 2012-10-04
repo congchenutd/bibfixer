@@ -5,7 +5,7 @@
 WidgetValidFields::WidgetValidFields(QWidget* parent) :	QWidget(parent)
 {
 	ui.setupUi(this);
-	setting = UserSetting::getInstance();
+	setting = UserSetting::getInstance("Rules.ini");
 
 	load();
 	ui.tvFields->setModel(&model);

@@ -10,7 +10,7 @@ WidgetAbbreviation::WidgetAbbreviation(QWidget* parent) :
 	QWidget(parent), currentRow(-1)
 {
 	ui.setupUi(this);
-	setting = UserSetting::getInstance();
+	setting = UserSetting::getInstance("Rules.ini");
 
 	load();
 	ui.tvAbbreviations->setModel(&model);

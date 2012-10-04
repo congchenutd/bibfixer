@@ -1,9 +1,7 @@
 #include "MainWindow.h"
 #include "DlgSettings.h"
-#include "WidgetAbbreviation.h"
 #include "Parser.h"
 #include "Commands.h"
-#include <QScrollBar>
 #include <QStyle>
 #include <QTextStream>
 #include <QFileDialog>
@@ -16,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     initActionStatuses();
 	ui.teOutput->setFont(UserSetting::getInstance()->getFont());
 
+	connect(ui.actionNew,          SIGNAL(triggered()), this, SLOT(onNewFile()));
     connect(ui.actionOpen,         SIGNAL(triggered()), this, SLOT(onOpen()));
     connect(ui.teOutput,           SIGNAL(pasted()),    this, SLOT(onPaste()));
     connect(ui.actionSave,         SIGNAL(triggered()), this, SLOT(onSave()));
@@ -80,7 +79,14 @@ void MainWindow::open(const QString& filePath)
         undoStack.clear();
         initActionStatuses();
         setActionStatus(Opened, true);
-    }
+	}
+}
+
+void MainWindow::onNewFile()
+{
+	ui.teOutput->clear();
+	undoStack.clear();
+	initActionStatuses();
 }
 
 void MainWindow::onOpen()
