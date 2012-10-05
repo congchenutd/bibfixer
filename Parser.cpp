@@ -32,7 +32,7 @@ ReferenceRecord BibParser::parseRecord(const QString& content) const
 	}
 
 	// fields
-	QStringList validFields = UserSetting::getInstance()->getFields();
+    QStringList validFields = UserSetting::getInstance("Rules.ini")->getFields();
 	QRegExp rxField("\\s*(\\w+)\\s*=\\s*\\{([^=]+)\\},?\\s*\\n\\s*");
 	int idxField = rxField.indexIn(content, idxTypeAndID + rxTypeAndID.matchedLength());
 	while(idxField > -1)
