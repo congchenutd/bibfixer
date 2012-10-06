@@ -72,14 +72,21 @@ void MainWindow::createActions()
 
 void MainWindow::open(const QString& filePath)
 {
-    QFile file(filePath);
-    if(file.open(QFile::ReadOnly))
+    if(filePath.isEmpty())
+        return;
+
+    if(QFileInfo(filePath).isFile())
     {
-        ui.teOutput->setPlainText(file.readAll());
-        undoStack.clear();
-        initActionStatuses();
-        setActionStatus(Opened, true);
-	}
+        QFile file(filePath);
+        if(file.open(QFile::ReadOnly))
+            ui.teOutput->setPlainText(file.readAll());
+    }
+    else {   // filePath is content
+        ui.teOutput->setPlainText(filePath);
+    }
+    undoStack.clear();
+    initActionStatuses();
+    setActionStatus(Opened, true);
 }
 
 void MainWindow::onNewFile()
