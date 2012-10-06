@@ -10,14 +10,14 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 public:
+    typedef enum {Init, Opened, Cleaned, Capitalized, Protected,
+                  Abbreviated, KeysGenerated, RunAll, Save} ActionStatus;
+public:
 	MainWindow(QWidget* parent = 0);
 	TextEdit* getTextEdit() const { return ui.teOutput; }
 
-    typedef enum {Init, Opened, Cleaned, Capitalized, Protected,
-                  Abbreviated, KeysGenerated, RunAll, Save} ActionStatus;
     void setActionStatus(ActionStatus status, bool value);
-
-    void open(const QString& filePath);
+    void open(const QString& filePath);   // called by external program
 
 private slots:
 	void onNewFile();
