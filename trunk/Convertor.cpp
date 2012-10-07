@@ -1,10 +1,6 @@
 #include "Convertor.h"
-#include "DlgSettings.h"
-#include <QTextStream>
-#include <QFile>
 #include <QRegExp>
-#include <QtAlgorithms>
-#include <QDebug>
+//#include <QtAlgorithms>
 
 //////////////////////////////////////////////////////////////////
 CaseConvertor::CaseConvertor()
@@ -61,77 +57,80 @@ QString CaseConvertor::toFirstCharUpperCase(const QString& word) const
 	return word.at(0).toUpper() + word.right(word.length() - 1);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
 QString ProtectionConvertor::convert(const QString& input) const
 {
-	QStringList convertedWords;
-	QStringList words = input.split(' ');
-	foreach(QString word, words)
-		convertedWords << toFirstCharProtected(word);   // convert
+    QStringList convertedWords;
+    QStringList words = input.split(' ');
+    foreach(QString word, words)
+        convertedWords << toFirstCharProtected(word);   // convert
 
     return convertedWords.join(" ");
 }
 
 QString ProtectionConvertor::toFirstCharProtected(const QString& word) const
 {
-	if(word.isEmpty())
-		return word;
+    if(word.isEmpty())
+        return word;
 
-	// skip {XXX}
-	QRegExp rxAllProtected("^\\{.+\\}$");
-	if(rxAllProtected.indexIn(word) > -1)
-		return word;
+    // skip {XXX}
+    QRegExp rxAllProtected("^\\{.+\\}$");
+    if(rxAllProtected.indexIn(word) > -1)
+        return word;
 
-	// skip {X}xxx
-	QRegExp rxFirstProtected("^\\{w\\}");
-	if(rxFirstProtected.indexIn(word) > -1)
-		return word;
+    // skip {X}xxx
+    QRegExp rxFirstProtected("^\\{w\\}");
+    if(rxFirstProtected.indexIn(word) > -1)
+        return word;
 
-	// skip non-letter chars
-	QString result = word;
-	int idx = 0;
-	while(idx < result.length() && !result.at(idx).isLetter())
-		++ idx;
+    // skip non-letter chars
+    QString result = word;
+    int idx = 0;
+    while(idx < result.length() && !result.at(idx).isLetter())
+        ++ idx;
 
-	// X... -> {X...}
-	if(idx < result.length() && result.at(0).isUpper())
-	{
-		result.insert(idx, '{');
-		result.insert(idx + 2, '}');
-	}
-	return result;
+    // X... -> {X...}
+    if(idx < result.length() && result.at(0).isUpper())
+    {
+        result.insert(idx, '{');
+        result.insert(idx + 2, '}');
+    }
+    return result;
 }
 
 ///////////////////////////////////////////////////////////////////////
 QString AbbreviationConvertor::convert(const QString& input) const
 {
-	QStringList rules = UserSetting::getInstance()->getSelectedAbbreviationRules();
-	QString result = input;
-	for(int i = rules.size()-1; i >=0; --i)      // reverse order: long rule first
-	{
-		QStringList sections = rules.at(i).split(';');  // two parts of a rule
-		if(sections.size() == 2)
-		{
-			QString fullName        = sections[0];
-			QString abbreviatedName = sections[1];
-			QRegExp rxBracket("\\([^\\)]+\\)");
-			if(rxBracket.indexIn(fullName) > -1)
-			{
-				QString longFullName = fullName;
-				longFullName.remove('(');
-				longFullName.remove(')');
+    QString result = input;
+    for(int i = rules.size()-1; i >=0; --i)      // reverse order: long rule first
+    {
+        QStringList sections = rules.at(i).split(';');  // two parts of a rule
+        if(sections.size() == 2)
+        {
+            QString fullName        = sections[0];
+            QString abbreviatedName = sections[1];
+            QRegExp rxBracket("\\([^\\)]+\\)");
+            if(rxBracket.indexIn(fullName) > -1)
+            {
+                QString longFullName = fullName;
+                longFullName.remove('(');
+                longFullName.remove(')');
 
-				QString shortFullName = fullName.remove(rxBracket).simplified();
+                QString shortFullName = fullName.remove(rxBracket).simplified();
 
-				result.replace(longFullName, abbreviatedName, Qt::CaseInsensitive);
-				result.replace(shortFullName, abbreviatedName, Qt::CaseInsensitive);
-			}
-			else
-				result.replace(fullName, abbreviatedName, Qt::CaseInsensitive);
-		}
-	}
+                result.replace(longFullName, abbreviatedName, Qt::CaseInsensitive);
+                result.replace(shortFullName, abbreviatedName, Qt::CaseInsensitive);
+            }
+            else
+                result.replace(fullName, abbreviatedName, Qt::CaseInsensitive);
+        }
+    }
 
-	return result;
+    return result;
+}
+
+void AbbreviationConvertor::setRules(const QStringList &r) {
+    rules = r;
 }
 
 

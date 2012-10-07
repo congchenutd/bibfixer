@@ -26,19 +26,20 @@ private:
 class ProtectionConvertor : public Convertor
 {
 public:
-	QString convert(const QString& input) const;
+    QString convert(const QString& input) const;
 
 private:
-	QString toFirstCharProtected(const QString& word) const;
+    QString toFirstCharProtected(const QString& word) const;
 };
 
 class AbbreviationConvertor : public Convertor
 {
 public:
-	QString convert(const QString& input) const;
+    QString convert(const QString& input) const;
+    void setRules(const QStringList& r);
 
 private:
-	QStringList rules;
+    QStringList rules;
 };
 
 #endif // CASECONVERTOR_H
