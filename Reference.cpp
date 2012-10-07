@@ -1,6 +1,7 @@
 #include "Reference.h"
 #include "Convertor.h"
 #include "../EnglishName/EnglishName.h"
+#include "DlgSettings.h"
 #include <QTextStream>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -121,6 +122,7 @@ void ReferenceList::protect(const QString& fieldName)
 void ReferenceList::abbreviate(const QString& fieldName)
 {
     AbbreviationConvertor convertor;
+    convertor.setRules(UserSetting::getInstance()->getSelectedAbbreviationRules());
 	for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
         it->convert(fieldName, convertor);
 }
