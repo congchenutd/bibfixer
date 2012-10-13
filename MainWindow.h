@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include "ui_MainWindow.h"
-#include "Reference.h"
 #include <QUndoStack>
 
 class MainWindow : public QMainWindow
@@ -11,7 +10,7 @@ class MainWindow : public QMainWindow
 
 public:
     typedef enum {Init, Opened, Cleaned, Capitalized, Protected,
-                  Abbreviated, KeysGenerated, RunAll, Save} ActionStatus;
+                  Abbreviated, KeysGenerated, RunAll, Save, Size} ActionStatus;
 public:
 	MainWindow(QWidget* parent = 0);
 	TextEdit* getTextEdit() const { return ui.teOutput; }
@@ -53,7 +52,7 @@ private:
 private:
 	Ui::MainWindow ui;
 	QUndoStack undoStack;
-    bool actionStatuses[Save+1];
+    bool actionStatuses[Size];
 };
 
 #endif // MAINWINDOW_H

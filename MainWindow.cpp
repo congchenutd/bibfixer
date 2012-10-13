@@ -1,6 +1,5 @@
 #include "MainWindow.h"
 #include "DlgSettings.h"
-#include "Parser.h"
 #include "Commands.h"
 #include <QStyle>
 #include <QTextStream>
@@ -61,13 +60,12 @@ void MainWindow::createActions()
     QAction* undoAction = undoStack.createUndoAction(this, tr("Undo"));
     undoAction->setIcon(QIcon(":/Images/Undo.png"));
     undoAction->setShortcuts(QKeySequence::Undo);
-    ui.mainToolBar->insertAction(ui.actionSettings, undoAction);
+    ui.mainToolBar->insertAction(0, undoAction);
 
     QAction* redoAction = undoStack.createRedoAction(this, tr("Redo"));
     redoAction->setIcon(QIcon(":/Images/Redo.png"));
     redoAction->setShortcuts(QKeySequence::Redo);
-    ui.mainToolBar->insertAction(ui.actionSettings, redoAction);
-    ui.mainToolBar->insertSeparator(ui.actionSettings);
+    ui.mainToolBar->insertAction(0, redoAction);
 }
 
 void MainWindow::open(const QString& filePath)
@@ -81,9 +79,10 @@ void MainWindow::open(const QString& filePath)
         if(file.open(QFile::ReadOnly))
             ui.teOutput->setPlainText(file.readAll());
     }
-    else {   // filePath is content
+    else {   // filePath is actually content from external call
         ui.teOutput->setPlainText(filePath);
     }
+
     undoStack.clear();
     initActionStatuses();
     setActionStatus(Opened, true);
