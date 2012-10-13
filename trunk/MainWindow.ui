@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>728</width>
+    <width>634</width>
     <height>439</height>
    </rect>
   </property>
@@ -29,19 +29,31 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>728</width>
-     <height>22</height>
+     <width>634</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionNew"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
+    <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuOperation">
     <property name="title">
      <string>Operation</string>
     </property>
+    <addaction name="actionRunAll"/>
+    <addaction name="actionClean"/>
+    <addaction name="actionCapitalize"/>
+    <addaction name="actionProtect"/>
+    <addaction name="actionAbbreviate"/>
+    <addaction name="actionGenerateKeys"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOperation"/>
@@ -74,9 +86,6 @@
    <addaction name="actionAbbreviate"/>
    <addaction name="actionGenerateKeys"/>
    <addaction name="actionSave"/>
-   <addaction name="separator"/>
-   <addaction name="actionSettings"/>
-   <addaction name="actionAbout"/>
   </widget>
   <action name="actionCapitalize">
    <property name="icon">
