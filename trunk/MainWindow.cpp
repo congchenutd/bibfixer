@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 	ui.setupUi(this);
     createActions();
     initActionStatuses();
-	ui.teOutput->setFont(UserSetting::getInstance()->getFont());
+	ui.teOutput->setFont(Setting::getInstance()->getFont());
 
 	connect(ui.actionNew,          SIGNAL(triggered()), this, SLOT(onNewFile()));
     connect(ui.actionOpen,         SIGNAL(triggered()), this, SLOT(onOpen()));
@@ -132,7 +132,7 @@ void MainWindow::onSettings()
 {
     DlgSettings dlg(this);
     if(dlg.exec() == QDialog::Accepted)
-        ui.teOutput->setFont(UserSetting::getInstance()->getFont());
+        ui.teOutput->setFont(Setting::getInstance()->getFont());
 }
 
 void MainWindow::onClean() {
@@ -174,6 +174,6 @@ void MainWindow::onAbout() {
 		tr("<h3><b>BibFixer: Fixing BibTex files</b></h3>"
 		   "<p>Built on %1</p>"
 		   "<p><a href=mailto:CongChenUTD@Gmail.com>CongChenUTD@Gmail.com</a></p>")
-					   .arg(UserSetting::getInstance()->getCompileDate()));
+					   .arg(Setting::getInstance()->getCompileDate()));
 
 }

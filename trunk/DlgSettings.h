@@ -4,7 +4,7 @@
 #include "ui_DlgSettings.h"
 #include "MySetting.h"
 
-class UserSetting;
+class Setting;
 class DlgSettings : public QDialog
 {
 	Q_OBJECT
@@ -19,14 +19,14 @@ private slots:
 private:
 	Ui::DlgSettings ui;
 	QFont font;
-	UserSetting* setting;
+	Setting* setting;
 };
 
 
-class UserSetting : public MySetting<UserSetting>
+class Setting : public MySetting<Setting>
 {
 public:
-	UserSetting(const QString& fileName);
+	Setting(const QString& fileName);
 
 	QFont getFont() const;
 	void setFont(const QFont& font);

@@ -1,6 +1,6 @@
 #include "Reference.h"
 #include "Convertor.h"
-#include "../EnglishName/EnglishName.h"
+#include "EnglishName.h"
 #include "DlgSettings.h"
 #include <QTextStream>
 
@@ -93,8 +93,8 @@ QStringList ReferenceList::getChangedValues() const
 }
 
 void ReferenceList::clearChangedValues() {
-	for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
-		it->clearChangedValues();
+    for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
+        it->clearChangedValues();
 }
 
 void ReferenceList::addRecord(const ReferenceRecord& record) {
@@ -122,7 +122,7 @@ void ReferenceList::protect(const QString& fieldName)
 void ReferenceList::abbreviate(const QString& fieldName)
 {
     AbbreviationConvertor convertor;
-    convertor.setRules(UserSetting::getInstance()->getSelectedAbbreviationRules());
+    convertor.setRules(Setting::getInstance("Rules.ini")->getSelectedAbbreviationRules());
 	for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
         it->convert(fieldName, convertor);
 }
@@ -133,7 +133,7 @@ void ReferenceList::generateKeys()
     {
         ReferenceRecord ref = it.value();
         ref.generateKey();
-        it = records.erase(it);
+        it = records.erase(it);      // re-insert the record because its key is changed
         records.insert(ref.getKey(), ref);
     }
 }

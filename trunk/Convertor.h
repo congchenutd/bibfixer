@@ -36,7 +36,7 @@ class AbbreviationConvertor : public Convertor
 {
 public:
     QString convert(const QString& input) const;
-    void setRules(const QStringList& r);
+    void setRules(const QStringList& r);   // fullname;abbreviatedname
 
 private:
     QStringList rules;

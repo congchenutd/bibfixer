@@ -5,7 +5,7 @@
 #include <QWidget>
 #include <QStandardItemModel>
 
-class UserSetting;
+class Setting;
 class WidgetValidFields : public QWidget
 {
 	Q_OBJECT
@@ -13,7 +13,6 @@ class WidgetValidFields : public QWidget
 public:
 	WidgetValidFields(QWidget* parent = 0);
 	void save();    // save to setting
-
 
 private slots:
 	void onCurrentRowChanged(const QModelIndex& idx);
@@ -25,7 +24,6 @@ private:
 
 private:
 	Ui::WidgetValidFields ui;
-	UserSetting* setting;
 	QStandardItemModel model;
 	int currentRow;
 };

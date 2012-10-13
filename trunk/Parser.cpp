@@ -1,5 +1,4 @@
 #include "Parser.h"
-#include "DlgSettings.h"
 #include <QRegExp>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -15,7 +14,11 @@ ReferenceList BibParser::parse(const QString& content) const
 		idxStart = findRecordStart(content, idxEnd);
 		idxEnd   = findRecordEnd  (content, idxStart + 1);
 	}
-	return result;
+    return result;
+}
+
+void BibParser::setValidFields(const QStringList& fields) {
+    validFields = fields;
 }
 
 ReferenceRecord BibParser::parseRecord(const QString& content) const
@@ -32,13 +35,12 @@ ReferenceRecord BibParser::parseRecord(const QString& content) const
 	}
 
 	// fields
-    QStringList validFields = UserSetting::getInstance("Rules.ini")->getFields();
 	QRegExp rxField("\\s*(\\w+)\\s*=\\s*\\{([^=]+)\\},?\\s*\\n\\s*");
 	int idxField = rxField.indexIn(content, idxTypeAndID + rxTypeAndID.matchedLength());
 	while(idxField > -1)
 	{
 		QString fieldName = rxField.cap(1).toLower();
-		if(validFields.contains(fieldName))
+        if(validFields.contains(fieldName))   // is a valid field
 			result.addField(fieldName, rxField.cap(2).simplified());
 		idxField = rxField.indexIn(content, idxField + rxField.matchedLength());
 	}

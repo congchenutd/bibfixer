@@ -5,7 +5,7 @@
 #include <QStandardItemModel>
 
 // edit abbreviation rules
-class UserSetting;
+class Setting;
 class WidgetAbbreviation : public QWidget
 {
 	Q_OBJECT
@@ -21,14 +21,14 @@ private slots:
 	void onDel();
 
 private:
-	void load();    // data saved in Abbreviation.txt
+    void load();
 
 private:
 	Ui::WidgetAbbreviation ui;
 	QStandardItemModel model;
 	int currentRow;
-	enum {FULL, ABBR, SELECT};
-	UserSetting* setting;
+
+    enum {FULL, ABBR, SELECTED};
 };
 
 #endif // DLGABBREVIATION_H
