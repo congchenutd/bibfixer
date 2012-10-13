@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>634</width>
+    <width>704</width>
     <height>439</height>
    </rect>
   </property>
@@ -29,8 +29,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>634</width>
-     <height>26</height>
+     <width>704</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -79,13 +79,13 @@
    </attribute>
    <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
+   <addaction name="actionSave"/>
    <addaction name="actionRunAll"/>
    <addaction name="actionClean"/>
    <addaction name="actionCapitalize"/>
    <addaction name="actionProtect"/>
    <addaction name="actionAbbreviate"/>
    <addaction name="actionGenerateKeys"/>
-   <addaction name="actionSave"/>
   </widget>
   <action name="actionCapitalize">
    <property name="icon">
