@@ -2,6 +2,7 @@
 #include "TextEdit.h"
 #include "Parser.h"
 #include "MainWindow.h"
+#include "DlgSettings.h"
 
 Command::Command(MainWindow* mainWindow, QUndoCommand* parent)
 	: QUndoCommand(parent), mainWnd(mainWindow) {}
@@ -10,7 +11,7 @@ void Command::undo()
 {
 	refCurrent = refBackup;                              // restore backup
 	output(refCurrent.toString());                       // restore output
-	highlightChanged();                                  // restore highlighting
+    highlight();                                         // restore highlighting
 	mainWnd->setActionStatus(getActionStatus(), false);  // restore action status
 }
 
@@ -23,7 +24,7 @@ void Command::redo()
 
 	output(refCurrent.toString());                       // output
 	refCurrent.setHighlightColor(getHighlightColor());   // highlight
-	highlightChanged();
+    highlight();
 
 	mainWnd->setActionStatus(getActionStatus(), true);   // update action status
 }
@@ -32,14 +33,14 @@ void Command::output(const QString& text) {
 	mainWnd->getTextEdit()->setPlainText(text);
 }
 
-void Command::highlightChanged()
+void Command::highlight()
 {
 	TextEdit* edit = mainWnd->getTextEdit();
-	edit->unHighlightLines();
+	edit->unHighlight();
     QStringList toBeHighlighted = refCurrent.getChangedValues();
-    foreach(const QString& line, toBeHighlighted)
-		edit->addHighlightedLine(line, refCurrent.getHighlightColor());
-	edit->highlightLines();
+    foreach(const QString& text, toBeHighlighted)
+        edit->addHighlightedText(text, refCurrent.getHighlightColor());
+	edit->highlight();
 }
 
 ReferenceList Command::refCurrent;
@@ -53,14 +54,18 @@ CleanCommand::CleanCommand(MainWindow* mainWindow, QUndoCommand* parent)
     setText("Clean");
 }
 
+// different than other commands, because it's the first command and has no backups
 void CleanCommand::undo()
 {
 	output(originalText);
     mainWnd->setActionStatus(MainWindow::Cleaned, false);
 }
 
-void CleanCommand::runCommand() {
-	refCurrent = BibParser().parse(originalText);
+void CleanCommand::runCommand()
+{
+    BibParser parser;
+    parser.setValidFields(Setting::getInstance("Rules.ini")->getFields());
+    refCurrent = parser.parse(originalText);
 }
 
 

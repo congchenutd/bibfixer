@@ -2,10 +2,9 @@
 #define PARSER_H
 
 #include "Reference.h"
-#include <QObject>
 
 // Parse the content of a reference file, and produce a ReferenceList
-class Parser : public QObject
+class Parser
 {
 public:
 	virtual ~Parser() {}
@@ -15,12 +14,16 @@ public:
 class BibParser : public Parser
 {
 public:
+    void setValidFields(const QStringList& fields);
 	virtual ReferenceList parse(const QString& content) const;
 
 private:
 	ReferenceRecord parseRecord(const QString& content) const;
 	int findRecordStart(const QString& content, int startFrom = 0) const;
 	int findRecordEnd  (const QString& content, int startFrom = 0) const;
+
+private:
+    QStringList validFields;
 };
 
 #endif // PARSER_H

@@ -1,7 +1,7 @@
 #include "WidgetAbbreviation.h"
 #include "DlgSettings.h"
-#include "../ImageColorBoolModel/ImageColorBoolProxy.h"
-#include "../ImageColorBoolModel/ImageColorBoolDelegate.h"
+#include "ImageColorBoolProxy.h"
+#include "ImageColorBoolDelegate.h"
 #include <QFile>
 #include <QTextStream>
 #include <QHeaderView>
@@ -10,7 +10,6 @@ WidgetAbbreviation::WidgetAbbreviation(QWidget* parent) :
 	QWidget(parent), currentRow(-1)
 {
 	ui.setupUi(this);
-	setting = UserSetting::getInstance("Rules.ini");
 
 	load();
 	ui.tvAbbreviations->setModel(&model);
@@ -18,7 +17,7 @@ WidgetAbbreviation::WidgetAbbreviation(QWidget* parent) :
 	ui.tvAbbreviations->horizontalHeader()->setStretchLastSection(true);
 
 	ImageColorBoolProxy* proxy = new ImageColorBoolProxy(this);
-	proxy->setColumnType(SELECT, ImageColorBoolProxy::BoolColumn);
+    proxy->setColumnType(SELECTED, ImageColorBoolProxy::BoolColumn);
 	proxy->setSourceModel(&model);
 
 	ui.tvAbbreviations->setModel(proxy);
@@ -39,7 +38,7 @@ QStringList WidgetAbbreviation::getSelectedRules() const
 	QStringList result;
 	int rowCount = model.rowCount();
 	for(int row=0; row<rowCount; row++)
-		if(model.data(model.index(row, SELECT)).toBool())
+        if(model.data(model.index(row, SELECTED)).toBool())
 			result << model.data(model.index(row, FULL)).toString() + ";" +
 					  model.data(model.index(row, ABBR)).toString();
 	return result;
@@ -55,7 +54,7 @@ void WidgetAbbreviation::onAdd()
 {
 	int lastRow = model.rowCount();
 	model.insertRow(lastRow);
-	model.setData(model.index(lastRow, SELECT), true);
+    model.setData(model.index(lastRow, SELECTED), true);
 	ui.tvAbbreviations->selectRow(lastRow);
 	ui.tvAbbreviations->scrollToBottom();
 }
@@ -69,19 +68,19 @@ void WidgetAbbreviation::onDel()
 void WidgetAbbreviation::load()
 {
 	model.setColumnCount(3);
-	model.setHeaderData(FULL,   Qt::Horizontal, tr("Fullname"));
-	model.setHeaderData(ABBR,   Qt::Horizontal, tr("Abbreviation"));
-	model.setHeaderData(SELECT, Qt::Horizontal, tr("Select"));
-	QStringList rules = setting->getAbbreviationRules();
+    model.setHeaderData(FULL,     Qt::Horizontal, tr("Fullname"));
+    model.setHeaderData(ABBR,     Qt::Horizontal, tr("Abbreviation"));
+    model.setHeaderData(SELECTED, Qt::Horizontal, tr("Selected"));
+    QStringList rules = Setting::getInstance("Rules.ini")->getAbbreviationRules();
 	model.setRowCount(rules.size());
 	for(int row = 0; row < rules.size(); ++ row)
 	{
 		QStringList sections = rules.at(row).split(";");
 		if(sections.size() == 3)
 		{
-			model.setData(model.index(row, FULL),   sections[0]);
-			model.setData(model.index(row, ABBR),   sections[1]);
-			model.setData(model.index(row, SELECT), sections[2]);
+            model.setData(model.index(row, FULL),     sections[FULL]);
+            model.setData(model.index(row, ABBR),     sections[ABBR]);
+            model.setData(model.index(row, SELECTED), sections[SELECTED]);
 		}
 	}
 }
@@ -92,13 +91,13 @@ void WidgetAbbreviation::save()
 	QStringList rules;
 	for(int row = 0; row < model.rowCount(); ++ row)
 	{
-		QString fullName        = model.data(model.index(row, FULL)).toString();
-		QString abbreviatedName = model.data(model.index(row, ABBR)).toString();
-		QString selected        = model.data(model.index(row, SELECT)).toString();
+        QString fullName        = model.data(model.index(row, FULL))    .toString();
+        QString abbreviatedName = model.data(model.index(row, ABBR))    .toString();
+        QString selected        = model.data(model.index(row, SELECTED)).toString();
 		QStringList rule;
 		if(!fullName.isEmpty() && !abbreviatedName.isEmpty() && !selected.isEmpty())
 			rule << fullName << abbreviatedName << selected;
 		rules << rule.join(";");
 	}
-	setting->setAbbreviationRules(rules);
+    Setting::getInstance("Rules.ini")->setAbbreviationRules(rules);
 }

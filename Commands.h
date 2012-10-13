@@ -17,10 +17,10 @@ public:
 	void redo();
 
 protected:
-	void highlightChanged();
+    void highlight();
 	void output(const QString& text);
 
-	virtual MainWindow::ActionStatus getActionStatus() const = 0;
+    virtual MainWindow::ActionStatus getActionStatus() const = 0;  // associated action
 	virtual QColor getHighlightColor() const = 0;
 	virtual void runCommand() = 0;     // a template method for specific operation
 

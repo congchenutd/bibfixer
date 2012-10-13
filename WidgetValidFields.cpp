@@ -5,7 +5,6 @@
 WidgetValidFields::WidgetValidFields(QWidget* parent) :	QWidget(parent)
 {
 	ui.setupUi(this);
-	setting = UserSetting::getInstance("Rules.ini");
 
 	load();
 	ui.tvFields->setModel(&model);
@@ -42,7 +41,7 @@ void WidgetValidFields::load()
 	model.setColumnCount(1);
 	model.setHeaderData(0, Qt::Horizontal, tr("Field name"));
 
-	QStringList fields = setting->getFields();
+    QStringList fields = Setting::getInstance("Rules.ini")->getFields();
 	model.setRowCount(fields.size());
 	for(int row = 0; row < fields.size(); ++ row)
 		model.setData(model.index(row, 0), fields.at(row));
@@ -54,5 +53,5 @@ void WidgetValidFields::save()
 	QStringList fields;
 	for(int row = 0; row < model.rowCount(); ++ row)
 		fields << model.data(model.index(row, 0)).toString();
-	setting->setFields(fields);
+    Setting::getInstance("Rules.ini")->setFields(fields);
 }

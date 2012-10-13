@@ -9,6 +9,10 @@ QT       += core gui network
 TARGET = BibFixer
 TEMPLATE = app
 
+INCLUDEPATH +=	../EnglishName \
+				../MySetting \
+				../ImageColorBoolModel
+
 win32 {
 	RC_FILE = Resource.rc
 }
@@ -33,7 +37,6 @@ SOURCES +=\
 
 HEADERS  += MainWindow.h \
 	DlgSettings.h \
-	MySetting.h \
 	Convertor.h \
 	TextEdit.h \
 	Parser.h \
@@ -43,7 +46,8 @@ HEADERS  += MainWindow.h \
     WidgetAbbreviation.h \
     WidgetValidFields.h \
     Commands.h \
-    ../EnglishName/EnglishName.h
+    ../EnglishName/EnglishName.h \
+    ../MySetting/MySetting.h
 
 FORMS    += MainWindow.ui \
 	DlgSettings.ui \

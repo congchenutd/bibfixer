@@ -1,6 +1,6 @@
 #include "Convertor.h"
 #include <QRegExp>
-//#include <QtAlgorithms>
+#include <QtAlgorithms>
 
 //////////////////////////////////////////////////////////////////
 CaseConvertor::CaseConvertor()
@@ -102,23 +102,28 @@ QString ProtectionConvertor::toFirstCharProtected(const QString& word) const
 QString AbbreviationConvertor::convert(const QString& input) const
 {
     QString result = input;
-    for(int i = rules.size()-1; i >=0; --i)      // reverse order: long rule first
+    foreach(const QString& rule, rules)
     {
-        QStringList sections = rules.at(i).split(';');  // two parts of a rule
+        QStringList sections = rule.split(';');  // two parts of a rule
         if(sections.size() == 2)
         {
             QString fullName        = sections[0];
             QString abbreviatedName = sections[1];
+
+            // handle optional words in the fullname
+            // e.g., fullname = Journal (of)
+            // longFullName = Journal of
+            // shortFullName = Journal
             QRegExp rxBracket("\\([^\\)]+\\)");
             if(rxBracket.indexIn(fullName) > -1)
             {
-                QString longFullName = fullName;
+                QString longFullName = fullName.simplified();
                 longFullName.remove('(');
                 longFullName.remove(')');
 
                 QString shortFullName = fullName.remove(rxBracket).simplified();
 
-                result.replace(longFullName, abbreviatedName, Qt::CaseInsensitive);
+                result.replace(longFullName,  abbreviatedName, Qt::CaseInsensitive);
                 result.replace(shortFullName, abbreviatedName, Qt::CaseInsensitive);
             }
             else
@@ -129,8 +134,13 @@ QString AbbreviationConvertor::convert(const QString& input) const
     return result;
 }
 
-void AbbreviationConvertor::setRules(const QStringList &r) {
+void AbbreviationConvertor::setRules(const QStringList& r)
+{
     rules = r;
+
+    // reverse order: to ensure long rule is applied first
+    // e.g., Journal (of) before Journal
+    qSort(rules.begin(), rules.end(), qGreater<QString>());
 }
 
 

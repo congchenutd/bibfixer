@@ -3,14 +3,14 @@
 
 TextEdit::TextEdit(QWidget* parent) : QPlainTextEdit(parent) {}
 
-void TextEdit::addHighlightedLine(const QString& line, const QColor& color) {
-	highlightedLines.insert(line, color);
+void TextEdit::addHighlightedText(const QString& text, const QColor& color) {
+    highlightedTexts.insert(text, color);
 }
 
-void TextEdit::highlightLines()
+void TextEdit::highlight()
 {
-    QList<QTextEdit::ExtraSelection> lineSelections;
-	for(HighLightedLines::Iterator it = highlightedLines.begin(); it != highlightedLines.end(); ++it)
+    QList<QTextEdit::ExtraSelection> selections;
+	for(HighLightedText::Iterator it = highlightedTexts.begin(); it != highlightedTexts.end(); ++it)
 	{
 		QTextCursor cursor = textCursor();
 		cursor.setPosition(0);
@@ -20,17 +20,17 @@ void TextEdit::highlightLines()
 			QTextEdit::ExtraSelection selection;
 			selection.format.setBackground(it.value());
 			selection.cursor = cursor;
-			lineSelections.append(selection);
+            selections << selection;
 			cursor = document()->find(it.key(), cursor);
 		}
 	}
-    setExtraSelections(lineSelections);
+    setExtraSelections(selections);
 }
 
-void TextEdit::unHighlightLines()
+void TextEdit::unHighlight()
 {
-    highlightedLines.clear();
-    highlightLines();
+    highlightedTexts.clear();
+    highlight();
 }
 
 void TextEdit::insertFromMimeData(const QMimeData* source)

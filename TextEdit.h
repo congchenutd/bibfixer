@@ -4,27 +4,27 @@
 #include <QPlainTextEdit>
 #include <QMap>
 
-// A text edit that can highlight certain lines
+// A text edit that can highlight certain texts
 class TextEdit : public QPlainTextEdit
 {
 	Q_OBJECT
 
-	typedef QMap<QString, QColor> HighLightedLines;
+    typedef QMap<QString, QColor> HighLightedText;
 
 public:
 	TextEdit(QWidget* parent = 0);
-	void addHighlightedLine(const QString& line, const QColor& color);
-	void highlightLines();
-    void unHighlightLines();
+    void addHighlightedText(const QString& text, const QColor& color);
+    void highlight();
+    void unHighlight();
 
 protected:
-    void insertFromMimeData(const QMimeData* source);
+    void insertFromMimeData(const QMimeData* source);  // copy-paste
 
 signals:
     void pasted();
 
 private:
-	HighLightedLines highlightedLines;
+    HighLightedText highlightedTexts;
 };
 
 #endif // TEXTEDIT_H
