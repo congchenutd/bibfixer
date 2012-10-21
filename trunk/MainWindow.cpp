@@ -29,18 +29,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
 void MainWindow::initActionStatuses()
 {
-    setActionStatus(Init,          true);
-    setActionStatus(Opened,        false);
-    setActionStatus(Cleaned,       false);
-    setActionStatus(Capitalized,   false);
-    setActionStatus(Protected,     false);
-    setActionStatus(Abbreviated,   false);
-    setActionStatus(KeysGenerated, false);
-    setActionStatus(RunAll,        false);
-    setActionStatus(Save,          false);
+    setActionStatus(Init,        true);
+    setActionStatus(Open,        false);
+    setActionStatus(Clean,       false);
+    setActionStatus(Capitalize,  false);
+    setActionStatus(Protect,     false);
+    setActionStatus(Abbreviate,  false);
+    setActionStatus(GenerateKey, false);
+    setActionStatus(RunAll,      false);
+    setActionStatus(Save,        false);
 }
 
-void MainWindow::setActionStatus(MainWindow::ActionStatus status, bool value)
+void MainWindow::setActionStatus(MainWindow::ActionName status, bool value)
 {
     actionStatuses[status] = value;
     ui.actionOpen        ->setEnabled(isOpenEnabled());
@@ -79,13 +79,13 @@ void MainWindow::open(const QString& filePath)
         if(file.open(QFile::ReadOnly))
             ui.teOutput->setPlainText(file.readAll());
     }
-    else {   // filePath is actually content from external call
+    else {   // filePath stores content when called by external process
         ui.teOutput->setPlainText(filePath);
     }
 
     undoStack.clear();
     initActionStatuses();
-    setActionStatus(Opened, true);
+    setActionStatus(Open, true);
 }
 
 void MainWindow::onNewFile()
@@ -106,7 +106,7 @@ void MainWindow::onOpen()
 }
 
 void MainWindow::onPaste() {
-    setActionStatus(Opened, !ui.teOutput->toPlainText().isEmpty());
+    setActionStatus(Open, !ui.teOutput->toPlainText().isEmpty());
 }
 
 void MainWindow::onSave()

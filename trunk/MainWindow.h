@@ -9,13 +9,13 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-    typedef enum {Init, Opened, Cleaned, Capitalized, Protected,
-                  Abbreviated, KeysGenerated, RunAll, Save, Size} ActionStatus;
+    typedef enum {Init, Open, Clean, Capitalize, Protect,
+                  Abbreviate, GenerateKey, RunAll, Save, Size} ActionName;
 public:
 	MainWindow(QWidget* parent = 0);
 	TextEdit* getTextEdit() const { return ui.teOutput; }
 
-    void setActionStatus(ActionStatus status, bool value);
+    void setActionStatus(ActionName status, bool value);
     void open(const QString& filePath);   // called by external program
 
 private slots:
@@ -37,17 +37,17 @@ private:
     void createActions();
 
     bool isOpenEnabled()         const { return actionStatuses[Init]; }
-    bool isCleanEnabled()        const { return actionStatuses[Opened]      && !actionStatuses[Cleaned];       }
-    bool isCapitalizeEnabled()   const { return actionStatuses[Cleaned]     && !actionStatuses[Capitalized];   }
-    bool isProtectEnabled()      const { return actionStatuses[Capitalized] && !actionStatuses[Protected];     }
-    bool isAbbreviateEnabled()   const { return actionStatuses[Cleaned]     && !actionStatuses[Abbreviated];   }
-    bool isGenerateKeysEnabled() const { return actionStatuses[Cleaned]     && !actionStatuses[KeysGenerated]; }
-    bool isSaveEnabled()         const { return actionStatuses[Opened]; }
-    bool isRunAllEnabled()       const { return actionStatuses[Opened] && !actionStatuses[RunAll] &&
-                                        (!actionStatuses[Capitalized] ||
-                                         !actionStatuses[Protected]   ||
-                                         !actionStatuses[Abbreviated] ||
-                                         !actionStatuses[KeysGenerated]); }
+    bool isCleanEnabled()        const { return actionStatuses[Open]       && !actionStatuses[Clean];       }
+    bool isCapitalizeEnabled()   const { return actionStatuses[Clean]      && !actionStatuses[Capitalize];   }
+    bool isProtectEnabled()      const { return actionStatuses[Capitalize] && !actionStatuses[Protect];     }
+    bool isAbbreviateEnabled()   const { return actionStatuses[Clean]      && !actionStatuses[Abbreviate];   }
+    bool isGenerateKeysEnabled() const { return actionStatuses[Clean]      && !actionStatuses[GenerateKey]; }
+    bool isSaveEnabled()         const { return actionStatuses[Open]; }
+    bool isRunAllEnabled()       const { return actionStatuses[Open] && !actionStatuses[RunAll] &&
+                                        (!actionStatuses[Capitalize] ||
+                                         !actionStatuses[Protect]    ||
+                                         !actionStatuses[Abbreviate] ||
+                                         !actionStatuses[GenerateKey]); }
 
 private:
 	Ui::MainWindow ui;

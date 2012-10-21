@@ -7,25 +7,27 @@
 #include <QColor>
 
 class Convertor;
-class ReferenceRecord
+class Reference
 {
 public:
 	typedef QMap<QString, QString> Fields;
 
 public:
-    void setType (const QString& t) { type = t; }
-    void setKey  (const QString& k) { key  = k; }
+    void setType (const QString& t) { if(!t.isEmpty()) type = t; }
+    void setKey  (const QString& k) { if(!k.isEmpty()) key  = k; }
 	QString getType() const { return type; }
     QString getKey()  const { return key;  }
-	void addField(const QString& fieldName, const QString& fieldValue);
+    bool    isValid() const { return !type.isEmpty(); }
+    bool    isEmpty() const { return isValid() && !fields.isEmpty(); }
+    void addField(const QString& fieldName, const QString& fieldValue);
 
 	void convert(const QString& fieldName, const Convertor& convertor);
     void generateKey();
 	QString toString() const;
 
 	// for highlighting
-	QStringList getChangedValues() const { return changedValues; }
-	void clearChangedValues() { changedValues.clear(); }
+    QStringList getChangedText() const { return changedValues; }
+    void clearChangedText() { changedValues.clear(); }
 
 private:
 	QString type;
@@ -37,11 +39,11 @@ private:
 class ReferenceList
 {
 public:
-	typedef QMap<QString, ReferenceRecord> Records;
+    typedef QMap<QString, Reference> Records;
 
 public:
     void clear();
-	void addRecord(const ReferenceRecord& record);
+    void addRecord(const Reference& record);
 	void capitalize(const QString& fieldName);
 	void protect   (const QString& fieldName);
 	void abbreviate(const QString& fieldName);
@@ -49,15 +51,14 @@ public:
 
 	QString toString() const;
 
-	QStringList getChangedValues() const;   // for hightlighting
-	void clearChangedValues();
-    QColor getHighlightColor() const { return highlightColor; }
-    void setHighlightColor(const QColor& clr) { highlightColor = clr; }
+    QStringList getChangedText() const;   // for hightlighting
+    void clearChangedText();
+    QColor getHighlightingColor() const { return color; }
+    void setHighlightingColor(const QColor& highlightingColor) { color = highlightingColor; }
 
 private:
-	Records records;
-    QColor  highlightColor;
+    Records records;
+    QColor  color;  // each snapshot stores its color
 };
-
 
 #endif // REFERENCE_H
