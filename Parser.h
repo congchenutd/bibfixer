@@ -3,7 +3,7 @@
 
 #include "Reference.h"
 
-// Parse the content of a reference file, and produce a ReferenceList
+// Parse the content of a reference (string), and produce a ReferenceList
 class Parser
 {
 public:
@@ -14,11 +14,11 @@ public:
 class BibParser : public Parser
 {
 public:
-    void setValidFields(const QStringList& fields);
+    void setValidFields(const QStringList& fields);  // other fields are ignored
 	virtual ReferenceList parse(const QString& content) const;
 
 private:
-	ReferenceRecord parseRecord(const QString& content) const;
+	Reference parseRecord(const QString& content) const;
 	int findRecordStart(const QString& content, int startFrom = 0) const;
 	int findRecordEnd  (const QString& content, int startFrom = 0) const;
 

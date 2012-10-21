@@ -20,15 +20,15 @@ protected:
     void highlight();
 	void output(const QString& text);
 
-    virtual MainWindow::ActionStatus getActionStatus() const = 0;  // associated action
-	virtual QColor getHighlightColor() const = 0;
+    virtual MainWindow::ActionName getActionName() const = 0;  // associated action
+    virtual QColor getHighlightColor() const = 0;  // for the change this command makes
 	virtual void runCommand() = 0;     // a template method for specific operation
 
 protected:
-	ReferenceList refBackup;           // each command object backups a version (for highlighting)
-	MainWindow*   mainWnd;
+    ReferenceList backupSnapshot;           // each command object backups a version (for highlighting)
+    MainWindow*   mainWnd;
 
-	static ReferenceList refCurrent;   // current version
+    static ReferenceList currentSnapshot;   // current version
 };
 
 class CleanCommand : public Command
@@ -38,7 +38,7 @@ public:
 	void undo();
 
 protected:
-	MainWindow::ActionStatus getActionStatus() const { return MainWindow::Cleaned; }
+    MainWindow::ActionName getActionName() const { return MainWindow::Clean; }
 	QColor getHighlightColor() const { return Qt::yellow; }
 	void runCommand();
 
@@ -49,10 +49,10 @@ private:
 class CapitalizeCommand : public Command
 {
 public:
-	CapitalizeCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
+    CapitalizeCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
 
 protected:
-	MainWindow::ActionStatus getActionStatus() const { return MainWindow::Capitalized; }
+    MainWindow::ActionName getActionName() const { return MainWindow::Capitalize; }
 	QColor getHighlightColor() const { return Qt::yellow; }
 	void runCommand();
 };
@@ -60,10 +60,10 @@ protected:
 class ProtectCommand : public Command
 {
 public:
-	ProtectCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
+    ProtectCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
 
 protected:
-	MainWindow::ActionStatus getActionStatus() const { return MainWindow::Protected; }
+    MainWindow::ActionName getActionName() const { return MainWindow::Protect; }
 	QColor getHighlightColor() const { return Qt::cyan; }
 	void runCommand();
 };
@@ -71,10 +71,10 @@ protected:
 class AbbreviateCommand : public Command
 {
 public:
-	AbbreviateCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
+    AbbreviateCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
 
 protected:
-	MainWindow::ActionStatus getActionStatus() const { return MainWindow::Abbreviated; }
+    MainWindow::ActionName getActionName() const { return MainWindow::Abbreviate; }
 	QColor getHighlightColor() const { return Qt::green; }
 	void runCommand();
 };
@@ -85,7 +85,7 @@ public:
     GenerateKeysCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
 
 protected:
-	MainWindow::ActionStatus getActionStatus() const { return MainWindow::KeysGenerated; }
+    MainWindow::ActionName getActionName() const { return MainWindow::GenerateKey; }
 	QColor getHighlightColor() const { return Qt::magenta; }
 	void runCommand();
 };

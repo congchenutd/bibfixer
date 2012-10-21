@@ -9,24 +9,24 @@ Command::Command(MainWindow* mainWindow, QUndoCommand* parent)
 
 void Command::undo()
 {
-	refCurrent = refBackup;                              // restore backup
-	output(refCurrent.toString());                       // restore output
+    currentSnapshot = backupSnapshot;                    // restore backup
+    output(currentSnapshot.toString());                  // restore output
     highlight();                                         // restore highlighting
-	mainWnd->setActionStatus(getActionStatus(), false);  // restore action status
+    mainWnd->setActionStatus(getActionName(), false);    // restore action status
 }
 
 void Command::redo()
 {
-	refBackup = refCurrent;                              // backup
-	refCurrent.clearChangedValues();                     // clear highlighting
+    backupSnapshot = currentSnapshot;                       // backup
+    currentSnapshot.clearChangedText();                     // clear highlighting
 
-	runCommand();                                        // template method
+    runCommand();                                           // template method
 
-	output(refCurrent.toString());                       // output
-	refCurrent.setHighlightColor(getHighlightColor());   // highlight
+    output(currentSnapshot.toString());                     // output
+    currentSnapshot.setHighlightingColor(getHighlightColor()); // the color goes with ref for undo
     highlight();
 
-	mainWnd->setActionStatus(getActionStatus(), true);   // update action status
+    mainWnd->setActionStatus(getActionName(), true);        // update action status
 }
 
 void Command::output(const QString& text) {
@@ -37,13 +37,13 @@ void Command::highlight()
 {
 	TextEdit* edit = mainWnd->getTextEdit();
 	edit->unHighlight();
-    QStringList toBeHighlighted = refCurrent.getChangedValues();
+    const QStringList toBeHighlighted = currentSnapshot.getChangedText();
     foreach(const QString& text, toBeHighlighted)
-        edit->addHighlightedText(text, refCurrent.getHighlightColor());
+        edit->addHighlightedText(text, currentSnapshot.getHighlightingColor());
 	edit->highlight();
 }
 
-ReferenceList Command::refCurrent;
+ReferenceList Command::currentSnapshot;
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -58,14 +58,14 @@ CleanCommand::CleanCommand(MainWindow* mainWindow, QUndoCommand* parent)
 void CleanCommand::undo()
 {
 	output(originalText);
-    mainWnd->setActionStatus(MainWindow::Cleaned, false);
+    mainWnd->setActionStatus(MainWindow::Clean, false);
 }
 
 void CleanCommand::runCommand()
 {
     BibParser parser;
     parser.setValidFields(Setting::getInstance("Rules.ini")->getFields());
-    refCurrent = parser.parse(originalText);
+    currentSnapshot = parser.parse(originalText);
 }
 
 
@@ -77,9 +77,9 @@ CapitalizeCommand::CapitalizeCommand(MainWindow* mainWindow, QUndoCommand* paren
 
 void CapitalizeCommand::runCommand()
 {
-    refCurrent.capitalize("title");
-    refCurrent.capitalize("journal");
-    refCurrent.capitalize("booktitle");
+    currentSnapshot.capitalize("title");
+    currentSnapshot.capitalize("journal");
+    currentSnapshot.capitalize("booktitle");
 }
 
 
@@ -90,7 +90,7 @@ ProtectCommand::ProtectCommand(MainWindow* mainWindow, QUndoCommand* parent)
 }
 
 void ProtectCommand::runCommand() {
-    refCurrent.protect("title");
+    currentSnapshot.protect("title");
 }
 
 
@@ -102,8 +102,8 @@ AbbreviateCommand::AbbreviateCommand(MainWindow* mainWindow, QUndoCommand* paren
 
 void AbbreviateCommand::runCommand()
 {
-    refCurrent.abbreviate("journal");
-    refCurrent.abbreviate("booktitle");
+    currentSnapshot.abbreviate("journal");
+    currentSnapshot.abbreviate("booktitle");
 }
 
 
@@ -114,5 +114,5 @@ GenerateKeysCommand::GenerateKeysCommand(MainWindow* mainWindow, QUndoCommand* p
 }
 
 void GenerateKeysCommand::runCommand() {
-    refCurrent.generateKeys();
+    currentSnapshot.generateKeys();
 }

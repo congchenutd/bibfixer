@@ -5,7 +5,7 @@
 #include <QTextStream>
 
 //////////////////////////////////////////////////////////////////////////////
-void ReferenceRecord::convert(const QString& fieldName, const Convertor& convertor)
+void Reference::convert(const QString& fieldName, const Convertor& convertor)
 {
 	if(!fields.contains(fieldName))
 		return;
@@ -13,11 +13,11 @@ void ReferenceRecord::convert(const QString& fieldName, const Convertor& convert
 	if(converted != fields[fieldName])
 	{
 		fields[fieldName] = converted;
-		changedValues << fields[fieldName];
+        changedValues << converted;
     }
 }
 
-void ReferenceRecord::generateKey()
+void Reference::generateKey()
 {
     if(!fields.contains("author"))
         return;
@@ -35,7 +35,7 @@ void ReferenceRecord::generateKey()
     changedValues << getKey();
 }
 
-QString ReferenceRecord::toString() const
+QString Reference::toString() const
 {
 	QString result;
 	QTextStream os(&result);
@@ -55,7 +55,7 @@ QString ReferenceRecord::toString() const
 	return result;
 }
 
-void ReferenceRecord::addField(const QString& fieldName, const QString& value)
+void Reference::addField(const QString& fieldName, const QString& value)
 {
 	// correct wrong page delimiters
 	QString fieldValue = value;
@@ -71,7 +71,7 @@ void ReferenceRecord::addField(const QString& fieldName, const QString& value)
 				fieldValue += "-" + endPage;
 		}
 	}
-	fields.insert(fieldName, fieldValue);
+    fields.insert(fieldName, fieldValue);
 }
 
 
@@ -79,26 +79,27 @@ void ReferenceRecord::addField(const QString& fieldName, const QString& value)
 QString ReferenceList::toString() const
 {
 	QString result;
-	foreach(const ReferenceRecord& record, records)
+	foreach(const Reference& record, records)
 		result += record.toString() + "\r\n\r\n";
 	return result;
 }
 
-QStringList ReferenceList::getChangedValues() const
+QStringList ReferenceList::getChangedText() const
 {
 	QStringList result;
-	foreach(const ReferenceRecord& record, records)
-		result << record.getChangedValues();
+	foreach(const Reference& record, records)
+		result << record.getChangedText();
 	return result;
 }
 
-void ReferenceList::clearChangedValues() {
+void ReferenceList::clearChangedText() {
     for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
-        it->clearChangedValues();
+        it->clearChangedText();
 }
 
-void ReferenceList::addRecord(const ReferenceRecord& record) {
-    records.insert(record.getKey(), record);
+void ReferenceList::addRecord(const Reference& record) {
+    if(!record.isEmpty())
+        records.insert(record.getKey(), record);
 }
 
 void ReferenceList::clear() {
@@ -131,10 +132,9 @@ void ReferenceList::generateKeys()
 {
     for(Records::Iterator it = records.begin(); it != records.end();)
     {
-        ReferenceRecord ref = it.value();
+        Reference ref = it.value();
         ref.generateKey();
         it = records.erase(it);      // re-insert the record because its key is changed
         records.insert(ref.getKey(), ref);
     }
 }
-
