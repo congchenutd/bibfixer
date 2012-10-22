@@ -20,6 +20,9 @@ void Reference::convert(const QString& fieldName, const Convertor& convertor)
 
 void Reference::generateKey(const QString& rule)
 {
+    if(rule.isEmpty())
+        return;
+
     QString key = KeyGenerator(this).generate(rule);
     if(!key.isEmpty())
     {
