@@ -13,7 +13,7 @@ void Reference::convert(const QString& fieldName, const Convertor& convertor)
 	if(converted != fields[fieldName])
 	{
 		fields[fieldName] = converted;
-        changedValues << converted;
+        changedText << converted;
     }
 }
 
@@ -32,7 +32,7 @@ void Reference::generateKey()
     QString year = fields.contains("year") ? fields["year"] : "0000";
     setKey(lastName + year);
 
-    changedValues << getKey();
+    changedText << getKey();
 }
 
 QString Reference::toString() const
