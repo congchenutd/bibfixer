@@ -28,22 +28,22 @@ Reference BibParser::parseRecord(const QString& content) const
 	// type and id
 	QRegExp rxTypeAndID("@(\\w+)\\{([^=]+),");
 	int idxTypeAndID = rxTypeAndID.indexIn(content);
-    if(idxTypeAndID < 0)
-        return result;
+	if(idxTypeAndID < 0)
+		return result;
 
-    result.setType(rxTypeAndID.cap(1));
-    result.setKey (rxTypeAndID.cap(2));
+	result.setType(rxTypeAndID.cap(1));
+	result.setKey (rxTypeAndID.cap(2));
 
 	// fields
 	QRegExp rxField("\\s*(\\w+)\\s*=\\s*\\{([^=]+)\\},?\\s*\\n\\s*");
 	int idxField = rxField.indexIn(content, idxTypeAndID + rxTypeAndID.matchedLength());
 	while(idxField > -1)
 	{
-        QString fieldName  = rxField.cap(1).toLower();
-        QString fieldValue = rxField.cap(2).simplified();
-        if(validFields.contains(fieldName))   // is a valid field
-            result.addField(fieldName, fieldValue);
-        idxField = rxField.indexIn(content, idxField + rxField.matchedLength());  // next field
+		QString fieldName  = rxField.cap(1).toLower();
+		QString fieldValue = rxField.cap(2).simplified();
+		if(validFields.contains(fieldName))   // is a valid field
+			result.addField(fieldName, fieldValue);
+		idxField = rxField.indexIn(content, idxField + rxField.matchedLength());  // next field
 	}
 
 	return result;

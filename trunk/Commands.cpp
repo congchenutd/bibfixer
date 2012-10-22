@@ -43,7 +43,7 @@ void Command::highlight()
 	edit->highlight();
 }
 
-//ReferenceList Command::currentSnapshot;
+ReferenceList Command::currentSnapshot;
 
 
 //////////////////////////////////////////////////////////////////////////////////////////

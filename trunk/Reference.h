@@ -13,14 +13,13 @@ public:
 	typedef QMap<QString, QString> Fields;
 
 public:
+	QString getType() const { return type; }
+	QString getKey()  const { return key;  }
+	bool isValid() const { return !type.isEmpty(); }
+	bool isEmpty() const { return !isValid() || fields.isEmpty(); }
     void setType (const QString& t) { if(!t.isEmpty()) type = t; }
     void setKey  (const QString& k) { if(!k.isEmpty()) key  = k; }
-	QString getType() const { return type; }
-    QString getKey()  const { return key;  }
-    bool    isValid() const { return !type.isEmpty(); }
-    bool    isEmpty() const { return isValid() && !fields.isEmpty(); }
     void addField(const QString& fieldName, const QString& fieldValue);
-
 	void convert(const QString& fieldName, const Convertor& convertor);
     void generateKey();
 	QString toString() const;
@@ -48,7 +47,6 @@ public:
 	void protect   (const QString& fieldName);
 	void abbreviate(const QString& fieldName);
     void generateKeys();
-
 	QString toString() const;
 
     QStringList getChangedText() const;   // for hightlighting
@@ -58,7 +56,7 @@ public:
 
 private:
     Records records;
-    QColor  color;  // each snapshot stores its color
+	QColor  color;     // each snapshot stores its color
 };
 
 #endif // REFERENCE_H
