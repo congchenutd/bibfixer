@@ -17,18 +17,18 @@ public:
 	void redo();
 
 protected:
-    void highlight();
+	void highlight();
 	void output(const QString& text);
 
     virtual MainWindow::ActionName getActionName() const = 0;  // associated action
-    virtual QColor getHighlightColor() const = 0;  // for the change this command makes
-	virtual void runCommand() = 0;     // a template method for specific operation
+	virtual QColor getHighlightColor() const = 0;              // for highlighting the change
+	virtual void runCommand() = 0;                             // template method
 
 protected:
-    ReferenceList backupSnapshot;           // each command object backups a version (for highlighting)
+	ReferenceList backupSnapshot;           // backup for retoring highlighting in undo
     MainWindow*   mainWnd;
 
-    ReferenceList currentSnapshot;   // current version
+	static ReferenceList currentSnapshot;   // current version
 };
 
 class CleanCommand : public Command
