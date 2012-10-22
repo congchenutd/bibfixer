@@ -28,7 +28,7 @@ protected:
     ReferenceList backupSnapshot;           // each command object backups a version (for highlighting)
     MainWindow*   mainWnd;
 
-    static ReferenceList currentSnapshot;   // current version
+    ReferenceList currentSnapshot;   // current version
 };
 
 class CleanCommand : public Command

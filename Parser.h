@@ -16,9 +16,9 @@ class BibParser : public Parser
 public:
     void setValidFields(const QStringList& fields);  // other fields are ignored
 	virtual ReferenceList parse(const QString& content) const;
+    Reference parseRecord(const QString& content) const;
 
 private:
-	Reference parseRecord(const QString& content) const;
 	int findRecordStart(const QString& content, int startFrom = 0) const;
 	int findRecordEnd  (const QString& content, int startFrom = 0) const;
 

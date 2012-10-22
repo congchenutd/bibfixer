@@ -26,14 +26,14 @@ public:
 	QString toString() const;
 
 	// for highlighting
-    QStringList getChangedText() const { return changedValues; }
-    void clearChangedText() { changedValues.clear(); }
+    QStringList getChangedText() const { return changedText; }
+    void clearChangedText() { changedText.clear(); }
 
 private:
 	QString type;
     QString key;
 	Fields  fields;
-	QStringList changedValues;
+    QStringList changedText;
 };
 
 class ReferenceList
