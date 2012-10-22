@@ -142,5 +142,3 @@ void AbbreviationConvertor::setRules(const QStringList& r)
     // e.g., Journal (of) before Journal
     qSort(rules.begin(), rules.end(), qGreater<QString>());
 }
-
-

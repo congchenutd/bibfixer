@@ -2,6 +2,7 @@
 #include "Convertor.h"
 #include "EnglishName.h"
 #include "DlgSettings.h"
+#include "KeyGenerator.h"
 #include <QTextStream>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -17,22 +18,14 @@ void Reference::convert(const QString& fieldName, const Convertor& convertor)
     }
 }
 
-void Reference::generateKey()
+void Reference::generateKey(const QString& rule)
 {
-    if(!fields.contains("author"))
-        return;
-
-    QStringList authors = fields["author"].split(" and ");
-    if(authors.size() < 1)
-        return;
-
-    QString firstAuthor = authors[0];
-    QString lastName = EnglishName(firstAuthor).getLastName().remove(" ");
-
-    QString year = fields.contains("year") ? fields["year"] : "0000";
-    setKey(lastName + year);
-
-    changedText << getKey();
+    QString key = KeyGenerator(this).generate(rule);
+    if(!key.isEmpty())
+    {
+        setKey(key);
+        changedText << key;
+    }
 }
 
 QString Reference::toString() const
@@ -52,7 +45,11 @@ QString Reference::toString() const
     }
 
 	os << "}";
-	return result;
+    return result;
+}
+
+QString Reference::getFieldValue(const QString& fieldName) const {
+    return fields.contains(fieldName) ? fields[fieldName] : QString();
 }
 
 void Reference::addField(const QString& fieldName, const QString& value)
@@ -130,10 +127,11 @@ void ReferenceList::abbreviate(const QString& fieldName)
 
 void ReferenceList::generateKeys()
 {
+    QString rule = Setting::getInstance("Rules.ini")->getKeyGenRule();
     for(Records::Iterator it = records.begin(); it != records.end();)
     {
         Reference ref = it.value();
-        ref.generateKey();
+        ref.generateKey(rule);
         it = records.erase(it);      // re-insert the record because its key is changed
         records.insert(ref.getKey(), ref);
     }
