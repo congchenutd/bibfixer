@@ -48,6 +48,7 @@ private:
                                          !actionStatuses[Protect]    ||
                                          !actionStatuses[Abbreviate] ||
                                          !actionStatuses[GenerateKey]); }
+    bool isReadOnly() const { return actionStatuses[Clean]; }
 
 private:
 	Ui::MainWindow ui;

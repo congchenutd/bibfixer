@@ -21,8 +21,9 @@ public:
     void setKey  (const QString& k) { if(!k.isEmpty()) key  = k; }
     void addField(const QString& fieldName, const QString& fieldValue);
 	void convert(const QString& fieldName, const Convertor& convertor);
-    void generateKey();
+    void generateKey(const QString& rule);
 	QString toString() const;
+    QString getFieldValue(const QString& fieldName) const;
 
 	// for highlighting
     QStringList getChangedText() const { return changedText; }

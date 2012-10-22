@@ -1,8 +1,9 @@
-#ifndef CASECONVERTOR_H
-#define CASECONVERTOR_H
+#ifndef CONVERTOR_H
+#define CONVERTOR_H
 
 #include <QStringList>
 
+// string format convertors
 class Convertor
 {
 public:
@@ -42,4 +43,4 @@ private:
     QStringList rules;
 };
 
-#endif // CASECONVERTOR_H
+#endif // CONVERTOR_H

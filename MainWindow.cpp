@@ -51,6 +51,8 @@ void MainWindow::setActionStatus(MainWindow::ActionName status, bool value)
     ui.actionGenerateKeys->setEnabled(isGenerateKeysEnabled());
     ui.actionSave        ->setEnabled(isSaveEnabled());
     ui.actionRunAll      ->setEnabled(isRunAllEnabled());
+
+    ui.teOutput->setReadOnly(isReadOnly());
 }
 
 void MainWindow::createActions()

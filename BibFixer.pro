@@ -33,7 +33,9 @@ SOURCES +=\
     WidgetValidFields.cpp \
     Main.cpp \
     Commands.cpp \
-    ../EnglishName/EnglishName.cpp
+    ../EnglishName/EnglishName.cpp \
+    WidgetKeyGen.cpp \
+    KeyGenerator.cpp
 
 HEADERS  += MainWindow.h \
 	DlgSettings.h \
@@ -47,12 +49,15 @@ HEADERS  += MainWindow.h \
     WidgetValidFields.h \
     Commands.h \
     ../EnglishName/EnglishName.h \
-    ../MySetting/MySetting.h
+    ../MySetting/MySetting.h \
+    WidgetKeyGen.h \
+    KeyGenerator.h
 
 FORMS    += MainWindow.ui \
 	DlgSettings.ui \
     WidgetAbbreviation.ui \
-    WidgetValidFields.ui
+    WidgetValidFields.ui \
+    WidgetKeyGen.ui
 
 RESOURCES += \
 	Resource.qrc

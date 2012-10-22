@@ -40,6 +40,9 @@ public:
 
 	QString getCompileDate() const;
 
+    QString getKeyGenRule() const;
+    void setKeyGenRule(const QString& rule);
+
 private:
 	void loadDefaults();
 };
