@@ -7,8 +7,11 @@ DlgSettings::DlgSettings(QWidget *parent) :
 	QDialog(parent)
 {
 	ui.setupUi(this);
+
+    // load settings
 	setting = Setting::getInstance();
 	font = setting->getFont();
+    ui.cbProtectFirstLetter->setChecked(setting->getProtectFirstLetter());
 
 	connect(ui.btFont, SIGNAL(clicked()), this, SLOT(onFont()));
 }
@@ -16,6 +19,7 @@ DlgSettings::DlgSettings(QWidget *parent) :
 void DlgSettings::accept()
 {
 	setting->setFont(font);
+    setting->setProtectFirstLetter(ui.cbProtectFirstLetter->isChecked());
 	ui.tabValidFields      ->save();
 	ui.tabAbbreviationRules->save();
     ui.tabKeyGen           ->save();
@@ -107,4 +111,12 @@ QString Setting::getKeyGenRule() const {
 
 void Setting::setKeyGenRule(const QString& rule) {
     setValue("KeyGenRule", rule);
+}
+
+bool Setting::getProtectFirstLetter() const {
+    return value("ProtectFirstLetter").toBool();
+}
+
+void Setting::setProtectFirstLetter(bool firstLetter) {
+    setValue("ProtectFirstLetter", firstLetter);
 }

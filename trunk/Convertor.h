@@ -11,6 +11,7 @@ public:
     virtual QString convert(const QString& input) const = 0;
 };
 
+// all words' first letter in upper case
 class CaseConvertor : public Convertor
 {
 public:
@@ -18,13 +19,14 @@ public:
 	QString convert(const QString& input) const;
 
 private:
-	QString toFirstCharUpperCase(const QString& word) const;
+    QString toFirstCharUpperCase(const QString& word) const;
 
 private:
-	QStringList lowercaseWords;
+    QStringList lowercaseWords;
 };
 
-class ProtectionConvertor : public Convertor
+// protect the first letter of each word by {}
+class FirstLetterProtectionConvertor : public Convertor
 {
 public:
     QString convert(const QString& input) const;
@@ -33,6 +35,21 @@ private:
     QString toFirstCharProtected(const QString& word) const;
 };
 
+// protect the entire sentence by {}
+class AllProtectionConvertor : public Convertor
+{
+public:
+    QString convert(const QString &input) const;
+};
+
+// remove the protective {}
+class UnprotectionConvertor : public Convertor
+{
+public:
+    QString convert(const QString &input) const;
+};
+
+// abbreviate based on the rules, such as transactions -> trans.
 class AbbreviationConvertor : public Convertor
 {
 public:

@@ -57,8 +57,39 @@ QString CaseConvertor::toFirstCharUpperCase(const QString& word) const
 	return word.at(0).toUpper() + word.right(word.length() - 1);
 }
 
+/////////////////////////////////////////////////////////////////////////////////
+QString UnprotectionConvertor::convert(const QString& input) const
+{
+    // get rid of the outer {}
+    QString line = input.simplified();
+    QRegExp rxAllProtected("^\\{(.+)\\}$");
+    if(rxAllProtected.indexIn(line) > -1)
+        line = rxAllProtected.cap(1);
+
+    // split into words and remove the {} for the first letter
+    QStringList wordList = line.split(' ');
+    QStringList result;
+    foreach(QString word, wordList)
+    {
+        QRegExp rxFirstProtected("^\\{\\w\\}");
+        if(rxFirstProtected.indexIn(word) > -1)
+        {
+            word.remove(0, 1);
+            word.remove(1, 1);
+        }
+        result << word;
+    }
+
+    return result.join(" ");
+}
+
 //////////////////////////////////////////////////////////////////////////////////
-QString ProtectionConvertor::convert(const QString& input) const
+QString AllProtectionConvertor::convert(const QString &input) const {
+    return "{" + input.simplified() + "}";
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+QString FirstLetterProtectionConvertor::convert(const QString& input) const
 {
     QStringList convertedWords;
     QStringList words = input.split(' ');
@@ -68,7 +99,7 @@ QString ProtectionConvertor::convert(const QString& input) const
     return convertedWords.join(" ");
 }
 
-QString ProtectionConvertor::toFirstCharProtected(const QString& word) const
+QString FirstLetterProtectionConvertor::toFirstCharProtected(const QString& word) const
 {
     if(word.isEmpty())
         return word;
@@ -79,7 +110,7 @@ QString ProtectionConvertor::toFirstCharProtected(const QString& word) const
         return word;
 
     // skip {X}xxx
-    QRegExp rxFirstProtected("^\\{w\\}");
+    QRegExp rxFirstProtected("^\\{\\w\\}");
     if(rxFirstProtected.indexIn(word) > -1)
         return word;
 

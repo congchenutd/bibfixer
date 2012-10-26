@@ -43,6 +43,9 @@ public:
     QString getKeyGenRule() const;
     void setKeyGenRule(const QString& rule);
 
+    bool getProtectFirstLetter() const;
+    void setProtectFirstLetter(bool firstLetter);
+
 private:
 	void loadDefaults();
 };

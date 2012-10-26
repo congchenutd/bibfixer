@@ -115,9 +115,13 @@ void ReferenceList::capitalize(const QString& fieldName)
 
 void ReferenceList::protect(const QString& fieldName)
 {
-    ProtectionConvertor convertor;
+    Convertor* convertor;
+    if(Setting::getInstance()->getProtectFirstLetter())
+        convertor = new FirstLetterProtectionConvertor;
+    else
+        convertor = new AllProtectionConvertor;
 	for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
-        it->convert(fieldName, convertor);
+        it->convert(fieldName, *convertor);
 }
 
 void ReferenceList::abbreviate(const QString& fieldName)
