@@ -2,6 +2,8 @@
 #include <QRegExp>
 #include <QtAlgorithms>
 
+namespace BibFixer {
+
 //////////////////////////////////////////////////////////////////
 CaseConvertor::CaseConvertor()
 {
@@ -172,4 +174,6 @@ void AbbreviationConvertor::setRules(const QStringList& r)
     // reverse order: to ensure long rule is applied first
     // e.g., Journal (of) before Journal
     qSort(rules.begin(), rules.end(), qGreater<QString>());
+}
+
 }

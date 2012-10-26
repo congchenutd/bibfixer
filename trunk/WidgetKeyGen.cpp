@@ -1,6 +1,8 @@
 #include "WidgetKeyGen.h"
 #include "DlgSettings.h"
 
+namespace BibFixer {
+
 WidgetKeyGen::WidgetKeyGen(QWidget *parent) :
     QWidget(parent)
 {
@@ -13,3 +15,4 @@ void WidgetKeyGen::save()
     Setting::getInstance("Rules.ini")->setKeyGenRule(ui.leRule->text().simplified());
 }
 
+}

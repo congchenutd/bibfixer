@@ -6,6 +6,8 @@
 #include <QStringList>
 #include <QColor>
 
+namespace BibFixer {
+
 class Convertor;
 class Reference
 {
@@ -59,5 +61,7 @@ private:
     Records records;
 	QColor  color;     // each snapshot stores its color
 };
+
+}
 
 #endif // REFERENCE_H

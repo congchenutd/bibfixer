@@ -6,6 +6,8 @@
 #include <QTextStream>
 #include <QHeaderView>
 
+namespace BibFixer {
+
 WidgetAbbreviation::WidgetAbbreviation(QWidget* parent) :
 	QWidget(parent), currentRow(-1)
 {
@@ -100,4 +102,6 @@ void WidgetAbbreviation::save()
 		rules << rule.join(";");
 	}
     Setting::getInstance("Rules.ini")->setAbbreviationRules(rules);
+}
+
 }

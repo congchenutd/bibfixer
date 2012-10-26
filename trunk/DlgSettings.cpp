@@ -3,6 +3,8 @@
 #include <QApplication>
 #include <QResource>
 
+namespace BibFixer {
+
 DlgSettings::DlgSettings(QWidget *parent) :
 	QDialog(parent)
 {
@@ -119,4 +121,6 @@ bool Setting::getProtectFirstLetter() const {
 
 void Setting::setProtectFirstLetter(bool firstLetter) {
     setValue("ProtectFirstLetter", firstLetter);
+}
+
 }

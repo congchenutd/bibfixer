@@ -3,6 +3,8 @@
 
 #include <QString>
 
+namespace BibFixer {
+
 class Reference;
 class KeyGenerator
 {
@@ -21,5 +23,7 @@ private:
 private:
     const Reference* ref;
 };
+
+}
 
 #endif // KEYGENERATOR_H

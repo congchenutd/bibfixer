@@ -5,6 +5,8 @@
 #include "KeyGenerator.h"
 #include <QTextStream>
 
+namespace BibFixer {
+
 //////////////////////////////////////////////////////////////////////////////
 void Reference::convert(const QString& fieldName, const Convertor& convertor)
 {
@@ -142,4 +144,6 @@ void ReferenceList::generateKeys()
         it = records.erase(it);      // re-insert the record because its key is changed
         records.insert(ref.getKey(), ref);
     }
+}
+
 }

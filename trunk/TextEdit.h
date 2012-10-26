@@ -4,6 +4,8 @@
 #include <QPlainTextEdit>
 #include <QMap>
 
+namespace BibFixer {
+
 // A text edit that can highlight certain texts
 class TextEdit : public QPlainTextEdit
 {
@@ -26,5 +28,7 @@ signals:
 private:
     HighLightedText highlightedTexts;
 };
+
+}
 
 #endif // TEXTEDIT_H

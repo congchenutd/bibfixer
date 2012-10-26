@@ -2,6 +2,8 @@
 #include "DlgSettings.h"
 #include <QHeaderView>
 
+namespace BibFixer {
+
 WidgetValidFields::WidgetValidFields(QWidget* parent) :	QWidget(parent)
 {
 	ui.setupUi(this);
@@ -54,4 +56,6 @@ void WidgetValidFields::save()
 	for(int row = 0; row < model.rowCount(); ++ row)
 		fields << model.data(model.index(row, 0)).toString();
     Setting::getInstance("Rules.ini")->setFields(fields);
+}
+
 }

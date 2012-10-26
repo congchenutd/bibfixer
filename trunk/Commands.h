@@ -5,6 +5,8 @@
 #include "Reference.h"
 #include "MainWindow.h"
 
+namespace BibFixer {
+
 class TextEdit;
 
 // Undo/redo commands (operations)
@@ -89,5 +91,7 @@ protected:
 	QColor getHighlightColor() const { return Qt::magenta; }
 	void runCommand();
 };
+
+}
 
 #endif // COMMANDS_H

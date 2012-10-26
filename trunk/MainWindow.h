@@ -4,6 +4,8 @@
 #include "ui_MainWindow.h"
 #include <QUndoStack>
 
+namespace BibFixer {
+
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -55,5 +57,7 @@ private:
 	QUndoStack undoStack;
     bool actionStatuses[Size];
 };
+
+}
 
 #endif // MAINWINDOW_H

@@ -4,6 +4,8 @@
 #include "ui_WidgetAbbreviation.h"
 #include <QStandardItemModel>
 
+namespace BibFixer {
+
 // edit abbreviation rules
 class Setting;
 class WidgetAbbreviation : public QWidget
@@ -30,5 +32,7 @@ private:
 
     enum {FULL, ABBR, SELECTED};
 };
+
+}
 
 #endif // DLGABBREVIATION_H

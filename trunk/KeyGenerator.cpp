@@ -2,6 +2,8 @@
 #include "Reference.h"
 #include "EnglishName.h"
 
+namespace BibFixer {
+
 KeyGenerator::KeyGenerator(const Reference* reference)
     : ref(reference) {}
 
@@ -65,4 +67,6 @@ QString KeyGenerator::getYear() const
 {
     QString year = ref->getFieldValue("year");
     return year.isEmpty() ? QString() : year;
+}
+
 }

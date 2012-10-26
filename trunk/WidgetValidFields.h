@@ -5,6 +5,8 @@
 #include <QWidget>
 #include <QStandardItemModel>
 
+namespace BibFixer {
+
 class Setting;
 class WidgetValidFields : public QWidget
 {
@@ -27,5 +29,7 @@ private:
 	QStandardItemModel model;
 	int currentRow;
 };
+
+}
 
 #endif // WIDGETVALIDFIELDS_H
