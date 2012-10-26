@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include "Convertor.h"
 #include <QRegExp>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -40,7 +41,7 @@ Reference BibParser::parseRecord(const QString& content) const
 	while(idxField > -1)
 	{
 		QString fieldName  = rxField.cap(1).toLower();
-		QString fieldValue = rxField.cap(2).simplified();
+        QString fieldValue = UnprotectionConvertor().convert(rxField.cap(2).simplified());
 		if(validFields.contains(fieldName))   // is a valid field
 			result.addField(fieldName, fieldValue);
 		idxField = rxField.indexIn(content, idxField + rxField.matchedLength());  // next field
