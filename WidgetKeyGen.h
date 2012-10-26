@@ -4,6 +4,8 @@
 #include "ui_WidgetKeyGen.h"
 #include <QWidget>
 
+namespace BibFixer {
+
 class WidgetKeyGen : public QWidget
 {
     Q_OBJECT
@@ -15,5 +17,7 @@ public:
 private:
     Ui::WidgetKeyGen ui;
 };
+
+}
 
 #endif // WIDGETKEYGEN_H

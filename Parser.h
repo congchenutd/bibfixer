@@ -3,6 +3,8 @@
 
 #include "Reference.h"
 
+namespace BibFixer {
+
 // Parse the content of a reference (string), and produce a ReferenceList
 class Parser
 {
@@ -25,5 +27,7 @@ private:
 private:
     QStringList validFields;
 };
+
+}
 
 #endif // PARSER_H

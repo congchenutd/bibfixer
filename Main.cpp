@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 
-    MainWindow wnd;
+    BibFixer::MainWindow wnd;
     wnd.showMaximized();
     if(argc > 1)
         wnd.open(argv[1]);

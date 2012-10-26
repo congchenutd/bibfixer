@@ -1,5 +1,6 @@
 #include "TextEdit.h"
-#include <QDebug>
+
+namespace BibFixer {
 
 TextEdit::TextEdit(QWidget* parent) : QPlainTextEdit(parent) {}
 
@@ -37,4 +38,6 @@ void TextEdit::insertFromMimeData(const QMimeData* source)
 {
     QPlainTextEdit::insertFromMimeData(source);
     emit pasted();
+}
+
 }

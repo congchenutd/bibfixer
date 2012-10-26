@@ -4,6 +4,8 @@
 #include "MainWindow.h"
 #include "DlgSettings.h"
 
+namespace BibFixer {
+
 Command::Command(MainWindow* mainWindow, QUndoCommand* parent)
 	: QUndoCommand(parent), mainWnd(mainWindow) {}
 
@@ -115,4 +117,6 @@ GenerateKeysCommand::GenerateKeysCommand(MainWindow* mainWindow, QUndoCommand* p
 
 void GenerateKeysCommand::runCommand() {
     currentSnapshot.generateKeys();
+}
+
 }

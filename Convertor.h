@@ -3,6 +3,8 @@
 
 #include <QStringList>
 
+namespace BibFixer {
+
 // string format convertors
 class Convertor
 {
@@ -59,5 +61,7 @@ public:
 private:
     QStringList rules;
 };
+
+}
 
 #endif // CONVERTOR_H

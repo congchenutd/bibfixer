@@ -4,6 +4,8 @@
 #include "ui_DlgSettings.h"
 #include "MySetting.h"
 
+namespace BibFixer {
+
 class Setting;
 class DlgSettings : public QDialog
 {
@@ -49,5 +51,7 @@ public:
 private:
 	void loadDefaults();
 };
+
+}
 
 #endif // DLGSETTINGS_H

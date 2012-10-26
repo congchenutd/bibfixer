@@ -20,7 +20,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="TextEdit" name="teOutput"/>
+     <widget class="BibFixer::TextEdit" name="teOutput"/>
     </item>
    </layout>
   </widget>
@@ -192,7 +192,7 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>TextEdit</class>
+   <class>BibFixer::TextEdit</class>
    <extends>QPlainTextEdit</extends>
    <header>TextEdit.h</header>
   </customwidget>

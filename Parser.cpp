@@ -2,6 +2,8 @@
 #include "Convertor.h"
 #include <QRegExp>
 
+namespace BibFixer {
+
 /////////////////////////////////////////////////////////////////////////////
 ReferenceList BibParser::parse(const QString& content) const
 {
@@ -59,4 +61,6 @@ int BibParser::findRecordEnd(const QString& content, int startFrom) const
     // if nextRecordStart == -1, lastIndexOf() returns the last '}', correct!
 	int nextRecordStart = findRecordStart(content, startFrom);
 	return content.lastIndexOf("}", nextRecordStart);
+}
+
 }

@@ -6,6 +6,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+namespace BibFixer {
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
@@ -176,5 +178,7 @@ void MainWindow::onAbout() {
 		   "<p>Built on %1</p>"
 		   "<p><a href=mailto:CongChenUTD@Gmail.com>CongChenUTD@Gmail.com</a></p>")
 					   .arg(Setting::getInstance()->getCompileDate()));
+
+}
 
 }
