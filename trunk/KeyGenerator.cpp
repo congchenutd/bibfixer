@@ -4,69 +4,64 @@
 
 namespace BibFixer {
 
-KeyGenerator::KeyGenerator(const Reference* reference)
-    : ref(reference) {}
+namespace KeyGenerator {
 
-QString KeyGenerator::generate(const QString& rule)
+QString generateKey(const Reference& ref, const QString& rule)
 {
     QString key;
     QStringList patterns = rule.split(";");
     foreach(const QString& pattern, patterns)
     {
         if(pattern == "lastname")
-            key += getLastName();
+            key += getLastName(ref);
         else if(pattern == "firstname")
-            key += getFirstName();
+            key += getFirstName(ref);
         else if(pattern == "firstletter")
-            key += getFirstLetter();
+            key += getFirstLetter(ref);
         else if(pattern == "firstword")
-            key += getFirstWord();
+            key += getFirstWord(ref);
         else if(pattern == "year")
-            key += getYear();
+            key += getYear(ref);
     }
     return key;
 }
 
-QString KeyGenerator::getFirstAuthor() const
+//////////////////////////////////////////////////////////////
+QString getFirstAuthor(const Reference& ref)
 {
-    QString authors = ref->getFieldValue("author");
+    QString authors = ref.getFieldValue("author");
     if(authors.isEmpty())
         return QString();
 
     QStringList authorList = authors.split(" and ");
-    if(authorList.size() < 1)
-        return QString();
-
-    return authorList.front();
+    return authorList.isEmpty() ? QString() : authorList.front();
 }
 
-QString KeyGenerator::getLastName() const {
-    return EnglishName(getFirstAuthor()).getLastName().remove(" ");   // no space
+QString getLastName(const Reference& ref) {
+    return EnglishName(getFirstAuthor(ref)).getLastName().remove(" ");   // no space
 }
 
-QString KeyGenerator::getFirstName() const {
-    return EnglishName(getFirstAuthor()).getFirstName().remove(" ");  // no space
+QString getFirstName(const Reference& ref) {
+    return EnglishName(getFirstAuthor(ref)).getFirstName().remove(" ");  // no space
 }
 
-QString KeyGenerator::getFirstLetter() const
+QString getFirstLetter(const Reference& ref)
 {
-    QString firstName = getFirstName();
+    QString firstName = getFirstName(ref);
     return firstName.isEmpty() ? QString() : firstName.at(0);
 }
 
-QString KeyGenerator::getFirstWord() const
+QString getFirstWord(const Reference& ref)
 {
-    QString title = ref->getFieldValue("title");
-    if(title.isEmpty())
-        return QString();
-
-    return title.split(" ").front();   // get the first word
+    QString title = ref.getFieldValue("title");
+    return title.isEmpty() ? QString() : title.split(" ").front();
 }
 
-QString KeyGenerator::getYear() const
+QString getYear(const Reference& ref)
 {
-    QString year = ref->getFieldValue("year");
+    QString year = ref.getFieldValue("year");
     return year.isEmpty() ? QString() : year;
 }
 
-}
+}  // KeyGenerator
+}  // BibFixer

@@ -6,55 +6,61 @@ namespace BibFixer {
 
 WidgetValidFields::WidgetValidFields(QWidget* parent) :	QWidget(parent)
 {
-	ui.setupUi(this);
+    _ui.setupUi(this);
 
 	load();
-	ui.tvFields->setModel(&model);
-	ui.tvFields->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    _ui.tvFields->setModel(&_model);
+    _ui.tvFields->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 
-	connect(ui.tvFields->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
+    connect(_ui.tvFields->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
 			this, SLOT(onCurrentRowChanged(QModelIndex)));
-	connect(ui.btAdd, SIGNAL(clicked()), this, SLOT(onAdd()));
-	connect(ui.btDel, SIGNAL(clicked()), this, SLOT(onDel()));
+    connect(_ui.btAdd, SIGNAL(clicked()), this, SLOT(onAdd()));
+    connect(_ui.btDel, SIGNAL(clicked()), this, SLOT(onDel()));
 }
 
 void WidgetValidFields::onCurrentRowChanged(const QModelIndex& idx)
 {
-	currentRow = idx.isValid() ? idx.row() : -1;
-	ui.btDel->setEnabled(idx.isValid());
+    _currentRow = idx.isValid() ? idx.row() : -1;
+    _ui.btDel->setEnabled(idx.isValid());
 }
 
 void WidgetValidFields::onAdd()
 {
-	int lastRow = model.rowCount();
-	model.insertRow(lastRow);
-	ui.tvFields->selectRow(lastRow);
-	ui.tvFields->scrollToBottom();
+    int lastRow = _model.rowCount();
+    _model.insertRow(lastRow);
+    _ui.tvFields->scrollToBottom();
+    _ui.tvFields->edit(_model.index(lastRow, 0));
 }
 
 void WidgetValidFields::onDel()
 {
-	model.removeRow(currentRow);  // FIXME: combining the two lines won't work
-	currentRow --;
+    int backup = _currentRow;      // removeRow() will trigger onCurrentRowChanged()
+    _model.removeRow(_currentRow);
+    _currentRow = backup;
+    _ui.tvFields->selectRow(_currentRow);
 }
 
 void WidgetValidFields::load()
 {
-	model.setColumnCount(1);
-	model.setHeaderData(0, Qt::Horizontal, tr("Field name"));
+    _model.setColumnCount(1);
+    _model.setHeaderData(0, Qt::Horizontal, tr("Field name"));
 
     QStringList fields = Setting::getInstance("Rules.ini")->getFields();
-	model.setRowCount(fields.size());
+    _model.setRowCount(fields.size());
 	for(int row = 0; row < fields.size(); ++ row)
-		model.setData(model.index(row, 0), fields.at(row));
+        _model.setData(_model.index(row, 0), fields.at(row));
 }
 
 void WidgetValidFields::save()
 {
-	model.sort(0);
+    _model.sort(0);
 	QStringList fields;
-	for(int row = 0; row < model.rowCount(); ++ row)
-		fields << model.data(model.index(row, 0)).toString();
+    for(int row = 0; row < _model.rowCount(); ++ row)
+    {
+        QString field = _model.data(_model.index(row, 0)).toString();
+        if(!field.isEmpty())
+            fields << field;
+    }
     Setting::getInstance("Rules.ini")->setFields(fields);
 }
 

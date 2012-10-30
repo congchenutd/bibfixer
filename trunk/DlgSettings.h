@@ -12,16 +12,16 @@ class DlgSettings : public QDialog
 	Q_OBJECT
 
 public:
-	DlgSettings(QWidget *parent = 0);
+    DlgSettings(QWidget* parent = 0);
 	virtual void accept();
 
 private slots:
 	void onFont();
 
 private:
-	Ui::DlgSettings ui;
-	QFont font;
-	Setting* setting;
+    Ui::DlgSettings _ui;
+    QFont    _font;
+    Setting* _setting;
 };
 
 
@@ -38,7 +38,7 @@ public:
 
 	QStringList getAbbreviationRules() const;
 	QStringList getSelectedAbbreviationRules() const;
-	void setAbbreviationRules(const QStringList& rules);
+    void setAbbreviationRules(const QStringList& rules);  // format: fullname;shortname;selected
 
 	QString getCompileDate() const;
 

@@ -8,39 +8,42 @@ namespace BibFixer {
 CaseConvertor::CaseConvertor()
 {
 	// Prepositions
-	lowercaseWords << "about" << "above" << "across" << "after" <<
-					  "against" << "along" << "among" << "around" <<
-					  "at" << "before" << "behind" << "below" <<
-					  "beneath" << "beside" << "between" << "beyond" <<
-					  "but" << "by" << "despite" << "down" <<
-					  "during" << "except" << "for" << "from" <<
-					  "in" << "inside" << "into" << "like" <<
-					  "near" << "of" << "off" << "on" <<
-					  "onto" << "out" << "outside" << "over" <<
-					  "past" << "since" << "through" << "throughout" <<
-					  "till" << "to" << "toward" << "under" <<
-					  "underneath" << "until" << "up" << "upon" <<
-					  "with" << "within" << "without";
+	_lowercaseWords << "about" << "above" << "across" << "after" <<
+                       "against" << "along" << "among" << "around" <<
+                       "at" << "before" << "behind" << "below" <<
+                       "beneath" << "beside" << "between" << "beyond" <<
+                       "but" << "by" << "despite" << "down" <<
+                       "during" << "except" << "for" << "from" <<
+                       "in" << "inside" << "into" << "like" <<
+                       "near" << "of" << "off" << "on" <<
+                       "onto" << "out" << "outside" << "over" <<
+                       "past" << "since" << "through" << "throughout" <<
+                       "till" << "to" << "toward" << "under" <<
+                       "underneath" << "until" << "up" << "upon" <<
+                       "with" << "within" << "without";
 
 	// Conjunctions
-	lowercaseWords << "after" << "although" << "as" << "because" <<
-					  "before" << "how" << "if" << "once" <<
-					  "since" << "than" << "that" << "though" <<
-					  "till" << "until" << "when" << "where" <<
-					  "whether" << "while" << "and";
+	_lowercaseWords << "after" << "although" << "as" << "because" <<
+                       "before" << "how" << "if" << "once" <<
+                       "since" << "than" << "that" << "though" <<
+                       "till" << "until" << "when" << "where" <<
+                       "whether" << "while" << "and";
 
 	// Articles
-	lowercaseWords << "the" << "a" << "an";
+	_lowercaseWords << "the" << "a" << "an";
 }
 
 QString CaseConvertor::convert(const QString& input) const
 {
+    if(input.isEmpty())
+        return QString();
+
 	QStringList convertedWords;
-	QStringList words = input.split(' ');
+    QStringList words = input.simplified().split(' ');
 	QString lastWord;
 	foreach(QString word, words)
 	{
-		if(lowercaseWords.contains(word, Qt::CaseInsensitive) && !lastWord.endsWith(':'))
+		if(_lowercaseWords.contains(word, Qt::CaseInsensitive) && !lastWord.endsWith(':'))
 			convertedWords << word.toLower();               // lower case unless it follows a colon
 		else
 			convertedWords << toFirstCharUpperCase(word);   // convert
@@ -51,17 +54,17 @@ QString CaseConvertor::convert(const QString& input) const
     return toFirstCharUpperCase(convertedWords.join(" "));
 }
 
-QString CaseConvertor::toFirstCharUpperCase(const QString& word) const
-{
-	if(word.isEmpty())
-		return word;
-
-	return word.at(0).toUpper() + word.right(word.length() - 1);
+QString CaseConvertor::toFirstCharUpperCase(const QString& word) const {
+    return word.isEmpty() ? word
+                          : word.at(0).toUpper() + word.right(word.length() - 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 QString UnprotectionConvertor::convert(const QString& input) const
 {
+    if(input.isEmpty())
+        return QString();
+
     // get rid of the outer {}
     QString line = input.simplified();
     QRegExp rxAllProtected("^\\{(.+)\\}$");
@@ -86,13 +89,17 @@ QString UnprotectionConvertor::convert(const QString& input) const
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-QString AllProtectionConvertor::convert(const QString &input) const {
-    return "{" + input.simplified() + "}";
+QString AllProtectionConvertor::convert(const QString& input) const {
+    return input.isEmpty() ? QString()
+                           : "{" + input.simplified() + "}";
 }
 
 //////////////////////////////////////////////////////////////////////////////////
 QString FirstLetterProtectionConvertor::convert(const QString& input) const
 {
+    if(input.isEmpty())
+        return QString();
+
     QStringList convertedWords;
     QStringList words = input.split(' ');
     foreach(QString word, words)
@@ -134,8 +141,11 @@ QString FirstLetterProtectionConvertor::toFirstCharProtected(const QString& word
 ///////////////////////////////////////////////////////////////////////
 QString AbbreviationConvertor::convert(const QString& input) const
 {
+    if(input.isEmpty())
+        return QString();
+
     QString result = input;
-    foreach(const QString& rule, rules)
+    foreach(const QString& rule, _rules)
     {
         QStringList sections = rule.split(';');  // two parts of a rule
         if(sections.size() == 2)
@@ -156,6 +166,7 @@ QString AbbreviationConvertor::convert(const QString& input) const
 
                 QString shortFullName = fullName.remove(rxBracket).simplified();
 
+                // try longFullName first, then shortFullName
                 result.replace(longFullName,  abbreviatedName, Qt::CaseInsensitive);
                 result.replace(shortFullName, abbreviatedName, Qt::CaseInsensitive);
             }
@@ -167,13 +178,13 @@ QString AbbreviationConvertor::convert(const QString& input) const
     return result;
 }
 
-void AbbreviationConvertor::setRules(const QStringList& r)
+void AbbreviationConvertor::setRules(const QStringList& rules)
 {
-    rules = r;
+    _rules = rules;
 
     // reverse order: to ensure long rule is applied first
     // e.g., Journal (of) before Journal
-    qSort(rules.begin(), rules.end(), qGreater<QString>());
+    qSort(_rules.begin(), _rules.end(), qGreater<QString>());
 }
 
 }

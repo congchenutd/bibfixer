@@ -24,7 +24,7 @@ private:
     QString toFirstCharUpperCase(const QString& word) const;
 
 private:
-    QStringList lowercaseWords;
+    QStringList _lowercaseWords;
 };
 
 // protect the first letter of each word by {}
@@ -41,14 +41,14 @@ private:
 class AllProtectionConvertor : public Convertor
 {
 public:
-    QString convert(const QString &input) const;
+    QString convert(const QString& input) const;
 };
 
 // remove the protective {}
 class UnprotectionConvertor : public Convertor
 {
 public:
-    QString convert(const QString &input) const;
+    QString convert(const QString& input) const;
 };
 
 // abbreviate based on the rules, such as transactions -> trans.
@@ -56,10 +56,10 @@ class AbbreviationConvertor : public Convertor
 {
 public:
     QString convert(const QString& input) const;
-    void setRules(const QStringList& r);   // fullname;abbreviatedname
+    void setRules(const QStringList& rules);   // format: fullname;abbreviatedname
 
 private:
-    QStringList rules;
+    QStringList _rules;
 };
 
 }

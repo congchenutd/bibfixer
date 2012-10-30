@@ -10,13 +10,13 @@ namespace BibFixer {
 //////////////////////////////////////////////////////////////////////////////
 void Reference::convert(const QString& fieldName, const Convertor& convertor)
 {
-	if(!fields.contains(fieldName))
+    if(!_fields.contains(fieldName))
 		return;
-    QString converted = convertor.convert(fields[fieldName]);
-	if(converted != fields[fieldName])
+    QString converted = convertor.convert(_fields[fieldName]);
+    if(converted != _fields[fieldName])
 	{
-		fields[fieldName] = converted;
-        changedText << converted;
+        _fields[fieldName] = converted;
+        _changedText << converted;
     }
 }
 
@@ -25,11 +25,11 @@ void Reference::generateKey(const QString& rule)
     if(rule.isEmpty())
         return;
 
-    QString key = KeyGenerator(this).generate(rule);
+    QString key = KeyGenerator::generateKey(*this, rule);
     if(!key.isEmpty())
     {
         setKey(key);
-        changedText << key;
+        _changedText << key;
     }
 }
 
@@ -39,10 +39,10 @@ QString Reference::toString() const
 	QTextStream os(&result);
     os << "@" << getType() << "{" << getKey() << ",\r\n";
 
-    QStringList keys = fields.keys();
+    QStringList keys = _fields.keys();
     for(int i = 0; i < keys.size(); ++i)
     {
-        os << "\t" << keys.at(i) << " = " << "{" << fields[keys.at(i)];
+        os << "\t" << keys.at(i) << " = " << "{" << _fields[keys.at(i)];
         if(i < keys.size() - 1)
             os << "},\r\n";
         else
@@ -54,7 +54,7 @@ QString Reference::toString() const
 }
 
 QString Reference::getFieldValue(const QString& fieldName) const {
-    return fields.contains(fieldName) ? fields[fieldName] : QString();
+    return _fields.contains(fieldName) ? _fields[fieldName] : QString();
 }
 
 void Reference::addField(const QString& fieldName, const QString& value)
@@ -73,7 +73,7 @@ void Reference::addField(const QString& fieldName, const QString& value)
 				fieldValue += "-" + endPage;
 		}
 	}
-    fields.insert(fieldName, fieldValue);
+    _fields.insert(fieldName, fieldValue);
 }
 
 
@@ -81,7 +81,7 @@ void Reference::addField(const QString& fieldName, const QString& value)
 QString ReferenceList::toString() const
 {
 	QString result;
-	foreach(const Reference& record, records)
+    foreach(const Reference& record, _records)
 		result += record.toString() + "\r\n\r\n";
 	return result;
 }
@@ -89,29 +89,29 @@ QString ReferenceList::toString() const
 QStringList ReferenceList::getChangedText() const
 {
 	QStringList result;
-	foreach(const Reference& record, records)
+    foreach(const Reference& record, _records)
 		result << record.getChangedText();
 	return result;
 }
 
 void ReferenceList::clearChangedText() {
-    for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
+    for(Records::Iterator it = _records.begin(); it != _records.end(); ++ it)
         it->clearChangedText();
 }
 
 void ReferenceList::addRecord(const Reference& record) {
     if(!record.isEmpty())
-        records.insert(record.getKey(), record);
+        _records.insert(record.getKey(), record);
 }
 
 void ReferenceList::clear() {
-	records.clear();
+    _records.clear();
 }
 
 void ReferenceList::capitalize(const QString& fieldName)
 {
     CaseConvertor convertor;
-	for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
+    for(Records::Iterator it = _records.begin(); it != _records.end(); ++ it)
         it->convert(fieldName, convertor);
 }
 
@@ -122,27 +122,28 @@ void ReferenceList::protect(const QString& fieldName)
         convertor = new FirstLetterProtectionConvertor;
     else
         convertor = new AllProtectionConvertor;
-	for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
+    for(Records::Iterator it = _records.begin(); it != _records.end(); ++ it)
         it->convert(fieldName, *convertor);
+    delete convertor;
 }
 
 void ReferenceList::abbreviate(const QString& fieldName)
 {
     AbbreviationConvertor convertor;
     convertor.setRules(Setting::getInstance("Rules.ini")->getSelectedAbbreviationRules());
-	for(Records::Iterator it = records.begin(); it != records.end(); ++ it)
+    for(Records::Iterator it = _records.begin(); it != _records.end(); ++ it)
         it->convert(fieldName, convertor);
 }
 
 void ReferenceList::generateKeys()
 {
     QString rule = Setting::getInstance("Rules.ini")->getKeyGenRule();
-    for(Records::Iterator it = records.begin(); it != records.end();)
+    for(Records::Iterator it = _records.begin(); it != _records.end();)
     {
         Reference ref = it.value();
         ref.generateKey(rule);
-        it = records.erase(it);      // re-insert the record because its key is changed
-        records.insert(ref.getKey(), ref);
+        it = _records.erase(it);      // re-insert the record because its key is changed
+        _records.insert(ref.getKey(), ref);
     }
 }
 

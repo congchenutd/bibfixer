@@ -20,8 +20,8 @@ ReferenceList BibParser::parse(const QString& content) const
     return result;
 }
 
-void BibParser::setValidFields(const QStringList& fields) {
-    validFields = fields;
+void BibParser::setValidFields(const QStringList& validFields) {
+    _validFields = validFields;
 }
 
 Reference BibParser::parseRecord(const QString& content) const
@@ -38,13 +38,13 @@ Reference BibParser::parseRecord(const QString& content) const
 	result.setKey (rxTypeAndID.cap(2));
 
 	// fields
-	QRegExp rxField("\\s*(\\w+)\\s*=\\s*\\{([^=]+)\\},?\\s*\\n\\s*");
+    QRegExp rxField("\\s*(\\w+)\\s*=\\s*\\{([^=]+)\\},?\\s*\\n?\\s*");
 	int idxField = rxField.indexIn(content, idxTypeAndID + rxTypeAndID.matchedLength());
 	while(idxField > -1)
 	{
 		QString fieldName  = rxField.cap(1).toLower();
         QString fieldValue = UnprotectionConvertor().convert(rxField.cap(2).simplified());
-		if(validFields.contains(fieldName))   // is a valid field
+		if(_validFields.contains(fieldName))   // is a valid field
 			result.addField(fieldName, fieldValue);
 		idxField = rxField.indexIn(content, idxField + rxField.matchedLength());  // next field
 	}

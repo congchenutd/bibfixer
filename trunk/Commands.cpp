@@ -7,45 +7,45 @@
 namespace BibFixer {
 
 Command::Command(MainWindow* mainWindow, QUndoCommand* parent)
-	: QUndoCommand(parent), mainWnd(mainWindow) {}
+	: QUndoCommand(parent), _mainWnd(mainWindow) {}
 
 void Command::undo()
 {
-    currentSnapshot = backupSnapshot;                    // restore backup
-    output(currentSnapshot.toString());                  // restore output
+    _currentSnapshot = _backupSnapshot;                  // restore backup
+    output(_currentSnapshot.toString());                 // restore output
     highlight();                                         // restore highlighting
-    mainWnd->setActionStatus(getActionName(), false);    // restore action status
+    _mainWnd->setTriggered(getActionName(), false);      // restore action status
 }
 
 void Command::redo()
 {
-    backupSnapshot = currentSnapshot;                       // backup
-    currentSnapshot.clearChangedText();                     // clear highlighting
+    _backupSnapshot = _currentSnapshot;                      // backup
+    _currentSnapshot.clearChangedText();                     // clear highlighting
 
-    runCommand();                                           // template method
+    runCommand();                                            // template method
 
-    output(currentSnapshot.toString());                     // output
-    currentSnapshot.setHighlightingColor(getHighlightColor()); // the color goes with ref for undo
+    output(_currentSnapshot.toString());                     // output
+    _currentSnapshot.setHighlightingColor(getHighlightColor()); // the color goes with ref for undo
     highlight();
 
-    mainWnd->setActionStatus(getActionName(), true);        // update action status
+    _mainWnd->setTriggered(getActionName(), true);        // update action status
 }
 
 void Command::output(const QString& text) {
-	mainWnd->getTextEdit()->setPlainText(text);
+	_mainWnd->getTextEdit()->setPlainText(text);
 }
 
 void Command::highlight()
 {
-	TextEdit* edit = mainWnd->getTextEdit();
+	TextEdit* edit = _mainWnd->getTextEdit();
 	edit->unHighlight();
-    const QStringList toBeHighlighted = currentSnapshot.getChangedText();
+    const QStringList toBeHighlighted = _currentSnapshot.getChangedText();
     foreach(const QString& text, toBeHighlighted)
-        edit->addHighlightedText(text, currentSnapshot.getHighlightingColor());
+        edit->addHighlighting(text, _currentSnapshot.getHighlightingColor());
 	edit->highlight();
 }
 
-ReferenceList Command::currentSnapshot;
+ReferenceList Command::_currentSnapshot;
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -60,14 +60,14 @@ CleanCommand::CleanCommand(MainWindow* mainWindow, QUndoCommand* parent)
 void CleanCommand::undo()
 {
 	output(originalText);
-    mainWnd->setActionStatus(MainWindow::Clean, false);
+    _mainWnd->setTriggered(MainWindow::Clean, false);
 }
 
 void CleanCommand::runCommand()
 {
     BibParser parser;
     parser.setValidFields(Setting::getInstance("Rules.ini")->getFields());
-    currentSnapshot = parser.parse(originalText);
+    _currentSnapshot = parser.parse(originalText);
 }
 
 
@@ -79,9 +79,9 @@ CapitalizeCommand::CapitalizeCommand(MainWindow* mainWindow, QUndoCommand* paren
 
 void CapitalizeCommand::runCommand()
 {
-    currentSnapshot.capitalize("title");
-    currentSnapshot.capitalize("journal");
-    currentSnapshot.capitalize("booktitle");
+    _currentSnapshot.capitalize("title");
+    _currentSnapshot.capitalize("journal");
+    _currentSnapshot.capitalize("booktitle");
 }
 
 
@@ -92,7 +92,7 @@ ProtectCommand::ProtectCommand(MainWindow* mainWindow, QUndoCommand* parent)
 }
 
 void ProtectCommand::runCommand() {
-    currentSnapshot.protect("title");
+    _currentSnapshot.protect("title");
 }
 
 
@@ -104,8 +104,8 @@ AbbreviateCommand::AbbreviateCommand(MainWindow* mainWindow, QUndoCommand* paren
 
 void AbbreviateCommand::runCommand()
 {
-    currentSnapshot.abbreviate("journal");
-    currentSnapshot.abbreviate("booktitle");
+    _currentSnapshot.abbreviate("journal");
+    _currentSnapshot.abbreviate("booktitle");
 }
 
 
@@ -116,7 +116,7 @@ GenerateKeysCommand::GenerateKeysCommand(MainWindow* mainWindow, QUndoCommand* p
 }
 
 void GenerateKeysCommand::runCommand() {
-    currentSnapshot.generateKeys();
+    _currentSnapshot.generateKeys();
 }
 
 }

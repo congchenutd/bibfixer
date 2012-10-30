@@ -6,6 +6,7 @@
 
 namespace BibFixer {
 
+// UI for editing keygen rules
 class WidgetKeyGen : public QWidget
 {
     Q_OBJECT
@@ -15,7 +16,7 @@ public:
     void save();
     
 private:
-    Ui::WidgetKeyGen ui;
+    Ui::WidgetKeyGen _ui;
 };
 
 }

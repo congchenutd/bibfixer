@@ -2,104 +2,103 @@
 #include "DlgSettings.h"
 #include "ImageColorBoolProxy.h"
 #include "ImageColorBoolDelegate.h"
-#include <QFile>
-#include <QTextStream>
 #include <QHeaderView>
 
 namespace BibFixer {
 
 WidgetAbbreviation::WidgetAbbreviation(QWidget* parent) :
-	QWidget(parent), currentRow(-1)
+	QWidget(parent), _currentRow(-1)
 {
-	ui.setupUi(this);
+	_ui.setupUi(this);
 
 	load();
-	ui.tvAbbreviations->setModel(&model);
-	ui.tvAbbreviations->resizeColumnsToContents();
-	ui.tvAbbreviations->horizontalHeader()->setStretchLastSection(true);
+	_ui.tvAbbreviations->setModel(&_model);
+	_ui.tvAbbreviations->resizeColumnsToContents();
+	_ui.tvAbbreviations->horizontalHeader()->setStretchLastSection(true);
 
 	ImageColorBoolProxy* proxy = new ImageColorBoolProxy(this);
     proxy->setColumnType(SELECTED, ImageColorBoolProxy::BoolColumn);
-	proxy->setSourceModel(&model);
+	proxy->setSourceModel(&_model);
 
-	ui.tvAbbreviations->setModel(proxy);
-	ImageColorBoolDelegate* delegate = new ImageColorBoolDelegate(proxy, ui.tvAbbreviations);
-	delegate->setEditTrigger(QEvent::MouseButtonPress);
+	_ui.tvAbbreviations->setModel(proxy);
+	ImageColorBoolDelegate* delegate = new ImageColorBoolDelegate(proxy, _ui.tvAbbreviations);
+    delegate->setEditTrigger(QEvent::MouseButtonPress);
 	delegate->setCheckedImage  (QPixmap(":/Images/Checked.png"));
 	delegate->setUncheckedImage(QPixmap(":/Images/UnChecked.png"));
-	ui.tvAbbreviations->setItemDelegate(delegate);
+	_ui.tvAbbreviations->setItemDelegate(delegate);
 
-	connect(ui.tvAbbreviations->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
+	connect(_ui.tvAbbreviations->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
 			this, SLOT(onCurrentRowChanged(QModelIndex)));
-	connect(ui.btAdd, SIGNAL(clicked()), this, SLOT(onAdd()));
-	connect(ui.btDel, SIGNAL(clicked()), this, SLOT(onDel()));
+	connect(_ui.btAdd, SIGNAL(clicked()), this, SLOT(onAdd()));
+	connect(_ui.btDel, SIGNAL(clicked()), this, SLOT(onDel()));
 }
 
 QStringList WidgetAbbreviation::getSelectedRules() const
 {
 	QStringList result;
-	int rowCount = model.rowCount();
-	for(int row=0; row<rowCount; row++)
-        if(model.data(model.index(row, SELECTED)).toBool())
-			result << model.data(model.index(row, FULL)).toString() + ";" +
-					  model.data(model.index(row, ABBR)).toString();
+    for(int row = 0; row < _model.rowCount(); row ++)
+        if(_model.data(_model.index(row, SELECTED)).toBool())
+			result << _model.data(_model.index(row, FULL)).toString() + ";" +
+                      _model.data(_model.index(row, SHORT)).toString();
 	return result;
 }
 
 void WidgetAbbreviation::onCurrentRowChanged(const QModelIndex& idx)
 {
-	currentRow = idx.isValid() ? idx.row() : -1;
-	ui.btDel->setEnabled(idx.isValid());
+	_currentRow = idx.isValid() ? idx.row() : -1;
+	_ui.btDel->setEnabled(idx.isValid());
 }
 
 void WidgetAbbreviation::onAdd()
 {
-	int lastRow = model.rowCount();
-	model.insertRow(lastRow);
-    model.setData(model.index(lastRow, SELECTED), true);
-	ui.tvAbbreviations->selectRow(lastRow);
-	ui.tvAbbreviations->scrollToBottom();
+	int lastRow = _model.rowCount();
+	_model.insertRow(lastRow);
+    _model.setData(_model.index(lastRow, SELECTED), true);
+	_ui.tvAbbreviations->scrollToBottom();
+    _ui.tvAbbreviations->selectRow(lastRow);
+
+    // FIXME: this doesn't work probably because of the delegate
+    // _ui.tvAbbreviations->edit(_model.index(lastRow, FULL));
 }
 
 void WidgetAbbreviation::onDel()
 {
-	model.removeRow(currentRow);  // FIXME: combining the two lines won't work
-	currentRow --;
+    int backup = _currentRow;      // removeRow() will trigger onCurrentRowChanged()
+    _model.removeRow(_currentRow);
+    _currentRow = backup;
 }
 
 void WidgetAbbreviation::load()
 {
-	model.setColumnCount(3);
-    model.setHeaderData(FULL,     Qt::Horizontal, tr("Fullname"));
-    model.setHeaderData(ABBR,     Qt::Horizontal, tr("Abbreviation"));
-    model.setHeaderData(SELECTED, Qt::Horizontal, tr("Selected"));
+	_model.setColumnCount(3);
+    _model.setHeaderData(FULL,     Qt::Horizontal, tr("Fullname"));
+    _model.setHeaderData(SHORT,    Qt::Horizontal, tr("Abbreviation"));
+    _model.setHeaderData(SELECTED, Qt::Horizontal, tr("Selected"));
     QStringList rules = Setting::getInstance("Rules.ini")->getAbbreviationRules();
-	model.setRowCount(rules.size());
-	for(int row = 0; row < rules.size(); ++ row)
-	{
-		QStringList sections = rules.at(row).split(";");
+	_model.setRowCount(rules.size());
+    for(int row = 0; row < rules.size(); ++ row)
+    {
+        QStringList sections = rules.at(row).split(";");
 		if(sections.size() == 3)
 		{
-            model.setData(model.index(row, FULL),     sections[FULL]);
-            model.setData(model.index(row, ABBR),     sections[ABBR]);
-            model.setData(model.index(row, SELECTED), sections[SELECTED]);
+            _model.setData(_model.index(row, FULL),     sections[FULL]);
+            _model.setData(_model.index(row, SHORT),    sections[SHORT]);
+            _model.setData(_model.index(row, SELECTED), sections[SELECTED]);
 		}
 	}
 }
 
 void WidgetAbbreviation::save()
 {
-	model.sort(FULL);
+	_model.sort(FULL);
 	QStringList rules;
-	for(int row = 0; row < model.rowCount(); ++ row)
+	for(int row = 0; row < _model.rowCount(); ++ row)
 	{
-        QString fullName        = model.data(model.index(row, FULL))    .toString();
-        QString abbreviatedName = model.data(model.index(row, ABBR))    .toString();
-        QString selected        = model.data(model.index(row, SELECTED)).toString();
-		QStringList rule;
-		if(!fullName.isEmpty() && !abbreviatedName.isEmpty() && !selected.isEmpty())
-			rule << fullName << abbreviatedName << selected;
-		rules << rule.join(";");
+        QString fullName  = _model.data(_model.index(row, FULL))    .toString();
+        QString shortName = _model.data(_model.index(row, SHORT))   .toString();
+        QString selected  = _model.data(_model.index(row, SELECTED)).toString();
+        if(!fullName.isEmpty() && !shortName.isEmpty() && !selected.isEmpty())
+            rules << (QStringList() << fullName << shortName << selected).join(";");
 	}
     Setting::getInstance("Rules.ini")->setAbbreviationRules(rules);
 }
