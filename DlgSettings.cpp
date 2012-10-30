@@ -8,23 +8,23 @@ namespace BibFixer {
 DlgSettings::DlgSettings(QWidget *parent) :
 	QDialog(parent)
 {
-	ui.setupUi(this);
+	_ui.setupUi(this);
 
     // load settings
-	setting = Setting::getInstance();
-	font = setting->getFont();
-    ui.cbProtectFirstLetter->setChecked(setting->getProtectFirstLetter());
+	_setting = Setting::getInstance();
+	_font = _setting->getFont();
+    _ui.cbProtectFirstLetter->setChecked(_setting->getProtectFirstLetter());
 
-	connect(ui.btFont, SIGNAL(clicked()), this, SLOT(onFont()));
+	connect(_ui.btFont, SIGNAL(clicked()), this, SLOT(onFont()));
 }
 
 void DlgSettings::accept()
 {
-	setting->setFont(font);
-    setting->setProtectFirstLetter(ui.cbProtectFirstLetter->isChecked());
-	ui.tabValidFields      ->save();
-	ui.tabAbbreviationRules->save();
-    ui.tabKeyGen           ->save();
+	_setting->setFont(_font);
+    _setting->setProtectFirstLetter(_ui.cbProtectFirstLetter->isChecked());
+	_ui.tabValidFields      ->save();
+	_ui.tabAbbreviationRules->save();
+    _ui.tabKeyGen           ->save();
 
 	QDialog::accept();
 }
@@ -32,9 +32,9 @@ void DlgSettings::accept()
 void DlgSettings::onFont()
 {
 	bool ok;
-	QFont f = QFontDialog::getFont(&ok, font, this);
+    QFont font = QFontDialog::getFont(&ok, _font, this);
 	if(ok)
-		font = f;
+        _font = font;
 }
 
 
@@ -50,7 +50,7 @@ Setting::Setting(const QString& fileName)
 void Setting::loadDefaults()
 {
 	setFont(qApp->font());
-    setKeyGenRule("lastname;firstletter;year]");
+    setKeyGenRule("lastname;firstletter;year");
 }
 
 QFont Setting::getFont() const
@@ -79,7 +79,7 @@ QStringList Setting::getAbbreviationRules() const
 {
 	// empty string.split() will produce a stringlist with one empty entry
 	QString content = value("AbbreviationRules").toString();
-	return content.isEmpty() ? QStringList() : content.split("#");
+    return content.isEmpty() ? QStringList() : content.split("#");
 }
 
 QStringList Setting::getSelectedAbbreviationRules() const

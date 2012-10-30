@@ -4,25 +4,29 @@ namespace BibFixer {
 
 TextEdit::TextEdit(QWidget* parent) : QPlainTextEdit(parent) {}
 
-void TextEdit::addHighlightedText(const QString& text, const QColor& color) {
-    highlightedTexts.insert(text, color);
+void TextEdit::addHighlighting(const QString& text, const QColor& bgColor) {
+    _highlightedTexts.insert(text, bgColor);
 }
 
 void TextEdit::highlight()
 {
     QList<QTextEdit::ExtraSelection> selections;
-	for(HighLightedText::Iterator it = highlightedTexts.begin(); it != highlightedTexts.end(); ++it)
+	for(HighLightedText::Iterator it = _highlightedTexts.begin(); it != _highlightedTexts.end(); ++it)
 	{
+        QString text  = it.key();
+        QColor  color = it.value();
+
+        // select all occurances of text and highlight them with color
 		QTextCursor cursor = textCursor();
 		cursor.setPosition(0);
-		cursor = document()->find(it.key(), cursor);
+        cursor = document()->find(text, cursor);
 		while(!cursor.isNull())
 		{
 			QTextEdit::ExtraSelection selection;
-			selection.format.setBackground(it.value());
+            selection.format.setBackground(color);
 			selection.cursor = cursor;
             selections << selection;
-			cursor = document()->find(it.key(), cursor);
+            cursor = document()->find(text, cursor);   // next occurance
 		}
 	}
     setExtraSelections(selections);
@@ -30,7 +34,7 @@ void TextEdit::highlight()
 
 void TextEdit::unHighlight()
 {
-    highlightedTexts.clear();
+    _highlightedTexts.clear();
     highlight();
 }
 

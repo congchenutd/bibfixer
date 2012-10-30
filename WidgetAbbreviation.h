@@ -6,7 +6,7 @@
 
 namespace BibFixer {
 
-// edit abbreviation rules
+// UI for editing abbreviation rules
 class Setting;
 class WidgetAbbreviation : public QWidget
 {
@@ -26,11 +26,11 @@ private:
     void load();
 
 private:
-	Ui::WidgetAbbreviation ui;
-	QStandardItemModel model;
-	int currentRow;
+    Ui::WidgetAbbreviation _ui;
+    QStandardItemModel _model;
+    int                _currentRow;
 
-    enum {FULL, ABBR, SELECTED};
+    enum {FULL, SHORT, SELECTED};   // columns
 };
 
 }

@@ -12,13 +12,13 @@ class MainWindow : public QMainWindow
 
 public:
     typedef enum {Init, Open, Clean, Capitalize, Protect,
-                  Abbreviate, GenerateKey, RunAll, Save, Size} ActionName;
+                  Abbreviate, GenerateKeys, RunAll, Save, Size} ActionName;
 public:
 	MainWindow(QWidget* parent = 0);
 	TextEdit* getTextEdit() const { return ui.teOutput; }
 
-    void setActionStatus(ActionName status, bool value);
-    void open(const QString& filePath);   // called by external program
+    void setTriggered(ActionName actionName, bool triggered);  // set action triggered
+    void openBibFile(const QString& filePath);                 // to be called by external program
 
 private slots:
 	void onNewFile();
@@ -35,27 +35,29 @@ private slots:
 	void onAbout();
 
 private:
-    void initActionStatuses();
+    void resetTriggered();
     void createActions();
 
-    bool isOpenEnabled()         const { return actionStatuses[Init]; }
-    bool isCleanEnabled()        const { return actionStatuses[Open]       && !actionStatuses[Clean];       }
-    bool isCapitalizeEnabled()   const { return actionStatuses[Clean]      && !actionStatuses[Capitalize];   }
-    bool isProtectEnabled()      const { return actionStatuses[Capitalize] && !actionStatuses[Protect];     }
-    bool isAbbreviateEnabled()   const { return actionStatuses[Clean]      && !actionStatuses[Abbreviate];   }
-    bool isGenerateKeysEnabled() const { return actionStatuses[Clean]      && !actionStatuses[GenerateKey]; }
-    bool isSaveEnabled()         const { return actionStatuses[Open]; }
-    bool isRunAllEnabled()       const { return actionStatuses[Open] && !actionStatuses[RunAll] &&
-                                        (!actionStatuses[Capitalize] ||
-                                         !actionStatuses[Protect]    ||
-                                         !actionStatuses[Abbreviate] ||
-                                         !actionStatuses[GenerateKey]); }
-    bool isReadOnly() const { return actionStatuses[Clean]; }
+    bool canOpen()         const { return _triggered[Init]; }
+    bool canClean()        const { return _triggered[Open]       && !_triggered[Clean];        }
+    bool canCapitalize()   const { return _triggered[Clean]      && !_triggered[Capitalize];   }
+    bool canProtect()      const { return _triggered[Capitalize] && !_triggered[Protect];      }
+    bool canAbbreviate()   const { return _triggered[Clean]      && !_triggered[Abbreviate];   }
+    bool canGenerateKeys() const { return _triggered[Clean]      && !_triggered[GenerateKeys]; }
+    bool canSave()         const { return _triggered[Open]; }
+    bool canRunAll()       const { return _triggered[Open] && !_triggered[RunAll] &&
+                                        (!_triggered[Capitalize] ||
+                                         !_triggered[Protect]    ||
+                                         !_triggered[Abbreviate] ||
+                                         !_triggered[GenerateKeys]); }
+    bool isReadOnly() const { return _triggered[Clean]; }
 
 private:
 	Ui::MainWindow ui;
-	QUndoStack undoStack;
-    bool actionStatuses[Size];
+    QUndoStack _undoStack;
+    bool       _triggered[Size];   // triggered[i]: if this action has been triggered
+                                   // not using states because enabling some actions
+                                   // cannot be determined by single state
 };
 
 }

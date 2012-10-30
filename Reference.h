@@ -2,25 +2,27 @@
 #define REFERENCE_H
 
 #include <QMap>
-#include <QString>
 #include <QStringList>
 #include <QColor>
 
 namespace BibFixer {
 
 class Convertor;
+
+// a reference, consisting of type, key, and multiple fields
+// a field consists of field name and field value
 class Reference
 {
 public:
-	typedef QMap<QString, QString> Fields;
+    typedef QMap<QString, QString> Fields;  // fieldName, fieldValue
 
 public:
-	QString getType() const { return type; }
-	QString getKey()  const { return key;  }
-	bool isValid() const { return !type.isEmpty(); }
-	bool isEmpty() const { return !isValid() || fields.isEmpty(); }
-    void setType (const QString& t) { if(!t.isEmpty()) type = t; }
-    void setKey  (const QString& k) { if(!k.isEmpty()) key  = k; }
+    QString getType() const { return _type; }
+    QString getKey()  const { return _key;  }
+    bool isValid() const { return !_type.isEmpty(); }
+    bool isEmpty() const { return !isValid() || _fields.isEmpty(); }
+    void setType (const QString& type) { if(!type.isEmpty()) _type = type; }
+    void setKey  (const QString& key)  { if(!key.isEmpty())  _key  = key;  }
     void addField(const QString& fieldName, const QString& fieldValue);
 	void convert(const QString& fieldName, const Convertor& convertor);
     void generateKey(const QString& rule);
@@ -28,16 +30,17 @@ public:
     QString getFieldValue(const QString& fieldName) const;
 
 	// for highlighting
-    QStringList getChangedText() const { return changedText; }
-    void clearChangedText() { changedText.clear(); }
+    QStringList getChangedText() const { return _changedText; }
+    void clearChangedText() { _changedText.clear(); }
 
 private:
-	QString type;
-    QString key;
-	Fields  fields;
-    QStringList changedText;
+    QString _type;
+    QString _key;
+    Fields  _fields;
+    QStringList _changedText;
 };
 
+// a list of reference
 class ReferenceList
 {
 public:
@@ -52,14 +55,15 @@ public:
     void generateKeys();
 	QString toString() const;
 
-    QStringList getChangedText() const;   // for hightlighting
+    // for hightlighting
+    QStringList getChangedText() const;
     void clearChangedText();
-    QColor getHighlightingColor() const { return color; }
-    void setHighlightingColor(const QColor& highlightingColor) { color = highlightingColor; }
+    QColor getHighlightingColor() const { return _color; }
+    void setHighlightingColor(const QColor& color) { _color = color; }
 
 private:
-    Records records;
-	QColor  color;     // each snapshot stores its color
+    Records _records;
+    QColor  _color;     // each reference list stores its color
 };
 
 }

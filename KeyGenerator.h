@@ -6,24 +6,21 @@
 namespace BibFixer {
 
 class Reference;
-class KeyGenerator
-{
-public:
-    explicit KeyGenerator(const Reference* reference);
-    QString generate(const QString& rule);
 
-private:
-    QString getFirstAuthor() const;    // first author's full name
-    QString getLastName()    const;    // first author's last name
-    QString getFirstName()   const;    // first author's first name
-    QString getFirstLetter() const;    // the first letter of first author's first name
-    QString getFirstWord()   const;    // the first word of the title
-    QString getYear()        const;
+// generate bibkey for a reference
+namespace KeyGenerator {
 
-private:
-    const Reference* ref;
-};
+// the rule is consist of multiple patterns, connected by ;
+QString generateKey(const Reference& ref, const QString& rule);
 
-}
+QString getFirstAuthor(const Reference& ref);    // first author's full name
+QString getLastName   (const Reference& ref);    // first author's last name
+QString getFirstName  (const Reference& ref);    // first author's first name
+QString getFirstLetter(const Reference& ref);    // the first letter of first author's first name
+QString getFirstWord  (const Reference& ref);    // the first word of the title
+QString getYear       (const Reference& ref);
+
+}  // KeyGenerator
+}  // BibFixer
 
 #endif // KEYGENERATOR_H

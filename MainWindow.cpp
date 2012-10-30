@@ -12,12 +12,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
     createActions();
-    initActionStatuses();
+    resetTriggered();   // init action status
 	ui.teOutput->setFont(Setting::getInstance()->getFont());
 
-	connect(ui.actionNew,          SIGNAL(triggered()), this, SLOT(onNewFile()));
+    connect(ui.actionNew,          SIGNAL(triggered()), this, SLOT(onNewFile()));
     connect(ui.actionOpen,         SIGNAL(triggered()), this, SLOT(onOpen()));
-    connect(ui.teOutput,           SIGNAL(pasted()),    this, SLOT(onPaste()));
     connect(ui.actionSave,         SIGNAL(triggered()), this, SLOT(onSave()));
     connect(ui.actionSettings,     SIGNAL(triggered()), this, SLOT(onSettings()));
     connect(ui.actionRunAll,       SIGNAL(triggered()), this, SLOT(onRunAll()));
@@ -27,52 +26,53 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui.actionAbbreviate,   SIGNAL(triggered()), this, SLOT(onAbbreviate()));
     connect(ui.actionGenerateKeys, SIGNAL(triggered()), this, SLOT(onGenerateKeys()));
     connect(ui.actionAbout,        SIGNAL(triggered()), this, SLOT(onAbout()));
+    connect(ui.teOutput,           SIGNAL(pasted()),    this, SLOT(onPaste()));
 }
 
-void MainWindow::initActionStatuses()
+void MainWindow::resetTriggered()
 {
-    setActionStatus(Init,        true);
-    setActionStatus(Open,        false);
-    setActionStatus(Clean,       false);
-    setActionStatus(Capitalize,  false);
-    setActionStatus(Protect,     false);
-    setActionStatus(Abbreviate,  false);
-    setActionStatus(GenerateKey, false);
-    setActionStatus(RunAll,      false);
-    setActionStatus(Save,        false);
+    // initial statuses
+    setTriggered(Init,         true);
+    setTriggered(Open,         false);
+    setTriggered(Clean,        false);
+    setTriggered(Capitalize,   false);
+    setTriggered(Protect,      false);
+    setTriggered(Abbreviate,   false);
+    setTriggered(GenerateKeys, false);
+    setTriggered(RunAll,       false);
+    setTriggered(Save,         false);
 }
 
-void MainWindow::setActionStatus(MainWindow::ActionName status, bool value)
+void MainWindow::setTriggered(MainWindow::ActionName actionName, bool triggered)
 {
-    actionStatuses[status] = value;
-    ui.actionOpen        ->setEnabled(isOpenEnabled());
-    ui.actionClean       ->setEnabled(isCleanEnabled());
-    ui.actionCapitalize  ->setEnabled(isCapitalizeEnabled());
-    ui.actionProtect     ->setEnabled(isProtectEnabled());
-    ui.actionAbbreviate  ->setEnabled(isAbbreviateEnabled());
-    ui.actionGenerateKeys->setEnabled(isGenerateKeysEnabled());
-    ui.actionSave        ->setEnabled(isSaveEnabled());
-    ui.actionRunAll      ->setEnabled(isRunAllEnabled());
-
-    ui.teOutput->setReadOnly(isReadOnly());
+    _triggered[actionName] = triggered;
+    ui.actionOpen        ->setEnabled(canOpen());
+    ui.actionClean       ->setEnabled(canClean());
+    ui.actionCapitalize  ->setEnabled(canCapitalize());
+    ui.actionProtect     ->setEnabled(canProtect());
+    ui.actionAbbreviate  ->setEnabled(canAbbreviate());
+    ui.actionGenerateKeys->setEnabled(canGenerateKeys());
+    ui.actionSave        ->setEnabled(canSave());
+    ui.actionRunAll      ->setEnabled(canRunAll());
+    ui.teOutput          ->setReadOnly(isReadOnly());
 }
 
 void MainWindow::createActions()
 {
     ui.actionOpen->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
 
-    QAction* undoAction = undoStack.createUndoAction(this, tr("Undo"));
+    QAction* undoAction = _undoStack.createUndoAction(this, tr("Undo"));
     undoAction->setIcon(QIcon(":/Images/Undo.png"));
     undoAction->setShortcuts(QKeySequence::Undo);
-    ui.mainToolBar->insertAction(0, undoAction);
+    ui.mainToolBar->insertAction(0, undoAction);  // append to the toolbar
 
-    QAction* redoAction = undoStack.createRedoAction(this, tr("Redo"));
+    QAction* redoAction = _undoStack.createRedoAction(this, tr("Redo"));
     redoAction->setIcon(QIcon(":/Images/Redo.png"));
     redoAction->setShortcuts(QKeySequence::Redo);
-    ui.mainToolBar->insertAction(0, redoAction);
+    ui.mainToolBar->insertAction(0, redoAction);  // append to the toolbar
 }
 
-void MainWindow::open(const QString& filePath)
+void MainWindow::openBibFile(const QString& filePath)
 {
     if(filePath.isEmpty())
         return;
@@ -87,16 +87,16 @@ void MainWindow::open(const QString& filePath)
         ui.teOutput->setPlainText(filePath);
     }
 
-    undoStack.clear();
-    initActionStatuses();
-    setActionStatus(Open, true);
+    _undoStack.clear();
+    resetTriggered();
+    setTriggered(Open, true);
 }
 
 void MainWindow::onNewFile()
 {
 	ui.teOutput->clear();
-	undoStack.clear();
-	initActionStatuses();
+	_undoStack.clear();
+    resetTriggered();
 }
 
 void MainWindow::onOpen()
@@ -106,11 +106,11 @@ void MainWindow::onOpen()
     if(filePath.isEmpty())
 		return;
 
-    open(filePath);
+    openBibFile(filePath);
 }
 
 void MainWindow::onPaste() {
-    setActionStatus(Open, !ui.teOutput->toPlainText().isEmpty());
+    setTriggered(Open, !ui.teOutput->toPlainText().isEmpty());
 }
 
 void MainWindow::onSave()
@@ -139,37 +139,40 @@ void MainWindow::onSettings()
 }
 
 void MainWindow::onClean() {
-    if(isCleanEnabled())
-        undoStack.push(new CleanCommand(this));
+    if(canClean())
+        _undoStack.push(new CleanCommand(this));
 }
 
 void MainWindow::onCapitalize() {
-    if(isCapitalizeEnabled())
-        undoStack.push(new CapitalizeCommand(this));
+    if(canCapitalize())
+        _undoStack.push(new CapitalizeCommand(this));
 }
 
 void MainWindow::onProtect() {
-    if(isProtectEnabled())
-        undoStack.push(new ProtectCommand(this));
+    if(canProtect())
+        _undoStack.push(new ProtectCommand(this));
 }
 
 void MainWindow::onAbbreviate() {
-    if(isAbbreviateEnabled())
-        undoStack.push(new AbbreviateCommand(this));
+    if(canAbbreviate())
+        _undoStack.push(new AbbreviateCommand(this));
 }
 
 void MainWindow::onGenerateKeys() {
-    if(isGenerateKeysEnabled())
-        undoStack.push(new GenerateKeysCommand(this));
+    if(canGenerateKeys())
+        _undoStack.push(new GenerateKeysCommand(this));
 }
 
 void MainWindow::onRunAll()
 {
-    onClean();
-    onCapitalize();
-    onProtect();
-    onAbbreviate();
-    onGenerateKeys();
+    if(canRunAll())
+    {
+        onClean();
+        onCapitalize();
+        onProtect();
+        onAbbreviate();
+        onGenerateKeys();
+    }
 }
 
 void MainWindow::onAbout() {

@@ -11,11 +11,11 @@ class TextEdit : public QPlainTextEdit
 {
 	Q_OBJECT
 
-    typedef QMap<QString, QColor> HighLightedText;
+    typedef QMap<QString, QColor> HighLightedText;  // text, bg color
 
 public:
 	TextEdit(QWidget* parent = 0);
-    void addHighlightedText(const QString& text, const QColor& color);
+    void addHighlighting(const QString& text, const QColor& bgColor);
     void highlight();
     void unHighlight();
 
@@ -26,7 +26,7 @@ signals:
     void pasted();
 
 private:
-    HighLightedText highlightedTexts;
+    HighLightedText _highlightedTexts;
 };
 
 }

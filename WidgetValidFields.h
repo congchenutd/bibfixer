@@ -8,6 +8,8 @@
 namespace BibFixer {
 
 class Setting;
+
+// UI for editing valid fields
 class WidgetValidFields : public QWidget
 {
 	Q_OBJECT
@@ -25,9 +27,9 @@ private:
 	void load();    // load data from setting
 
 private:
-	Ui::WidgetValidFields ui;
-	QStandardItemModel model;
-	int currentRow;
+    Ui::WidgetValidFields _ui;
+    QStandardItemModel _model;
+    int                _currentRow;
 };
 
 }

@@ -27,10 +27,10 @@ protected:
 	virtual void runCommand() = 0;                             // template method
 
 protected:
-	ReferenceList backupSnapshot;           // backup for retoring highlighting in undo
-    MainWindow*   mainWnd;
+    ReferenceList _backupSnapshot;           // backup for retoring highlighting in undo
+    MainWindow*   _mainWnd;
 
-	static ReferenceList currentSnapshot;   // current version
+    static ReferenceList _currentSnapshot;   // current version
 };
 
 class CleanCommand : public Command
@@ -87,7 +87,7 @@ public:
     GenerateKeysCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
 
 protected:
-    MainWindow::ActionName getActionName() const { return MainWindow::GenerateKey; }
+    MainWindow::ActionName getActionName() const { return MainWindow::GenerateKeys; }
 	QColor getHighlightColor() const { return Qt::magenta; }
 	void runCommand();
 };
