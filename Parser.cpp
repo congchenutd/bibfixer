@@ -38,14 +38,17 @@ Reference BibParser::parseRecord(const QString& content) const
 	result.setKey (rxTypeAndID.cap(2));
 
 	// fields
-    QRegExp rxField("\\s*(\\w+)\\s*=\\s*\\{([^=]+)\\},?\\s*\\n?\\s*");
+    QRegExp rxField("\\s*(\\w+)\\s*=\\s*\\{([^=]+)\\}[,\\s\\r\\n]");
 	int idxField = rxField.indexIn(content, idxTypeAndID + rxTypeAndID.matchedLength());
 	while(idxField > -1)
 	{
 		QString fieldName  = rxField.cap(1).toLower();
-        QString fieldValue = UnprotectionConvertor().convert(rxField.cap(2).simplified());
-		if(_validFields.contains(fieldName))   // is a valid field
-			result.addField(fieldName, fieldValue);
+        if(_validFields.contains(fieldName))   // is a valid field
+        {
+            QString fieldValue = UnprotectionConvertor().convert(  // remove {}
+                                      rxField.cap(2).simplified());
+            result.addField(fieldName, fieldValue);
+        }
 		idxField = rxField.indexIn(content, idxField + rxField.matchedLength());  // next field
 	}
 
