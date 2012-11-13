@@ -2,6 +2,7 @@
 #include <QFontDialog>
 #include <QApplication>
 #include <QResource>
+#include <QMessageBox>
 
 namespace BibFixer {
 
@@ -41,7 +42,7 @@ void DlgSettings::onFont()
 //////////////////////////////////////////////////////////////////////////
 // Setting
 Setting::Setting(const QString& fileName)
-: MySetting<Setting>(fileName)
+    : MySetting<Setting>(fileName)
 {
 	if(QFile(this->fileName).size() == 0)   // no setting
 		loadDefaults();

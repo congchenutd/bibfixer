@@ -18,7 +18,9 @@ public:
 	TextEdit* getTextEdit() const { return ui.teOutput; }
 
     void setTriggered(ActionName actionName, bool triggered);  // set action triggered
-    void openBibFile(const QString& filePath);                 // to be called by external program
+
+public slots:
+    void openBibFile(const QString& filePath);     // to be called by external program
 
 private slots:
 	void onNewFile();
