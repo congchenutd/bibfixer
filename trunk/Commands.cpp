@@ -66,7 +66,7 @@ void CleanCommand::undo()
 void CleanCommand::runCommand()
 {
     BibParser parser;
-    parser.setValidFields(Setting::getInstance("Rules.ini")->getFields());
+    parser.setValidFields(Setting::getInstance("Rules.ini")->getSelectedFields());
     _currentSnapshot = parser.parse(originalText);
 }
 

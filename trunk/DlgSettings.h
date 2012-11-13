@@ -34,6 +34,7 @@ public:
 	void setFont(const QFont& font);
 
 	QStringList getFields() const;
+    QStringList getSelectedFields() const;
 	void setFields(const QStringList& fields);
 
 	QStringList getAbbreviationRules() const;

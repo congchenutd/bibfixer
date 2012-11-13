@@ -71,6 +71,19 @@ QStringList Setting::getFields() const
     return content.isEmpty() ? QStringList() : content.split("#");
 }
 
+QStringList Setting::getSelectedFields() const
+{
+    QStringList allFields = getFields();
+    QStringList result;
+    foreach(const QString& field, allFields)
+    {
+        QStringList sections = field.split(";");
+        if(sections.size() == 2 && sections[1].toLower() == "true")
+            result << sections[0];
+    }
+    return result;
+}
+
 void Setting::setFields(const QStringList& fields) {
     setValue("Fields", fields.join("#").toLower());
 }
