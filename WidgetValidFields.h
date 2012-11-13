@@ -27,6 +27,8 @@ private:
 	void load();    // load data from setting
 
 private:
+    enum {FIELD_NAME, SELECTED};
+
     Ui::WidgetValidFields _ui;
     QStandardItemModel _model;
     int                _currentRow;
