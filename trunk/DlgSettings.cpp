@@ -68,11 +68,11 @@ QStringList Setting::getFields() const
 {
 	// empty string.split() will produce a stringlist with one empty entry
 	QString content = value("Fields").toString();
-	return content.isEmpty() ? QStringList() : content.split(";");
+    return content.isEmpty() ? QStringList() : content.split("#");
 }
 
 void Setting::setFields(const QStringList& fields) {
-	setValue("Fields", fields.join(";").toLower());
+    setValue("Fields", fields.join("#").toLower());
 }
 
 QStringList Setting::getAbbreviationRules() const
