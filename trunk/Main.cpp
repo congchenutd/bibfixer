@@ -9,7 +9,8 @@ int main(int argc, char *argv[])
 
     BibFixer::MainWindow wnd;
     app.setActivationWindow(&wnd);
-    wnd.showMaximized();
+    wnd.resize(1000, 600);
+    wnd.show();
     if(argc > 1)
         wnd.openBibFile(argv[1]);
 

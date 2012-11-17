@@ -11,6 +11,7 @@ namespace BibFixer {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
+
     createActions();
     resetTriggered();   // init action status
 	ui.teOutput->setFont(Setting::getInstance()->getFont());
