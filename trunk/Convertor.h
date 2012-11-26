@@ -22,6 +22,7 @@ public:
 
 private:
     QString toFirstCharUpperCase(const QString& word) const;
+    bool    containsPunctuation(const QString& word) const;
 
 private:
     QStringList _lowercaseWords;
