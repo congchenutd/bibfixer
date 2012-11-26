@@ -43,8 +43,9 @@ QString CaseConvertor::convert(const QString& input) const
 	QString lastWord;
 	foreach(QString word, words)
 	{
-		if(_lowercaseWords.contains(word, Qt::CaseInsensitive) && !lastWord.endsWith(':'))
-			convertedWords << word.toLower();               // lower case unless it follows a colon
+        if(_lowercaseWords.contains(word, Qt::CaseInsensitive)
+                && !containsPunctuation(lastWord))
+            convertedWords << word.toLower();  // lower case unless it follows a punctuation
 		else
 			convertedWords << toFirstCharUpperCase(word);   // convert
 		lastWord = word;
@@ -57,6 +58,14 @@ QString CaseConvertor::convert(const QString& input) const
 QString CaseConvertor::toFirstCharUpperCase(const QString& word) const {
     return word.isEmpty() ? word
                           : word.at(0).toUpper() + word.right(word.length() - 1);
+}
+
+bool CaseConvertor::containsPunctuation(const QString& word) const
+{
+    foreach(const QChar& ch, word)
+        if(ch.isPunct())
+            return true;
+    return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
