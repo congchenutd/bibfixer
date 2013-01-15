@@ -23,7 +23,7 @@ void DlgSettings::accept()
 {
 	_setting->setFont(_font);
     _setting->setProtectFirstLetter(_ui.cbProtectFirstLetter->isChecked());
-	_ui.tabValidFields      ->save();
+    _ui.widgetValidFields      ->save();
 	_ui.tabAbbreviationRules->save();
     _ui.tabKeyGen           ->save();
 

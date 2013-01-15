@@ -1,10 +1,5 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2011-12-20T17:46:18
-#
-#-------------------------------------------------
-
-QT       += core gui network
+QT += core sql network
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = BibFixer
 TEMPLATE = app
@@ -13,7 +8,7 @@ INCLUDEPATH +=	../EnglishName \
 				../MySetting \
 				../ImageColorBoolModel
 
-include(qtsingleapplication-2.6_1/src/qtsingleapplication.pri)
+include(qtsingleapplication/src/qtsingleapplication.pri)
 
 win32 {
 	RC_FILE = Resource.rc
