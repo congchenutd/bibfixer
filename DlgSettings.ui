@@ -19,38 +19,104 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="BibFixer::WidgetValidFields" name="tabValidFields">
+     <widget class="QWidget" name="tabValidFields">
       <attribute name="title">
-       <string>Valid fields</string>
+       <string>Parsing</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Valid fields</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <property name="leftMargin">
+           <number>5</number>
+          </property>
+          <property name="topMargin">
+           <number>5</number>
+          </property>
+          <property name="rightMargin">
+           <number>5</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
+          </property>
+          <item>
+           <widget class="BibFixer::WidgetValidFields" name="widgetValidFields" native="true"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabProtection">
+      <attribute name="title">
+       <string>Protection</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QCheckBox" name="cbProtectFirstLetter">
+         <property name="text">
+          <string>Protect first letter only</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>428</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </widget>
      <widget class="BibFixer::WidgetAbbreviation" name="tabAbbreviationRules">
       <attribute name="title">
-       <string>Abbreviation rules</string>
+       <string>Abbreviation</string>
       </attribute>
      </widget>
      <widget class="BibFixer::WidgetKeyGen" name="tabKeyGen">
       <attribute name="title">
-       <string>Key generator</string>
+       <string>Key generating</string>
       </attribute>
      </widget>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="cbProtectFirstLetter">
-     <property name="text">
-      <string>Protect first letter only</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="btFont">
-     <property name="text">
-      <string>Font</string>
-     </property>
-     <property name="autoDefault">
-      <bool>false</bool>
-     </property>
+     <widget class="QWidget" name="tabOthers">
+      <attribute name="title">
+       <string>Others</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QPushButton" name="btFont">
+         <property name="text">
+          <string>Font</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
