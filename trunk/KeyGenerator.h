@@ -13,6 +13,9 @@ namespace KeyGenerator {
 // the rule is consist of multiple patterns, connected by ;
 QString generateKey(const Reference& ref, const QString& rule);
 
+QString parseEntity(const Reference& ref, const QString& entity);
+QString getAuthor(const Reference& ref, int order = 1);
+
 QString getFirstAuthor(const Reference& ref);    // first author's full name
 QString getLastName   (const Reference& ref);    // first author's last name
 QString getFirstName  (const Reference& ref);    // first author's first name
