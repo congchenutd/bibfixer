@@ -17,13 +17,18 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Rules of generating key
-  - lastname: last name of the first author
-  - firstname: first name of the first author
-  - firstletter: first letter of the first name of the first author
-  - firstword: the first word in the title
-  - year
-Seperate by &quot;;&quot;</string>
+      <string>Objects:
+  - Title
+  - AuthorX (X is a number, 0 for last author, 1 for 1st, and so on)
+  - LastName 
+  - FirstName
+  - FirstLetter
+  - Year
+Case insensitive.
+For example, [Author1.LastName][Title.FirstLetter][Year]</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
