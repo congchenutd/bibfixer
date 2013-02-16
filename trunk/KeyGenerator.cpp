@@ -1,6 +1,7 @@
 #include "KeyGenerator.h"
 #include "Reference.h"
 #include "EnglishName.h"
+#include "Convertor.h"
 #include <QRegExp>
 
 namespace BibFixer {
@@ -9,40 +10,25 @@ namespace KeyGenerator {
 
 QString generateKey(const Reference& ref, const QString& rule)
 {
-    QString key;
-//    QStringList patterns = rule.split(";");
-//    foreach(const QString& pattern, patterns)
-//    {
-//        if(pattern == "lastname")
-//            key += getLastName(ref);
-//        else if(pattern == "firstname")
-//            key += getFirstName(ref);
-//        else if(pattern == "firstletter")
-//            key += getFirstLetter(ref);
-//        else if(pattern == "firstword")
-//            key += getFirstWord(ref);
-//        else if(pattern == "year")
-//            key += getYear(ref);
-//    }
-
-    QRegExp rx("\\[([\\w\\.]+)\\]");
-    int index = rx.indexIn(rule);
+    QString result;
+    QRegExp rxSubRule("\\[([\\w\\.]+)\\]");
+    int index = rxSubRule.indexIn(rule);
     while(index > -1)
     {
-        QString entity = rx.cap(1).toLower();
-        key += parseEntity(ref, entity);
-        index = rx.indexIn(rule, index + rx.matchedLength());
+        QString subRule = rxSubRule.cap(1).toLower();
+        result += parseSubRule(ref, subRule);
+        index = rxSubRule.indexIn(rule, index + rxSubRule.matchedLength());
     }
-    return key;
+    return result;
 }
 
-QString parseEntity(const Reference& ref, const QString& entity)
+QString parseSubRule(const Reference& ref, const QString& subRule)
 {
-    if(entity.startsWith("title"))
+    if(subRule.startsWith("title"))
     {
-        if(entity == "title.firstword")
+        if(subRule == "title.firstword")
             return getFirstWord(ref);
-        else if(entity == "title.firstletter")
+        else if(subRule == "title.firstletter")
         {
             QString firstWord = getFirstWord(ref);
             return firstWord.isEmpty() ? QString() : firstWord.at(0);
@@ -51,31 +37,31 @@ QString parseEntity(const Reference& ref, const QString& entity)
             return ref.getFieldValue("title");
     }
 
-    else if(entity.startsWith("author"))
+    else if(subRule.startsWith("author"))
     {
         int order = 1;
         QRegExp rx("author(\\d)\\.", Qt::CaseInsensitive);
-        if(rx.indexIn(entity) > -1)
+        if(rx.indexIn(subRule) > -1)
             order = rx.cap(1).toInt();
 
         QString author = getAuthor(ref, order);
         if(author.isEmpty())
             return author;
 
-        if(entity.endsWith(".lastname"))
+        if(subRule.endsWith(".lastname"))
             return EnglishName(author).getLastName();
-        else if(entity.endsWith(".firstname"))
+        else if(subRule.endsWith(".firstname"))
             return EnglishName(author).getFirstName();
-        else if(entity.endsWith(".firstletter"))
+        else if(subRule.endsWith(".firstletter"))
             return author.at(0);
         else
             return author;
     }
 
-    else if(entity == "year")
+    else if(subRule == "year")
         return getYear(ref);
 
-    return QString("Invalid pattern");
+    return QString("Invalid keygen rules");
 }
 
 QString getAuthor(const Reference& ref, int order)
@@ -95,14 +81,8 @@ QString getAuthor(const Reference& ref, int order)
 }
 
 //////////////////////////////////////////////////////////////
-QString getFirstAuthor(const Reference& ref)
-{
-    QString authors = ref.getFieldValue("author");
-    if(authors.isEmpty())
-        return QString();
-
-    QStringList authorList = authors.split(" and ");
-    return authorList.isEmpty() ? QString() : authorList.front();
+QString getFirstAuthor(const Reference& ref) {
+    return getAuthor(ref, 1);
 }
 
 QString getLastName(const Reference& ref) {
@@ -121,7 +101,7 @@ QString getFirstLetter(const Reference& ref)
 
 QString getFirstWord(const Reference& ref)
 {
-    QString title = ref.getFieldValue("title");
+    QString title =UnprotectionConvertor().convert(ref.getFieldValue("title"));
     return title.isEmpty() ? QString() : title.split(" ").front();
 }
 

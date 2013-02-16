@@ -41,18 +41,17 @@ private:
     void createActions();
 
     bool canOpen()         const { return _triggered[Init]; }
-    bool canClean()        const { return _triggered[Open]       && !_triggered[Clean];        }
-    bool canCapitalize()   const { return _triggered[Clean]      && !_triggered[Capitalize];   }
-    bool canProtect()      const { return _triggered[Capitalize] && !_triggered[Protect];      }
-    bool canAbbreviate()   const { return _triggered[Clean]      && !_triggered[Abbreviate];   }
-    bool canGenerateKeys() const { return _triggered[Clean]      && !_triggered[GenerateKeys]; }
+    bool canClean()        const { return _triggered[Open]  && !_triggered[Clean];        }
+    bool canCapitalize()   const { return _triggered[Clean] && !_triggered[Capitalize];   }
+    bool canProtect()      const { return _triggered[Clean] && !_triggered[Protect];      }
+    bool canAbbreviate()   const { return _triggered[Clean] && !_triggered[Abbreviate];   }
+    bool canGenerateKeys() const { return _triggered[Clean] && !_triggered[GenerateKeys]; }
     bool canSave()         const { return _triggered[Open]; }
     bool canRunAll()       const { return _triggered[Open] && !_triggered[RunAll] &&
                                         (!_triggered[Capitalize] ||
                                          !_triggered[Protect]    ||
                                          !_triggered[Abbreviate] ||
                                          !_triggered[GenerateKeys]); }
-    bool isReadOnly() const { return _triggered[Clean]; }
 
 private:
 	Ui::MainWindow ui;
