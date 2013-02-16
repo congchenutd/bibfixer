@@ -1,6 +1,7 @@
 #include "Convertor.h"
 #include <QRegExp>
 #include <QtAlgorithms>
+#include <QtDebug>
 
 namespace BibFixer {
 
@@ -27,7 +28,7 @@ CaseConvertor::CaseConvertor()
                        "before" << "how" << "if" << "once" <<
                        "since" << "than" << "that" << "though" <<
                        "till" << "until" << "when" << "where" <<
-                       "whether" << "while" << "and";
+                       "whether" << "while" << "and" << "or";
 
 	// Articles
 	_lowercaseWords << "the" << "a" << "an";
@@ -98,9 +99,18 @@ QString UnprotectionConvertor::convert(const QString& input) const
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-QString AllProtectionConvertor::convert(const QString& input) const {
-    return input.isEmpty() ? QString()
-                           : "{" + input.simplified() + "}";
+QString AllProtectionConvertor::convert(const QString& input) const
+{
+    if(input.isEmpty())
+        return QString();
+
+    qDebug() << input;
+
+    QRegExp rxAllProtected("^\\{.+\\}$");   // already protected
+    if(rxAllProtected.indexIn(input) > -1)
+        return input.simplified();
+
+    return "{" + input.simplified() + "}";
 }
 
 //////////////////////////////////////////////////////////////////////////////////
