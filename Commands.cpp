@@ -28,6 +28,7 @@ void Command::redo()
     _currentSnapshot.setHighlightingColor(getHighlightColor()); // the color goes with ref for undo
     highlight();
 
+    QString result = _mainWnd->getTextEdit()->toPlainText();
     _mainWnd->setTriggered(getActionName(), true);        // update action status
 }
 

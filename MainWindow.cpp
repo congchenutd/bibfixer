@@ -55,7 +55,6 @@ void MainWindow::setTriggered(MainWindow::ActionName actionName, bool triggered)
     ui.actionGenerateKeys->setEnabled(canGenerateKeys());
     ui.actionSave        ->setEnabled(canSave());
     ui.actionRunAll      ->setEnabled(canRunAll());
-    ui.teOutput          ->setReadOnly(isReadOnly());
 }
 
 void MainWindow::createActions()
