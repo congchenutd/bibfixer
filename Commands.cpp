@@ -24,12 +24,12 @@ void Command::redo()
 
     runCommand();                                            // template method
 
-    output(_currentSnapshot.toString());                     // output
+    QString runResult = _currentSnapshot.toString();
+    output(runResult);                     // output
     _currentSnapshot.setHighlightingColor(getHighlightColor()); // the color goes with ref for undo
     highlight();
 
-    QString result = _mainWnd->getTextEdit()->toPlainText();
-    _mainWnd->setTriggered(getActionName(), true);        // update action status
+    _mainWnd->setTriggered(getActionName(), !runResult.isEmpty());  // update action status
 }
 
 void Command::output(const QString& text) {

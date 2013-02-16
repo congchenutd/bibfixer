@@ -48,7 +48,7 @@ void MainWindow::setTriggered(MainWindow::ActionName actionName, bool triggered)
 {
     _triggered[actionName] = triggered;
     ui.actionOpen        ->setEnabled(canOpen());
-    ui.actionClean       ->setEnabled(canClean());
+//    ui.actionClean       ->setEnabled(canClean());
     ui.actionCapitalize  ->setEnabled(canCapitalize());
     ui.actionProtect     ->setEnabled(canProtect());
     ui.actionAbbreviate  ->setEnabled(canAbbreviate());
