@@ -11,65 +11,75 @@ namespace BibFixer {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
+    ui.teOutput->setFont(Setting::getInstance()->getFont());
 
-    createActions();
-    resetTriggered();   // init action status
-	ui.teOutput->setFont(Setting::getInstance()->getFont());
+    initActions();
+    resetActionStatus();
 
     connect(ui.actionNew,          SIGNAL(triggered()), this, SLOT(onNewFile()));
     connect(ui.actionOpen,         SIGNAL(triggered()), this, SLOT(onOpen()));
     connect(ui.actionSave,         SIGNAL(triggered()), this, SLOT(onSave()));
     connect(ui.actionSettings,     SIGNAL(triggered()), this, SLOT(onSettings()));
     connect(ui.actionRunAll,       SIGNAL(triggered()), this, SLOT(onRunAll()));
-    connect(ui.actionClean,        SIGNAL(triggered()), this, SLOT(onClean()));
-    connect(ui.actionCapitalize,   SIGNAL(triggered()), this, SLOT(onCapitalize()));
-    connect(ui.actionProtect,      SIGNAL(triggered()), this, SLOT(onProtect()));
-    connect(ui.actionAbbreviate,   SIGNAL(triggered()), this, SLOT(onAbbreviate()));
+    connect(ui.actionClean,        SIGNAL(triggered(bool)), this, SLOT(onClean     (bool)));
+    connect(ui.actionCapitalize,   SIGNAL(triggered(bool)), this, SLOT(onCapitalize(bool)));
+    connect(ui.actionProtect,      SIGNAL(triggered(bool)), this, SLOT(onProtect   (bool)));
+    connect(ui.actionAbbreviate,   SIGNAL(triggered(bool)), this, SLOT(onAbbreviate(bool)));
     connect(ui.actionGenerateKeys, SIGNAL(triggered()), this, SLOT(onGenerateKeys()));
     connect(ui.actionAbout,        SIGNAL(triggered()), this, SLOT(onAbout()));
     connect(ui.teOutput,           SIGNAL(pasted()),    this, SLOT(onPaste()));
 }
 
-void MainWindow::resetTriggered()
+void MainWindow::resetActionStatus()
 {
-    // initial statuses
-    setTriggered(Init,         true);
-    setTriggered(Open,         false);
-    setTriggered(Clean,        false);
-    setTriggered(Capitalize,   false);
-    setTriggered(Protect,      false);
-    setTriggered(Abbreviate,   false);
-    setTriggered(GenerateKeys, false);
-    setTriggered(RunAll,       false);
-    setTriggered(Save,         false);
+    updateActionStatus(Init,         true);
+    updateActionStatus(Open,         false);
+    updateActionStatus(Clean,        false);
+    updateActionStatus(Capitalize,   false);
+    updateActionStatus(Protect,      false);
+    updateActionStatus(Abbreviate,   false);
+    updateActionStatus(GenerateKeys, false);
+    updateActionStatus(RunAll,       false);
+    updateActionStatus(Save,         false);
 }
 
-void MainWindow::setTriggered(MainWindow::ActionName actionName, bool triggered)
+void MainWindow::setActionTriggered(MainWindow::ActionName actionName, bool triggered)
 {
+    // _triggered is synced with action's checked() status
+    // use _triggered because some actions are not checkable, such as RunAll, GenerateKeys
     _triggered[actionName] = triggered;
-    ui.actionOpen        ->setEnabled(canOpen());
-//    ui.actionClean       ->setEnabled(canClean());
-    ui.actionCapitalize  ->setEnabled(canCapitalize());
-    ui.actionProtect     ->setEnabled(canProtect());
-    ui.actionAbbreviate  ->setEnabled(canAbbreviate());
-    ui.actionGenerateKeys->setEnabled(canGenerateKeys());
-    ui.actionSave        ->setEnabled(canSave());
-    ui.actionRunAll      ->setEnabled(canRunAll());
+    _actions  [actionName]->setChecked(triggered);
 }
 
-void MainWindow::createActions()
+void MainWindow::updateActionStatus(MainWindow::ActionName actionName, bool triggered)
+{
+    setActionTriggered(actionName, triggered);
+
+    // Clean affects other 4 actions
+    if(!ui.actionClean->isChecked())
+    {
+        setActionTriggered(Capitalize,  false);
+        setActionTriggered(Protect,     false);
+        setActionTriggered(Abbreviate,  false);
+        setActionTriggered(GenerateKeys,false);
+    }
+
+    ui.actionSave        ->setEnabled(isTriggered(Open));
+    ui.actionClean       ->setEnabled(isTriggered(Open));
+    ui.actionRunAll      ->setEnabled(canRunAll());
+    ui.actionCapitalize  ->setEnabled(isTriggered(Clean));
+    ui.actionProtect     ->setEnabled(isTriggered(Clean));
+    ui.actionAbbreviate  ->setEnabled(isTriggered(Clean));
+    ui.actionGenerateKeys->setEnabled(isTriggered(Clean));
+}
+
+void MainWindow::initActions()
 {
     ui.actionOpen->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
-
-    QAction* undoAction = _undoStack.createUndoAction(this, tr("Undo"));
-    undoAction->setIcon(QIcon(":/Images/Undo.png"));
-    undoAction->setShortcuts(QKeySequence::Undo);
-    ui.mainToolBar->insertAction(0, undoAction);  // append to the toolbar
-
-    QAction* redoAction = _undoStack.createRedoAction(this, tr("Redo"));
-    redoAction->setIcon(QIcon(":/Images/Redo.png"));
-    redoAction->setShortcuts(QKeySequence::Redo);
-    ui.mainToolBar->insertAction(0, redoAction);  // append to the toolbar
+    _actions << ui.actionOpen  << ui.actionSave       << ui.actionRunAll
+             << ui.actionClean << ui.actionCapitalize << ui.actionProtect
+             << ui.actionAbbreviate << ui.actionGenerateKeys
+             << new QAction(this);   // placeholder for Init
 }
 
 void MainWindow::openBibFile(const QString& filePath)
@@ -87,16 +97,14 @@ void MainWindow::openBibFile(const QString& filePath)
         ui.teOutput->setPlainText(filePath);
     }
 
-    _undoStack.clear();
-    resetTriggered();
-    setTriggered(Open, true);
+    resetActionStatus();
+    updateActionStatus(Open, true);
 }
 
 void MainWindow::onNewFile()
 {
 	ui.teOutput->clear();
-	_undoStack.clear();
-    resetTriggered();
+    resetActionStatus();
 }
 
 void MainWindow::onOpen()
@@ -109,13 +117,16 @@ void MainWindow::onOpen()
     openBibFile(filePath);
 }
 
-void MainWindow::onPaste() {
-    setTriggered(Open, !ui.teOutput->toPlainText().isEmpty());
+// same as onOpen()
+void MainWindow::onPaste()
+{
+    resetActionStatus();
+    updateActionStatus(Open, !getContent().isEmpty());
 }
 
 void MainWindow::onSave()
 {
-	if(ui.teOutput->toPlainText().isEmpty())
+    if(getContent().isEmpty())
 		return;
 
 	QString outputFileName = QFileDialog::getSaveFileName(this,
@@ -127,7 +138,7 @@ void MainWindow::onSave()
 	if(file.open(QFile::WriteOnly))
 	{
 		QTextStream os(&file);
-        os << ui.teOutput->toPlainText();
+        os << getContent();
 	}
 }
 
@@ -138,41 +149,46 @@ void MainWindow::onSettings()
         ui.teOutput->setFont(Setting::getInstance()->getFont());
 }
 
-void MainWindow::onClean() {
-    if(canClean())
-        _undoStack.push(new CleanCommand(this));
+void MainWindow::onClean(bool redo)
+{
+    if(redo && !isTriggered(Clean))
+        CleanCommand::setOriginalText(getContent());
+    runCommand(Clean, redo, new CleanCommand(this));
 }
-
-void MainWindow::onCapitalize() {
-    if(canCapitalize())
-        _undoStack.push(new CapitalizeCommand(this));
+void MainWindow::onCapitalize(bool redo) {
+    runCommand(Capitalize, redo, new CapitalizeCommand(this));
 }
-
-void MainWindow::onProtect() {
-    if(canProtect())
-        _undoStack.push(new ProtectCommand(this));
+void MainWindow::onProtect(bool redo) {
+    runCommand(Protect, redo, new ProtectCommand(this));
 }
-
-void MainWindow::onAbbreviate() {
-    if(canAbbreviate())
-        _undoStack.push(new AbbreviateCommand(this));
+void MainWindow::onAbbreviate(bool redo) {
+    runCommand(Abbreviate, redo, new AbbreviateCommand(this));
 }
-
 void MainWindow::onGenerateKeys() {
-    if(canGenerateKeys())
-        _undoStack.push(new GenerateKeysCommand(this));
+    runCommand(GenerateKeys, true, new GenerateKeysCommand(this));
+}
+
+void MainWindow::runCommand(MainWindow::ActionName actionName, bool redo, AbstractCommand* command)
+{
+    if(redo) {
+        if(!isTriggered(actionName))
+            command->redo();
+    }
+    else
+        command->undo();
+}
+
+QString MainWindow::getContent() const {
+    return getTextEdit()->toPlainText();
 }
 
 void MainWindow::onRunAll()
 {
-    if(canRunAll())
-    {
-        onClean();
-        onCapitalize();
-        onProtect();
-        onAbbreviate();
-        onGenerateKeys();
-    }
+    onClean();
+    onCapitalize();
+    onProtect();
+    onAbbreviate();
+    onGenerateKeys();
 }
 
 void MainWindow::onAbout() {
@@ -184,4 +200,4 @@ void MainWindow::onAbout() {
 
 }
 
-}
+}  // namespace BibFixer

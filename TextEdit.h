@@ -11,6 +11,7 @@ class TextEdit : public QPlainTextEdit
 {
 	Q_OBJECT
 
+private:
     typedef QMap<QString, QColor> HighLightedText;  // text, bg color
 
 public:
@@ -20,7 +21,7 @@ public:
     void unHighlight();
 
 protected:
-    void insertFromMimeData(const QMimeData* source);  // copy-paste
+    void insertFromMimeData(const QMimeData* source);  // pasted
 
 signals:
     void pasted();

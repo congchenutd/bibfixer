@@ -10,7 +10,7 @@ WidgetValidFields::WidgetValidFields(QWidget* parent) :	QWidget(parent)
 {
     _ui.setupUi(this);
 
-	load();
+    loadValidFields();
     _ui.tvFields->setModel(&_model);
 
 #if QT_VERSION >= 0x050000
@@ -60,7 +60,7 @@ void WidgetValidFields::onDel()
     _ui.tvFields->selectRow(_currentRow);
 }
 
-void WidgetValidFields::load()
+void WidgetValidFields::loadValidFields()
 {
     _model.setColumnCount(2);
     _model.setHeaderData(FIELD_NAME, Qt::Horizontal, tr("Field name"));
@@ -70,7 +70,7 @@ void WidgetValidFields::load()
     _model.setRowCount(fields.size());
 	for(int row = 0; row < fields.size(); ++ row)
     {
-        QStringList sections = fields.at(row).split(";");
+        QStringList sections = fields.at(row).split(_separator);
         if(sections.size() == 2)
         {
             _model.setData(_model.index(row, FIELD_NAME), sections[FIELD_NAME]);
@@ -85,10 +85,10 @@ void WidgetValidFields::save()
 	QStringList fields;
     for(int row = 0; row < _model.rowCount(); ++ row)
     {
-        QString field    = _model.data(_model.index(row, FIELD_NAME)).toString();
+        QString field    = _model.data(_model.index(row, FIELD_NAME)).toString().toLower();
         QString selected = _model.data(_model.index(row, SELECTED))  .toString();
         if(!field.isEmpty() && !selected.isEmpty())
-            fields << (QStringList() << field << selected).join(";");
+            fields << (QStringList() << field << selected).join(_separator);
     }
     Setting::getInstance("Rules.ini")->setFields(fields);
 }

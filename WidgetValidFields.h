@@ -16,7 +16,7 @@ class WidgetValidFields : public QWidget
 
 public:
 	WidgetValidFields(QWidget* parent = 0);
-	void save();    // save to setting
+    void save();
 
 private slots:
 	void onCurrentRowChanged(const QModelIndex& idx);
@@ -24,14 +24,15 @@ private slots:
 	void onDel();
 
 private:
-	void load();    // load data from setting
+    void loadValidFields();    // load data from setting
 
 private:
-    enum {FIELD_NAME, SELECTED};
+    enum {FIELD_NAME, SELECTED};   // columns
 
     Ui::WidgetValidFields _ui;
     QStandardItemModel _model;
     int                _currentRow;
+    const static char  _separator = ';';
 };
 
 }

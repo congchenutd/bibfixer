@@ -1,10 +1,14 @@
 #include "Parser.h"
 #include "Convertor.h"
+#include "DlgSettings.h"
 #include <QRegExp>
 
 namespace BibFixer {
 
-/////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+BibParser::BibParser(const QStringList& validFields)
+    : _validFields(validFields) {}
+
 ReferenceList BibParser::parse(const QString& content) const
 {
 	ReferenceList result;
@@ -20,16 +24,12 @@ ReferenceList BibParser::parse(const QString& content) const
     return result;
 }
 
-void BibParser::setValidFields(const QStringList& validFields) {
-    _validFields = validFields;
-}
-
 Reference BibParser::parseRecord(const QString& content) const
 {
 	Reference result;
 
 	// type and id
-	QRegExp rxTypeAndID("@(\\w+)\\{([^=]+),");
+    QRegExp rxTypeAndID("@(\\w+)\\{([^=]*),");
 	int idxTypeAndID = rxTypeAndID.indexIn(content);
 	if(idxTypeAndID < 0)
 		return result;
@@ -45,12 +45,16 @@ Reference BibParser::parseRecord(const QString& content) const
 		QString fieldName  = rxField.cap(1).toLower();
         if(_validFields.contains(fieldName))   // is a valid field
         {
-            QString fieldValue = UnprotectionConvertor().convert(  // remove {}
+            QString fieldValue = ProtectionConvertor().undo(  // remove protective {}
                                       rxField.cap(2).simplified());
             result.addField(fieldName, fieldValue);
         }
 		idxField = rxField.indexIn(content, idxField + rxField.matchedLength());  // next field
 	}
+
+    // generate key
+    if(result.getKey().isEmpty())
+        result.generateKey(Setting::getInstance("Rules.ini")->getKeyGenRule());
 
 	return result;
 }
@@ -61,7 +65,7 @@ int BibParser::findRecordStart(const QString& content, int startFrom) const {
 
 int BibParser::findRecordEnd(const QString& content, int startFrom) const
 {
-    // if nextRecordStart == -1, lastIndexOf() returns the last '}', correct!
+    // if nextRecordStart == -1, lastIndexOf() returns the last '}', still correct!
 	int nextRecordStart = findRecordStart(content, startFrom);
 	return content.lastIndexOf("}", nextRecordStart);
 }

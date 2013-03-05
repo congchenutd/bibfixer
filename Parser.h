@@ -6,23 +6,23 @@
 namespace BibFixer {
 
 // Parse the content of a reference (string), and produce a ReferenceList
-class Parser
+class IParser
 {
 public:
-	virtual ~Parser() {}
+    virtual ~IParser() {}
 	virtual ReferenceList parse(const QString& content) const = 0;
 };
 
-class BibParser : public Parser
+class BibParser : public IParser
 {
 public:
-    void setValidFields(const QStringList& validFields);        // invalid fields will be ignored
-    virtual ReferenceList parse(const QString& content) const;  // may contain multi references
-    Reference parseRecord(const QString& content) const;        // just one reference's content
+    BibParser(const QStringList& validFields);            // invalid fields will be ignored
+    ReferenceList parse(const QString& content) const;    // may contain multi references
 
 private:
 	int findRecordStart(const QString& content, int startFrom = 0) const;
 	int findRecordEnd  (const QString& content, int startFrom = 0) const;
+    Reference parseRecord(const QString& content) const;  // parse one reference's content
 
 private:
     QStringList _validFields;

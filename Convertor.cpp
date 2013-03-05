@@ -1,12 +1,18 @@
 #include "Convertor.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QtAlgorithms>
-#include <QtDebug>
 
 namespace BibFixer {
 
-//////////////////////////////////////////////////////////////////
-CaseConvertor::CaseConvertor()
+UnConvertor::UnConvertor(const IConvertor* convertor, QObject* parent)
+    : QObject(parent), _convertor(convertor) {}
+
+QString UnConvertor::redo(const QString &input) const { return _convertor->undo(input); }
+QString UnConvertor::undo(const QString &input) const { return _convertor->redo(input); }
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+CaseConvertor::CaseConvertor(QObject* parent) : QObject(parent)
 {
 	// Prepositions
 	_lowercaseWords << "about" << "above" << "across" << "after" <<
@@ -34,29 +40,33 @@ CaseConvertor::CaseConvertor()
 	_lowercaseWords << "the" << "a" << "an";
 }
 
-QString CaseConvertor::convert(const QString& input) const
+QString CaseConvertor::redo(const QString& input) const
 {
     if(input.isEmpty())
         return QString();
 
 	QStringList convertedWords;
-    QStringList words = input.simplified().split(' ');
+    QStringList wordList = input.simplified().split(' ');
 	QString lastWord;
-	foreach(QString word, words)
+    foreach(QString word, wordList)
 	{
         if(_lowercaseWords.contains(word, Qt::CaseInsensitive)
                 && !containsPunctuation(lastWord))
             convertedWords << word.toLower();  // lower case unless it follows a punctuation
 		else
-			convertedWords << toFirstCharUpperCase(word);   // convert
+            convertedWords << makeFirstCharUpper(word);   // convert to upper case
 		lastWord = word;
 	}
 
 	// the first char of a sentence must be upper case
-    return toFirstCharUpperCase(convertedWords.join(" "));
+    return makeFirstCharUpper(convertedWords.join(" "));
 }
 
-QString CaseConvertor::toFirstCharUpperCase(const QString& word) const {
+QString CaseConvertor::undo(const QString& input) const {
+    return makeFirstCharUpper(input.toLower());
+}
+
+QString CaseConvertor::makeFirstCharUpper(const QString& word) const {
     return word.isEmpty() ? word
                           : word.at(0).toUpper() + word.right(word.length() - 1);
 }
@@ -69,8 +79,20 @@ bool CaseConvertor::containsPunctuation(const QString& word) const
     return false;
 }
 
-/////////////////////////////////////////////////////////////////////////////////
-QString UnprotectionConvertor::convert(const QString& input) const
+//////////////////////////////////////////////////////////////////////////////////
+QString ProtectionConvertor::redo(const QString& input) const
+{
+    if(input.isEmpty())
+        return QString();
+
+    QRegExp rxAllProtected("^\\{.+\\}$");
+    if(rxAllProtected.indexIn(input) > -1)    // already protected
+        return input.simplified();
+
+    return "{" + input.simplified() + "}";
+}
+
+QString ProtectionConvertor::undo(const QString& input) const
 {
     if(input.isEmpty())
         return QString();
@@ -86,8 +108,8 @@ QString UnprotectionConvertor::convert(const QString& input) const
     QStringList result;
     foreach(QString word, wordList)
     {
-        QRegExp rxFirstProtected("^\\{\\w\\}");
-        if(rxFirstProtected.indexIn(word) > -1)
+        QRegExp rxFirstCharProtected("^\\{\\w\\}");
+        if(rxFirstCharProtected.indexIn(word) > -1)
         {
             word.remove(0, 1);
             word.remove(1, 1);
@@ -98,112 +120,104 @@ QString UnprotectionConvertor::convert(const QString& input) const
     return result.join(" ");
 }
 
-//////////////////////////////////////////////////////////////////////////////////
-QString AllProtectionConvertor::convert(const QString& input) const
-{
-    if(input.isEmpty())
-        return QString();
-
-    qDebug() << input;
-
-    QRegExp rxAllProtected("^\\{.+\\}$");   // already protected
-    if(rxAllProtected.indexIn(input) > -1)
-        return input.simplified();
-
-    return "{" + input.simplified() + "}";
-}
-
-//////////////////////////////////////////////////////////////////////////////////
-QString FirstLetterProtectionConvertor::convert(const QString& input) const
-{
-    if(input.isEmpty())
-        return QString();
-
-    QStringList convertedWords;
-    QStringList words = input.split(' ');
-    foreach(QString word, words)
-        convertedWords << toFirstCharProtected(word);   // convert
-
-    return convertedWords.join(" ");
-}
-
-QString FirstLetterProtectionConvertor::toFirstCharProtected(const QString& word) const
-{
-    if(word.isEmpty())
-        return word;
-
-    // skip {XXX}
-    QRegExp rxAllProtected("^\\{.+\\}$");
-    if(rxAllProtected.indexIn(word) > -1)
-        return word;
-
-    // skip {X}xxx
-    QRegExp rxFirstProtected("^\\{\\w\\}");
-    if(rxFirstProtected.indexIn(word) > -1)
-        return word;
-
-    // skip non-letter chars
-    QString result = word;
-    int idx = 0;
-    while(idx < result.length() && !result.at(idx).isLetter())
-        ++ idx;
-
-    // X... -> {X...}
-    if(idx < result.length() && result.at(0).isUpper())
-    {
-        result.insert(idx, '{');
-        result.insert(idx + 2, '}');
-    }
-    return result;
-}
-
 ///////////////////////////////////////////////////////////////////////
-QString AbbreviationConvertor::convert(const QString& input) const
+AbbreviationConvertor::AbbreviationConvertor(const QStringList& rules, QObject* parent)
+    : QObject(parent) {
+    setRules(rules);
+}
+
+QString AbbreviationConvertor::redo(const QString& input) const
 {
     if(input.isEmpty())
         return QString();
 
     QString result = input;
-    foreach(const QString& rule, _rules)
-    {
-        QStringList sections = rule.split(';');  // two parts of a rule
-        if(sections.size() == 2)
-        {
-            QString fullName        = sections[0];
-            QString abbreviatedName = sections[1];
+    foreach(const AbbreviationRule& rule, _rules)
+        result.replace(rule._longTerm, rule._shortTerm, Qt::CaseInsensitive);
+    return result;
+}
 
-            // handle optional words in the fullname
-            // e.g., fullname = Journal (of)
-            // longFullName = Journal of
-            // shortFullName = Journal
-            QRegExp rxBracket("\\([^\\)]+\\)");
-            if(rxBracket.indexIn(fullName) > -1)
-            {
-                QString longFullName = fullName.simplified();
-                longFullName.remove('(');
-                longFullName.remove(')');
+QString AbbreviationConvertor::undo(const QString& input) const
+{
+    if(input.isEmpty())
+        return QString();
 
-                QString shortFullName = fullName.remove(rxBracket).simplified();
-
-                // try longFullName first, then shortFullName
-                result.replace(longFullName,  abbreviatedName, Qt::CaseInsensitive);
-                result.replace(shortFullName, abbreviatedName, Qt::CaseInsensitive);
-            }
-            else
-                result.replace(fullName, abbreviatedName, Qt::CaseInsensitive);
-        }
-    }
-
+    QString result = input;
+    foreach(const AbbreviationRule& rule, _rules)
+        result.replace(rule._shortTerm, rule._longTerm, Qt::CaseInsensitive);
     return result;
 }
 
 void AbbreviationConvertor::setRules(const QStringList& rules)
 {
-    _rules = rules;
+    _rules.clear();
+    foreach(const QString& rule, rules)
+        _rules << AbbreviationRule(rule).expand();
 
     // reverse order: to ensure long rule is applied first
     // e.g., Journal (of) before Journal
-    qSort(_rules.begin(), _rules.end(), qGreater<QString>());
+    qSort(_rules.begin(), _rules.end(), qGreater<AbbreviationRule>());
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+AbbreviationConvertor::AbbreviationRule::AbbreviationRule(const QString& ruleString)
+{
+    QStringList sections = ruleString.split(';');
+    if(sections.size() <= 2)
+    {
+        _longTerm  = sections[0].simplified();
+        _shortTerm = sections[1].simplified();
+    }
+}
+
+AbbreviationConvertor::AbbreviationRule::AbbreviationRule(const QString& longTerm,
+                                                          const QString& shortTerm)
+    : _longTerm(longTerm),
+      _shortTerm(shortTerm) {}
+
+bool AbbreviationConvertor::AbbreviationRule::isValid() const {
+    return !_longTerm.isEmpty() && !_shortTerm.isEmpty();
+}
+
+QList<AbbreviationConvertor::AbbreviationRule>
+AbbreviationConvertor::AbbreviationRule::expand() const
+{
+    QList<AbbreviationRule> result;
+    if(!isValid())
+        return result;
+
+    // find options, e.g.,  "(of|on)"
+    QRegularExpression rxBracket("\\([^\\)]+\\)");
+    QRegularExpressionMatch match = rxBracket.match(_longTerm);
+    if(!match.hasMatch())   // no options, no expansion
+    {
+        result << *this;
+        return result;
+    }
+
+    // fixed part, e.g., Conference in "Conference (of|on)"
+    QString fixedPart = _longTerm;
+    fixedPart.remove(rxBracket);
+    fixedPart = fixedPart.simplified();
+
+    // get options, e.g., of, on
+    QString optionString = match.captured(0);
+    optionString.remove("(");
+    optionString.remove(")");
+    QStringList options = optionString.split("|");
+
+    // fixedPart + option makes a new rule
+    foreach(const QString& option, options)
+        result << AbbreviationRule(fixedPart + " " + option, _shortTerm);
+
+    result << AbbreviationRule(fixedPart, _shortTerm);   // fixed rule
+
+    return result;
+}
+
+bool AbbreviationConvertor::AbbreviationRule::operator <(const AbbreviationRule& other) const {
+    return _longTerm < other._longTerm;
 }
 
 }

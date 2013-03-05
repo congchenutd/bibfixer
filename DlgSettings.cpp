@@ -13,7 +13,7 @@ DlgSettings::DlgSettings(QWidget *parent) :
 
     // load settings
 	_setting = Setting::getInstance();
-	_font = _setting->getFont();
+    setFont(_setting->getFont());
     _ui.cbProtectFirstLetter->setChecked(_setting->getProtectFirstLetter());
 
 	connect(_ui.btFont, SIGNAL(clicked()), this, SLOT(onFont()));
@@ -21,21 +21,29 @@ DlgSettings::DlgSettings(QWidget *parent) :
 
 void DlgSettings::accept()
 {
-	_setting->setFont(_font);
+    _setting->setFont(getFont());
     _setting->setProtectFirstLetter(_ui.cbProtectFirstLetter->isChecked());
-    _ui.widgetValidFields      ->save();
+    _ui.widgetValidFields   ->save();
 	_ui.tabAbbreviationRules->save();
     _ui.tabKeyGen           ->save();
 
 	QDialog::accept();
 }
 
+void DlgSettings::setFont(const QFont& font) {
+    _ui.btFont->setFont(font);
+}
+
+QFont DlgSettings::getFont() const {
+    return _ui.btFont->font();
+}
+
 void DlgSettings::onFont()
 {
 	bool ok;
-    QFont font = QFontDialog::getFont(&ok, _font, this);
+    QFont font = QFontDialog::getFont(&ok, getFont(), this);
 	if(ok)
-        _font = font;
+        setFont(font);
 }
 
 
@@ -51,7 +59,7 @@ Setting::Setting(const QString& fileName)
 void Setting::loadDefaults()
 {
 	setFont(qApp->font());
-    setKeyGenRule("lastname;firstletter;year");
+    // FIXME: loadDefaults() works on all setting objects, including rules.ini
 }
 
 QFont Setting::getFont() const
@@ -65,18 +73,14 @@ void Setting::setFont(const QFont& font) {
 	setValue("Font", font);
 }
 
-QStringList Setting::getFields() const
-{
-	// empty string.split() will produce a stringlist with one empty entry
-	QString content = value("Fields").toString();
-    return content.isEmpty() ? QStringList() : content.split("#");
+QStringList Setting::getFields() const {
+    return value("Fields").toStringList();
 }
 
 QStringList Setting::getSelectedFields() const
 {
-    QStringList allFields = getFields();
     QStringList result;
-    foreach(const QString& field, allFields)
+    foreach(const QString& field, getFields())
     {
         QStringList sections = field.split(";");
         if(sections.size() == 2 && sections[1].toLower() == "true")
@@ -86,14 +90,11 @@ QStringList Setting::getSelectedFields() const
 }
 
 void Setting::setFields(const QStringList& fields) {
-    setValue("Fields", fields.join("#").toLower());
+    setValue("Fields", fields);
 }
 
-QStringList Setting::getAbbreviationRules() const
-{
-	// empty string.split() will produce a stringlist with one empty entry
-	QString content = value("AbbreviationRules").toString();
-    return content.isEmpty() ? QStringList() : content.split("#");
+QStringList Setting::getAbbreviationRules() const {
+    return value("AbbreviationRules").toStringList();
 }
 
 QStringList Setting::getSelectedAbbreviationRules() const
@@ -110,7 +111,7 @@ QStringList Setting::getSelectedAbbreviationRules() const
 }
 
 void Setting::setAbbreviationRules(const QStringList& rules) {
-	setValue("AbbreviationRules", rules.join("#"));
+    setValue("AbbreviationRules", rules);
 }
 
 QString Setting::getCompileDate() const

@@ -2,34 +2,36 @@
 #define MAINWINDOW_H
 
 #include "ui_MainWindow.h"
-#include <QUndoStack>
 
 namespace BibFixer {
+
+class AbstractCommand;
 
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-    typedef enum {Init, Open, Clean, Capitalize, Protect,
-                  Abbreviate, GenerateKeys, RunAll, Save, Size} ActionName;
+    typedef enum {Open, Save, RunAll, Clean, Capitalize, Protect,
+                  Abbreviate, GenerateKeys, Init, Size} ActionName;
 public:
 	MainWindow(QWidget* parent = 0);
 	TextEdit* getTextEdit() const { return ui.teOutput; }
 
-    void setTriggered(ActionName actionName, bool triggered);  // set action triggered
+    // called when a command is executed
+    void updateActionStatus(ActionName actionName, bool triggered);
 
 public slots:
-    void openBibFile(const QString& filePath);     // to be called by external program
+    void openBibFile(const QString& filePath);     // called by external program
 
 private slots:
 	void onNewFile();
 	void onOpen();
     void onPaste();
-	void onClean();
-    void onCapitalize();
-	void onProtect();
-	void onAbbreviate();
+    void onClean     (bool redo = true);
+    void onCapitalize(bool redo = true);
+    void onProtect   (bool redo = true);
+    void onAbbreviate(bool redo = true);
     void onGenerateKeys();
     void onRunAll();
 	void onSave();
@@ -37,30 +39,30 @@ private slots:
 	void onAbout();
 
 private:
-    void resetTriggered();
-    void createActions();
+    void resetActionStatus();
+    void initActions();
+    void setActionTriggered(ActionName actionName, bool triggered);
+    bool isTriggered(ActionName actionName) const { return _triggered[actionName]; }
 
-    bool canOpen()         const { return _triggered[Init]; }
-    bool canClean()        const { return _triggered[Open]  && !_triggered[Clean];        }
-    bool canCapitalize()   const { return _triggered[Clean] && !_triggered[Capitalize];   }
-    bool canProtect()      const { return _triggered[Clean] && !_triggered[Protect];      }
-    bool canAbbreviate()   const { return _triggered[Clean] && !_triggered[Abbreviate];   }
-    bool canGenerateKeys() const { return _triggered[Clean] && !_triggered[GenerateKeys]; }
-    bool canSave()         const { return _triggered[Open]; }
-    bool canRunAll()       const { return _triggered[Open] && !_triggered[RunAll] &&
-                                        (!_triggered[Capitalize] ||
-                                         !_triggered[Protect]    ||
-                                         !_triggered[Abbreviate] ||
-                                         !_triggered[GenerateKeys]); }
+    bool canRunAll() const { return _triggered[Open] &&
+                                    (!_triggered[Clean]      ||
+                                     !_triggered[Capitalize] ||
+                                     !_triggered[Protect]    ||
+                                     !_triggered[Abbreviate] ||
+                                     !_triggered[GenerateKeys]); }
+
+    void runCommand(ActionName actionName, bool redo, AbstractCommand* command);
+    QString getContent() const;
 
 private:
 	Ui::MainWindow ui;
-    QUndoStack _undoStack;
-    bool       _triggered[Size];   // triggered[i]: if this action has been triggered
-                                   // not using states because enabling some actions
-                                   // cannot be determined by single state
+    bool _triggered[Size];   // triggered[i]: if this action has been triggered
+                             // not using states because enabling some actions
+                             // cannot be determined by single state
+                             // synced with action's checked() state
+    QList<QAction*> _actions;
 };
 
-}
+} // namespace BibFixer
 
 #endif // MAINWINDOW_H

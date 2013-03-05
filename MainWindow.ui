@@ -88,6 +88,9 @@
    <addaction name="actionGenerateKeys"/>
   </widget>
   <action name="actionCapitalize">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="Resource.qrc">
      <normaloff>:/Images/Uppercase.png</normaloff>:/Images/Uppercase.png</iconset>
@@ -100,6 +103,9 @@
    </property>
   </action>
   <action name="actionAbbreviate">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="Resource.qrc">
      <normaloff>:/Images/Abbreviation.png</normaloff>:/Images/Abbreviation.png</iconset>
@@ -132,6 +138,9 @@
    </property>
   </action>
   <action name="actionClean">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="Resource.qrc">
      <normaloff>:/Images/Clean.png</normaloff>:/Images/Clean.png</iconset>
@@ -150,6 +159,9 @@
    </property>
   </action>
   <action name="actionProtect">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="Resource.qrc">
      <normaloff>:/Images/Protect.png</normaloff>:/Images/Protect.png</iconset>

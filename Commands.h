@@ -1,7 +1,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
-#include <QUndoCommand>
 #include "Reference.h"
 #include "MainWindow.h"
 
@@ -10,86 +9,103 @@ namespace BibFixer {
 class TextEdit;
 
 // Undo/redo commands (operations)
-class Command : public QUndoCommand
+class ICommand
 {
 public:
-	Command(MainWindow* mainWindow, QUndoCommand* parent = 0);
-	virtual ~Command() {}
-	void undo();
-	void redo();
+    virtual ~ICommand() {}
+    virtual void undo() = 0;
+    virtual void redo() = 0;
+    virtual MainWindow::ActionName getActionName()     const = 0; // associated action
+    virtual QColor                 getHighlightColor() const = 0; // for highlighting the changes
+};
+
+class AbstractCommand : public QObject, public ICommand
+{
+public:
+    AbstractCommand(MainWindow* mainWindow = 0);
+    virtual void undo();
+    virtual void redo();
 
 protected:
 	void highlight();
 	void output(const QString& text);
 
-    virtual MainWindow::ActionName getActionName() const = 0;  // associated action
-	virtual QColor getHighlightColor() const = 0;              // for highlighting the change
-	virtual void runCommand() = 0;                             // template method
-
 protected:
-    ReferenceList _backupSnapshot;           // backup for retoring highlighting in undo
-    MainWindow*   _mainWnd;
+    MainWindow* _mainWnd;
 
-    static ReferenceList _currentSnapshot;   // current version
+    static ReferenceList _reference;  // the reference all the commands work on
 };
 
-class CleanCommand : public Command
+class CleanCommand : public AbstractCommand
 {
 public:
-    CleanCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
-	void undo();
+    CleanCommand(MainWindow* mainWindow);
+    void undo();
+    void redo();
+
+    // must set original text before redo is called
+    static void setOriginalText(const QString& originalText) { _originalText = originalText; }
 
 protected:
-    MainWindow::ActionName getActionName() const { return MainWindow::Clean; }
-	QColor getHighlightColor() const { return Qt::yellow; }
-	void runCommand();
+    MainWindow::ActionName getActionName()     const { return MainWindow::Clean; }
+    QColor                 getHighlightColor() const { return Qt::yellow; }
+
+protected:
+    static QString _originalText;
+};
+
+class CapitalizeCommand : public AbstractCommand
+{
+public:
+    CapitalizeCommand(MainWindow* mainWindow);
+    void undo();
+    void redo();
+
+protected:
+    MainWindow::ActionName getActionName()     const { return MainWindow::Capitalize; }
+    QColor                 getHighlightColor() const { return Qt::yellow; }
+    void run(IConvertor* convertor);
+};
+
+class ProtectCommand : public AbstractCommand
+{
+public:
+    ProtectCommand(MainWindow* mainWindow);
+    void undo();
+    void redo();
+
+protected:
+    MainWindow::ActionName getActionName()     const { return MainWindow::Protect; }
+    QColor                 getHighlightColor() const { return Qt::cyan; }
+    void run(IConvertor* convertor);
+};
+
+class AbbreviateCommand : public AbstractCommand
+{
+public:
+    AbbreviateCommand(MainWindow* mainWindow);
+    void undo();
+    void redo();
+
+protected:
+    MainWindow::ActionName getActionName()     const { return MainWindow::Abbreviate; }
+    QColor                 getHighlightColor() const { return Qt::green; }
+    void run(IConvertor* convertor);
 
 private:
-	QString originalText;
+    QStringList _rules;
 };
 
-class CapitalizeCommand : public Command
+class GenerateKeysCommand : public AbstractCommand
 {
 public:
-    CapitalizeCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
+    GenerateKeysCommand(MainWindow* mainWindow);
+    void undo() {}
+    void redo();
 
 protected:
-    MainWindow::ActionName getActionName() const { return MainWindow::Capitalize; }
-	QColor getHighlightColor() const { return Qt::yellow; }
-	void runCommand();
-};
-
-class ProtectCommand : public Command
-{
-public:
-    ProtectCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
-
-protected:
-    MainWindow::ActionName getActionName() const { return MainWindow::Protect; }
-	QColor getHighlightColor() const { return Qt::cyan; }
-	void runCommand();
-};
-
-class AbbreviateCommand : public Command
-{
-public:
-    AbbreviateCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
-
-protected:
-    MainWindow::ActionName getActionName() const { return MainWindow::Abbreviate; }
-	QColor getHighlightColor() const { return Qt::green; }
-	void runCommand();
-};
-
-class GenerateKeysCommand : public Command
-{
-public:
-    GenerateKeysCommand(MainWindow* mainWindow, QUndoCommand* parent = 0);
-
-protected:
-    MainWindow::ActionName getActionName() const { return MainWindow::GenerateKeys; }
-	QColor getHighlightColor() const { return Qt::magenta; }
-	void runCommand();
+    MainWindow::ActionName getActionName()     const { return MainWindow::GenerateKeys; }
+    QColor                 getHighlightColor() const { return Qt::magenta; }
 };
 
 }

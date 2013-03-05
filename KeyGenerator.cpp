@@ -6,23 +6,24 @@
 
 namespace BibFixer {
 
-namespace KeyGenerator {
+KeyGenerator::KeyGenerator(const QString& rule)
+    : _rule (rule.toLower()) {}
 
-QString generateKey(const Reference& ref, const QString& rule)
+QString KeyGenerator::generateKey(const Reference& ref) const
 {
     QString result;
     QRegExp rxSubRule("\\[([\\w\\.]+)\\]");
-    int index = rxSubRule.indexIn(rule);
+    int index = rxSubRule.indexIn(_rule);
     while(index > -1)
     {
-        QString subRule = rxSubRule.cap(1).toLower();
+        QString subRule = rxSubRule.cap(1);
         result += parseSubRule(ref, subRule);
-        index = rxSubRule.indexIn(rule, index + rxSubRule.matchedLength());
+        index = rxSubRule.indexIn(_rule, index + rxSubRule.matchedLength());
     }
     return result;
 }
 
-QString parseSubRule(const Reference& ref, const QString& subRule)
+QString KeyGenerator::parseSubRule(const Reference& ref, const QString& subRule) const
 {
     if(subRule.startsWith("title"))
     {
@@ -40,11 +41,11 @@ QString parseSubRule(const Reference& ref, const QString& subRule)
     else if(subRule.startsWith("author"))
     {
         int order = 1;
-        QRegExp rx("author(\\d)\\.", Qt::CaseInsensitive);
+        QRegExp rx("author(\\d)\\.", Qt::CaseInsensitive);  // e.g., author1
         if(rx.indexIn(subRule) > -1)
             order = rx.cap(1).toInt();
 
-        QString author = getAuthor(ref, order);
+        QString author = getAuthor(ref, order);  // fullname
         if(author.isEmpty())
             return author;
 
@@ -64,7 +65,7 @@ QString parseSubRule(const Reference& ref, const QString& subRule)
     return QString("Invalid keygen rules");
 }
 
-QString getAuthor(const Reference& ref, int order)
+QString KeyGenerator::getAuthor(const Reference& ref, int order) const
 {
     QString authors = ref.getFieldValue("author");
     if(authors.isEmpty())
@@ -77,39 +78,37 @@ QString getAuthor(const Reference& ref, int order)
     if(order > authorList.size())
         return QString();
 
-    return order == 0 ? authorList.last() : authorList.at(order - 1);
+    return order <= 0 ? authorList.last() : authorList.at(order - 1);
 }
 
-//////////////////////////////////////////////////////////////
-QString getFirstAuthor(const Reference& ref) {
+QString KeyGenerator::getFirstAuthor(const Reference& ref) const {
     return getAuthor(ref, 1);
 }
 
-QString getLastName(const Reference& ref) {
-    return EnglishName(getFirstAuthor(ref)).getLastName().remove(" ");   // no space
+QString KeyGenerator::getLastName(const Reference& ref) const {
+    return EnglishName(getFirstAuthor(ref)).getLastName().simplified();
 }
 
-QString getFirstName(const Reference& ref) {
-    return EnglishName(getFirstAuthor(ref)).getFirstName().remove(" ");  // no space
+QString KeyGenerator::getFirstName(const Reference& ref) const {
+    return EnglishName(getFirstAuthor(ref)).getFirstName().simplified();
 }
 
-QString getFirstLetter(const Reference& ref)
+QString KeyGenerator::getFirstLetter(const Reference& ref) const
 {
     QString firstName = getFirstName(ref);
     return firstName.isEmpty() ? QString() : firstName.at(0);
 }
 
-QString getFirstWord(const Reference& ref)
+QString KeyGenerator::getFirstWord(const Reference& ref) const
 {
-    QString title =UnprotectionConvertor().convert(ref.getFieldValue("title"));
-    return title.isEmpty() ? QString() : title.split(" ").front();
+    QString title = ProtectionConvertor().undo(ref.getFieldValue("title"));
+    return title.isEmpty() ? QString() : title.split(" ").front().simplified();
 }
 
-QString getYear(const Reference& ref)
+QString KeyGenerator::getYear(const Reference& ref) const
 {
     QString year = ref.getFieldValue("year");
     return year.isEmpty() ? QString() : year;
 }
 
-}  // KeyGenerator
 }  // BibFixer
