@@ -19,17 +19,17 @@ void TextEdit::highlight()
         // select all occurances of text and highlight them with color
 		QTextCursor cursor = textCursor();
 		cursor.setPosition(0);
-        cursor = document()->find(text, cursor);
+        cursor = document()->find(text, cursor);       // move cursor to text
 		while(!cursor.isNull())
 		{
-			QTextEdit::ExtraSelection selection;
+            QTextEdit::ExtraSelection selection;       // select text
             selection.format.setBackground(color);
 			selection.cursor = cursor;
-            selections << selection;
+            selections << selection;                   // add selected
             cursor = document()->find(text, cursor);   // next occurance
 		}
 	}
-    setExtraSelections(selections);
+    setExtraSelections(selections);                    // highlight
 }
 
 void TextEdit::unHighlight()

@@ -11,7 +11,7 @@ WidgetAbbreviation::WidgetAbbreviation(QWidget* parent) :
 {
 	_ui.setupUi(this);
 
-	load();
+    loadRules();
 	_ui.tvAbbreviations->setModel(&_model);
 	_ui.tvAbbreviations->resizeColumnsToContents();
 	_ui.tvAbbreviations->horizontalHeader()->setStretchLastSection(true);
@@ -38,7 +38,7 @@ QStringList WidgetAbbreviation::getSelectedRules() const
 	QStringList result;
     for(int row = 0; row < _model.rowCount(); row ++)
         if(_model.data(_model.index(row, SELECTED)).toBool())
-			result << _model.data(_model.index(row, FULL)).toString() + ";" +
+            result << _model.data(_model.index(row, FULL)).toString() + _separator +
                       _model.data(_model.index(row, SHORT)).toString();
 	return result;
 }
@@ -68,7 +68,7 @@ void WidgetAbbreviation::onDel()
     _currentRow = backup;
 }
 
-void WidgetAbbreviation::load()
+void WidgetAbbreviation::loadRules()
 {
 	_model.setColumnCount(3);
     _model.setHeaderData(FULL,     Qt::Horizontal, tr("Fullname"));
@@ -78,7 +78,7 @@ void WidgetAbbreviation::load()
 	_model.setRowCount(rules.size());
     for(int row = 0; row < rules.size(); ++ row)
     {
-        QStringList sections = rules.at(row).split(";");
+        QStringList sections = rules.at(row).split(_separator);
 		if(sections.size() == 3)
 		{
             _model.setData(_model.index(row, FULL),     sections[FULL]);
@@ -98,7 +98,7 @@ void WidgetAbbreviation::save()
         QString shortName = _model.data(_model.index(row, SHORT))   .toString();
         QString selected  = _model.data(_model.index(row, SELECTED)).toString();
         if(!fullName.isEmpty() && !shortName.isEmpty() && !selected.isEmpty())
-            rules << (QStringList() << fullName << shortName << selected).join(";");
+            rules << (QStringList() << fullName << shortName << selected).join(_separator);
 	}
     Setting::getInstance("Rules.ini")->setAbbreviationRules(rules);
 }

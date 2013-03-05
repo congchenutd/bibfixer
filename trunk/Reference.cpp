@@ -1,18 +1,17 @@
 #include "Reference.h"
 #include "Convertor.h"
 #include "EnglishName.h"
-#include "DlgSettings.h"
 #include "KeyGenerator.h"
 #include <QTextStream>
 
 namespace BibFixer {
 
-//////////////////////////////////////////////////////////////////////////////
-void Reference::convert(const QString& fieldName, const Convertor& convertor)
+/////////////////////////////////////////////////////////////////////////////////
+void Reference::convert(const QString& fieldName, const IConvertor* convertor)
 {
     if(!_fields.contains(fieldName))
 		return;
-    QString converted = convertor.convert(_fields[fieldName]);
+    QString converted = convertor->redo(_fields[fieldName]);
     if(converted != _fields[fieldName])
 	{
         _fields[fieldName] = converted;
@@ -25,7 +24,7 @@ void Reference::generateKey(const QString& rule)
     if(rule.isEmpty())
         return;
 
-    QString key = KeyGenerator::generateKey(*this, rule);
+    QString key = KeyGenerator(rule).generateKey(*this);
     if(!key.isEmpty())
     {
         setKey(key);
@@ -35,18 +34,21 @@ void Reference::generateKey(const QString& rule)
 
 QString Reference::toString() const
 {
+    if(!isValid())
+        return QObject::tr("Invalid reference");
+
 	QString result;
 	QTextStream os(&result);
     os << "@" << getType() << "{" << getKey() << ",\r\n";
 
-    QStringList keys = _fields.keys();
-    for(int i = 0; i < keys.size(); ++i)
+    QStringList keyList = _fields.keys();
+    for(int i = 0; i < keyList.size(); ++i)
     {
-        os << "\t" << keys.at(i) << " = " << "{" << _fields[keys.at(i)];
-        if(i < keys.size() - 1)
+        os << "\t" << keyList.at(i) << " = " << "{" << _fields[keyList.at(i)];
+        if(i < keyList.size() - 1)
             os << "},\r\n";
         else
-            os << "}\r\n";
+            os << "}\r\n";   // the last field doesn't end with ,
     }
 
 	os << "}";
@@ -63,13 +65,13 @@ void Reference::addField(const QString& fieldName, const QString& value)
 	QString fieldValue = value;
 	if(fieldName == "pages")
 	{
-		QRegExp rxPages("(\\d+)(\\D+)?(\\d+)?");
+        QRegExp rxPages("(\\d+)(\\D+)?(\\d+)?");  // number something else number
 		if(rxPages.indexIn(fieldValue) > -1)
 		{
 			QString startPage = rxPages.cap(1);
 			QString endPage   = rxPages.cap(3);
 			fieldValue = startPage;
-			if(!endPage.isEmpty())
+            if(!endPage.isEmpty())                // may only have a start page
 				fieldValue += "-" + endPage;
 		}
 	}
@@ -108,36 +110,13 @@ void ReferenceList::clear() {
     _records.clear();
 }
 
-void ReferenceList::capitalize(const QString& fieldName)
-{
-    CaseConvertor convertor;
+void ReferenceList::convertField(const IConvertor* convertor, const QString& fieldName) {
     for(Records::Iterator it = _records.begin(); it != _records.end(); ++ it)
         it->convert(fieldName, convertor);
 }
 
-void ReferenceList::protect(const QString& fieldName)
+void ReferenceList::generateKeys(const QString& rule)
 {
-    Convertor* convertor;
-    if(Setting::getInstance()->getProtectFirstLetter())
-        convertor = new FirstLetterProtectionConvertor;
-    else
-        convertor = new AllProtectionConvertor;
-    for(Records::Iterator it = _records.begin(); it != _records.end(); ++ it)
-        it->convert(fieldName, *convertor);
-    delete convertor;
-}
-
-void ReferenceList::abbreviate(const QString& fieldName)
-{
-    AbbreviationConvertor convertor;
-    convertor.setRules(Setting::getInstance("Rules.ini")->getSelectedAbbreviationRules());
-    for(Records::Iterator it = _records.begin(); it != _records.end(); ++ it)
-        it->convert(fieldName, convertor);
-}
-
-void ReferenceList::generateKeys()
-{
-    QString rule = Setting::getInstance("Rules.ini")->getKeyGenRule();
     for(Records::Iterator it = _records.begin(); it != _records.end();)
     {
         Reference ref = it.value();
@@ -147,4 +126,4 @@ void ReferenceList::generateKeys()
     }
 }
 
-}
+}  // namespace BibFixer

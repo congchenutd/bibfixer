@@ -23,12 +23,13 @@ private slots:
 	void onDel();
 
 private:
-    void load();
+    void loadRules();   // init model
 
 private:
     Ui::WidgetAbbreviation _ui;
     QStandardItemModel _model;
     int                _currentRow;
+    const static char _separator = ';';
 
     enum {FULL, SHORT, SELECTED};   // columns
 };

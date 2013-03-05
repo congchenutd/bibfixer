@@ -19,8 +19,11 @@ private slots:
 	void onFont();
 
 private:
+    QFont getFont() const;
+    void setFont(const QFont &font);
+
+private:
     Ui::DlgSettings _ui;
-    QFont    _font;
     Setting* _setting;
 };
 
@@ -35,7 +38,7 @@ public:
 
 	QStringList getFields() const;
     QStringList getSelectedFields() const;
-	void setFields(const QStringList& fields);
+    void setFields(const QStringList& fields);  // format: fieldname;selected(bool)
 
 	QStringList getAbbreviationRules() const;
 	QStringList getSelectedAbbreviationRules() const;

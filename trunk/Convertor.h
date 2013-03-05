@@ -2,65 +2,82 @@
 #define CONVERTOR_H
 
 #include <QStringList>
+#include <QObject>
 
 namespace BibFixer {
 
+class UnConvertor;
+
 // string format convertors
-class Convertor
+class IConvertor
 {
 public:
-	virtual ~Convertor() {}
-    virtual QString convert(const QString& input) const = 0;
+    virtual ~IConvertor() {}
+    virtual QString redo(const QString& input) const = 0;
+    virtual QString undo(const QString& input) const = 0;
 };
 
-// all words' first letter in upper case
-class CaseConvertor : public Convertor
+// a special convertor that unconverts
+class UnConvertor : public IConvertor, public QObject
 {
 public:
-	CaseConvertor();
-	QString convert(const QString& input) const;
+    UnConvertor(const IConvertor* convertor, QObject* parent = 0);
+    QString redo(const QString& input) const;
+    QString undo(const QString& input) const;
 
 private:
-    QString toFirstCharUpperCase(const QString& word) const;
+    const IConvertor* _convertor;
+};
+
+// convert all words' first letter to upper case
+class CaseConvertor : public IConvertor, public QObject
+{
+public:
+    CaseConvertor(QObject* parent = 0);
+    QString redo(const QString& input) const;
+    QString undo(const QString& input) const;
+
+private:
+    QString makeFirstCharUpper (const QString& word) const;
     bool    containsPunctuation(const QString& word) const;
 
 private:
     QStringList _lowercaseWords;
 };
 
-// protect the first letter of each word by {}
-class FirstLetterProtectionConvertor : public Convertor
-{
-public:
-    QString convert(const QString& input) const;
-
-private:
-    QString toFirstCharProtected(const QString& word) const;
-};
-
 // protect the entire sentence by {}
-class AllProtectionConvertor : public Convertor
+class ProtectionConvertor : public IConvertor, public QObject
 {
 public:
-    QString convert(const QString& input) const;
+    ProtectionConvertor(QObject* parent = 0) : QObject(parent) {}
+    QString redo(const QString& input) const;
+    QString undo(const QString& input) const;
 };
 
-// remove the protective {}
-class UnprotectionConvertor : public Convertor
+// abbreviate fields based on the rules, such as transactions -> trans.
+class AbbreviationConvertor : public IConvertor, public QObject
 {
 public:
-    QString convert(const QString& input) const;
-};
-
-// abbreviate based on the rules, such as transactions -> trans.
-class AbbreviationConvertor : public Convertor
-{
-public:
-    QString convert(const QString& input) const;
-    void setRules(const QStringList& rules);   // format: fullname;abbreviatedname
+    AbbreviationConvertor(const QStringList& rules, QObject* parent = 0);
+    QString redo(const QString& input) const;
+    QString undo(const QString& input) const;
+    void setRules(const QStringList& rules);   // format: longterm;shortterm
 
 private:
-    QStringList _rules;
+    struct AbbreviationRule
+    {
+        QString _longTerm;
+        QString _shortTerm;
+
+        AbbreviationRule(const QString& ruleString);  // format: longterm;shortterm
+        AbbreviationRule(const QString& longTerm, const QString& shortTerm);
+        bool isValid() const;
+        QList<AbbreviationRule> expand() const;       // expand rules with options
+
+        bool operator<(const AbbreviationRule& other) const;  // for sorting
+    };
+
+    QList<AbbreviationRule> _rules;
 };
 
 }
