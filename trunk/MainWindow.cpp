@@ -21,10 +21,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui.actionSave,         SIGNAL(triggered()), this, SLOT(onSave()));
     connect(ui.actionSettings,     SIGNAL(triggered()), this, SLOT(onSettings()));
     connect(ui.actionRunAll,       SIGNAL(triggered()), this, SLOT(onRunAll()));
-    connect(ui.actionClean,        SIGNAL(triggered(bool)), this, SLOT(onClean     (bool)));
-    connect(ui.actionCapitalize,   SIGNAL(triggered(bool)), this, SLOT(onCapitalize(bool)));
-    connect(ui.actionProtect,      SIGNAL(triggered(bool)), this, SLOT(onProtect   (bool)));
-    connect(ui.actionAbbreviate,   SIGNAL(triggered(bool)), this, SLOT(onAbbreviate(bool)));
+    connect(ui.actionClean,        SIGNAL(triggered(bool)), this, SLOT(onClean       (bool)));
+    connect(ui.actionCapitalize,   SIGNAL(triggered(bool)), this, SLOT(onCapitalize  (bool)));
+    connect(ui.actionProtect,      SIGNAL(triggered(bool)), this, SLOT(onProtect     (bool)));
+    connect(ui.actionAbbreviate,   SIGNAL(triggered(bool)), this, SLOT(onAbbreviate  (bool)));
+    connect(ui.actionShortenNames, SIGNAL(triggered()), this, SLOT(onShortenNames()));
     connect(ui.actionGenerateKeys, SIGNAL(triggered()), this, SLOT(onGenerateKeys()));
     connect(ui.actionAbout,        SIGNAL(triggered()), this, SLOT(onAbout()));
     connect(ui.teOutput,           SIGNAL(pasted()),    this, SLOT(onPaste()));
@@ -46,7 +47,7 @@ void MainWindow::resetActionStatus()
 void MainWindow::setActionTriggered(MainWindow::ActionName actionName, bool triggered)
 {
     // _triggered is synced with action's checked() status
-    // use _triggered because some actions are not checkable, such as RunAll, GenerateKeys
+    // use _triggered, because some actions are not checkable, such as RunAll, GenerateKeys
     _triggered[actionName] = triggered;
     _actions  [actionName]->setChecked(triggered);
 }
@@ -70,6 +71,7 @@ void MainWindow::updateActionStatus(MainWindow::ActionName actionName, bool trig
     ui.actionCapitalize  ->setEnabled(isTriggered(Clean));
     ui.actionProtect     ->setEnabled(isTriggered(Clean));
     ui.actionAbbreviate  ->setEnabled(isTriggered(Clean));
+    ui.actionShortenNames->setEnabled(isTriggered(Clean));
     ui.actionGenerateKeys->setEnabled(isTriggered(Clean));
 }
 
@@ -78,7 +80,7 @@ void MainWindow::initActions()
     ui.actionOpen->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
     _actions << ui.actionOpen  << ui.actionSave       << ui.actionRunAll
              << ui.actionClean << ui.actionCapitalize << ui.actionProtect
-             << ui.actionAbbreviate << ui.actionGenerateKeys
+             << ui.actionAbbreviate << ui.actionShortenNames << ui.actionGenerateKeys
              << new QAction(this);   // placeholder for Init
 }
 
@@ -149,10 +151,7 @@ void MainWindow::onSettings()
         ui.teOutput->setFont(Setting::getInstance()->getFont());
 }
 
-void MainWindow::onClean(bool redo)
-{
-    if(redo && !isTriggered(Clean))
-        CleanCommand::setOriginalText(getContent());
+void MainWindow::onClean(bool redo) {
     runCommand(Clean, redo, new CleanCommand(this));
 }
 void MainWindow::onCapitalize(bool redo) {
@@ -163,6 +162,9 @@ void MainWindow::onProtect(bool redo) {
 }
 void MainWindow::onAbbreviate(bool redo) {
     runCommand(Abbreviate, redo, new AbbreviateCommand(this));
+}
+void MainWindow::onShortenNames() {
+    runCommand(ShortenNames, true, new ShortenNamesCommand(this));
 }
 void MainWindow::onGenerateKeys() {
     runCommand(GenerateKeys, true, new GenerateKeysCommand(this));
