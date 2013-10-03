@@ -12,20 +12,30 @@ AbstractCommand::AbstractCommand(MainWindow* mainWindow)
 
 void AbstractCommand::undo()
 {
-    _mainWnd->updateActionStatus(getActionName(), false);  // set this action unchecked
+    _mainWnd->updateActionStatus(getActionName(), false);  // set the action unchecked
     output(_reference.toString());
     highlight();
 }
 
 void AbstractCommand::redo()
 {
-    _mainWnd->updateActionStatus(getActionName(), true);  // set this action unchecked
+    _mainWnd->updateActionStatus(getActionName(), true);   // set the action checked
     output(_reference.toString());
     highlight();
 }
 
 void AbstractCommand::output(const QString& text) {
-	_mainWnd->getTextEdit()->setPlainText(text);
+    _mainWnd->getTextEdit()->setPlainText(text);
+}
+
+void AbstractCommand::run(IConvertor* convertor, const QStringList& fields)
+{
+    if(convertor != 0)
+    {
+        _reference.clearChangedText();
+        foreach(const QString& field, fields)
+            _reference.convertField(convertor, field);
+    }
 }
 
 void AbstractCommand::highlight()
@@ -39,7 +49,6 @@ void AbstractCommand::highlight()
 
 ReferenceList AbstractCommand::_reference;
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 QString CleanCommand::_originalText;
 
@@ -48,17 +57,19 @@ CleanCommand::CleanCommand(MainWindow* mainWindow)
 
 void CleanCommand::undo()
 {
-    _mainWnd->updateActionStatus(getActionName(), false);
-    output(_originalText);  // don't use _reference.toString() because it's not inited yet
+    _mainWnd->updateActionStatus(getActionName(), false);  // set the action unchecked
+    output(_originalText);                                 // restore
 }
 
 void CleanCommand::redo()
 {
+    _originalText = _mainWnd->getTextEdit()->toPlainText();  // backup
+
     QStringList validFields = Setting::getInstance("Rules.ini")->getSelectedFields();
     _reference = BibParser(validFields).parse(_originalText);
-    _mainWnd->updateActionStatus(getActionName(), true);
+
+    _mainWnd->updateActionStatus(getActionName(), true);     // set the action checked
     output(_reference.toString());
-    // no highlight needed
 }
 
 
@@ -68,24 +79,17 @@ CapitalizeCommand::CapitalizeCommand(MainWindow* mainWindow)
 
 void CapitalizeCommand::undo()
 {
-    run(new UnConvertor(new CaseConvertor(this)));
+    run(new UnConvertor(new CaseConvertor(this)),
+        QStringList() << "title" << "journal" << "booktitle");
     AbstractCommand::undo();
 }
 
 void CapitalizeCommand::redo()
 {
-    run(new CaseConvertor(this));
+    run(new CaseConvertor(this),
+        QStringList() << "title" << "journal" << "booktitle");
     AbstractCommand::redo();
 }
-
-void CapitalizeCommand::run(IConvertor* convertor)
-{
-    _reference.clearChangedText();
-    _reference.convertField(convertor, "title");
-    _reference.convertField(convertor, "journal");
-    _reference.convertField(convertor, "booktitle");
-}
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 ProtectCommand::ProtectCommand(MainWindow* mainWindow)
@@ -93,22 +97,15 @@ ProtectCommand::ProtectCommand(MainWindow* mainWindow)
 
 void ProtectCommand::undo()
 {
-    run(new UnConvertor(new ProtectionConvertor(this)));
+    run(new UnConvertor(new ProtectionConvertor(this)), QStringList() << "title");
     AbstractCommand::undo();
 }
 
 void ProtectCommand::redo()
 {
-    run(new ProtectionConvertor(this));
+    run(new ProtectionConvertor(this), QStringList() << "title");
     AbstractCommand::redo();
 }
-
-void ProtectCommand::run(IConvertor* convertor)
-{
-    _reference.clearChangedText();
-    _reference.convertField(convertor, "title");
-}
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 AbbreviateCommand::AbbreviateCommand(MainWindow* mainWindow)
@@ -118,23 +115,27 @@ AbbreviateCommand::AbbreviateCommand(MainWindow* mainWindow)
 
 void AbbreviateCommand::undo()
 {
-    run(new UnConvertor(new AbbreviationConvertor(_rules, this)));
+    run(new UnConvertor(new AbbreviationConvertor(_rules, this)),
+        QStringList() << "journal" << "booktitle");
     AbstractCommand::undo();
 }
 
 void AbbreviateCommand::redo()
 {
-    run(new AbbreviationConvertor(_rules, this));
+    run(new AbbreviationConvertor(_rules, this),
+        QStringList() << "journal" << "booktitle");
     AbstractCommand::redo();
 }
 
-void AbbreviateCommand::run(IConvertor* convertor)
-{
-    _reference.clearChangedText();                     // clear highlighting
-    _reference.convertField(convertor, "journal");
-    _reference.convertField(convertor, "booktitle");
-}
+////////////////////////////////////////////////////////////////////////////
+ShortenNamesCommand::ShortenNamesCommand(MainWindow* mainWindow)
+    : AbstractCommand(mainWindow) {}
 
+void ShortenNamesCommand::redo()
+{
+    run(new ShortenNamesConvertor(this), QStringList() << "author");
+    AbstractCommand::redo();
+}
 
 /////////////////////////////////////////////////////////////////////////////
 GenerateKeysCommand::GenerateKeysCommand(MainWindow* mainWindow)
@@ -142,6 +143,7 @@ GenerateKeysCommand::GenerateKeysCommand(MainWindow* mainWindow)
 
 void GenerateKeysCommand::redo()
 {
+    _reference.clearChangedText();
     _reference.generateKeys(Setting::getInstance("Rules.ini")->getKeyGenRule());
     AbstractCommand::redo();
 }

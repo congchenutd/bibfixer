@@ -54,6 +54,18 @@ public:
     QString undo(const QString& input) const;
 };
 
+// shorten first and middle names
+class ShortenNamesConvertor : public IConvertor, public QObject
+{
+public:
+    ShortenNamesConvertor(QObject* parent = 0) : QObject(parent) {}
+    QString redo(const QString& input) const;
+    QString undo(const QString& input) const;
+
+private:
+    static QString _backup;
+};
+
 // abbreviate fields based on the rules, such as transactions -> trans.
 class AbbreviationConvertor : public IConvertor, public QObject
 {

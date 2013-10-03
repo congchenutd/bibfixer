@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>704</width>
+    <width>733</width>
     <height>439</height>
    </rect>
   </property>
@@ -29,7 +29,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>704</width>
+     <width>733</width>
      <height>22</height>
     </rect>
    </property>
@@ -53,6 +53,7 @@
     <addaction name="actionCapitalize"/>
     <addaction name="actionProtect"/>
     <addaction name="actionAbbreviate"/>
+    <addaction name="actionShortenNames"/>
     <addaction name="actionGenerateKeys"/>
    </widget>
    <addaction name="menuFile"/>
@@ -64,7 +65,7 @@
    </property>
    <property name="iconSize">
     <size>
-     <width>64</width>
+     <width>48</width>
      <height>32</height>
     </size>
    </property>
@@ -85,6 +86,7 @@
    <addaction name="actionCapitalize"/>
    <addaction name="actionProtect"/>
    <addaction name="actionAbbreviate"/>
+   <addaction name="actionShortenNames"/>
    <addaction name="actionGenerateKeys"/>
   </widget>
   <action name="actionCapitalize">
@@ -198,6 +200,18 @@
    </property>
    <property name="text">
     <string>New</string>
+   </property>
+  </action>
+  <action name="actionShortenNames">
+   <property name="icon">
+    <iconset resource="Resource.qrc">
+     <normaloff>:/Images/Heads.png</normaloff>:/Images/Heads.png</iconset>
+   </property>
+   <property name="text">
+    <string>Shorten Names</string>
+   </property>
+   <property name="toolTip">
+    <string>Shorten Names</string>
    </property>
   </action>
  </widget>

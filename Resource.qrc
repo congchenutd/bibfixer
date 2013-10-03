@@ -16,5 +16,6 @@
         <file>CompileDate.txt</file>
         <file>Images/Key.png</file>
         <file>Images/New.png</file>
+        <file>Images/Heads.png</file>
     </qresource>
 </RCC>

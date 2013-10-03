@@ -1,4 +1,5 @@
 #include "Convertor.h"
+#include "EnglishName.h"
 #include <QRegularExpression>
 #include <QtAlgorithms>
 
@@ -120,6 +121,23 @@ QString ProtectionConvertor::undo(const QString& input) const
     return result.join(" ");
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+QString ShortenNamesConvertor::_backup;
+
+QString ShortenNamesConvertor::redo(const QString& input) const
+{
+    _backup = input;
+    QStringList result;
+    QStringList names = input.split(" and ");
+    foreach(const QString& name, names)
+        result << EnglishName(name).toString("L,;f;m");
+    return result.join(" and ");
+}
+
+QString ShortenNamesConvertor::undo(const QString&) const {
+    return _backup;
+}
+
 ///////////////////////////////////////////////////////////////////////
 AbbreviationConvertor::AbbreviationConvertor(const QStringList& rules, QObject* parent)
     : QObject(parent) {
@@ -158,7 +176,6 @@ void AbbreviationConvertor::setRules(const QStringList& rules)
     // e.g., Journal (of) before Journal
     qSort(_rules.begin(), _rules.end(), qGreater<AbbreviationRule>());
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////
 AbbreviationConvertor::AbbreviationRule::AbbreviationRule(const QString& ruleString)

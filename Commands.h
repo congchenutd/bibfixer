@@ -30,6 +30,9 @@ protected:
 	void highlight();
 	void output(const QString& text);
 
+    // run the convertor on the fields of _reference
+    void run(IConvertor* convertor, const QStringList& fields);
+
 protected:
     MainWindow* _mainWnd;
 
@@ -43,15 +46,12 @@ public:
     void undo();
     void redo();
 
-    // must set original text before redo is called
-    static void setOriginalText(const QString& originalText) { _originalText = originalText; }
-
 protected:
     MainWindow::ActionName getActionName()     const { return MainWindow::Clean; }
     QColor                 getHighlightColor() const { return Qt::yellow; }
 
-protected:
-    static QString _originalText;
+private:
+    static QString _originalText;  // for backup
 };
 
 class CapitalizeCommand : public AbstractCommand
@@ -64,7 +64,6 @@ public:
 protected:
     MainWindow::ActionName getActionName()     const { return MainWindow::Capitalize; }
     QColor                 getHighlightColor() const { return Qt::yellow; }
-    void run(IConvertor* convertor);
 };
 
 class ProtectCommand : public AbstractCommand
@@ -77,7 +76,6 @@ public:
 protected:
     MainWindow::ActionName getActionName()     const { return MainWindow::Protect; }
     QColor                 getHighlightColor() const { return Qt::cyan; }
-    void run(IConvertor* convertor);
 };
 
 class AbbreviateCommand : public AbstractCommand
@@ -90,10 +88,21 @@ public:
 protected:
     MainWindow::ActionName getActionName()     const { return MainWindow::Abbreviate; }
     QColor                 getHighlightColor() const { return Qt::green; }
-    void run(IConvertor* convertor);
 
 private:
     QStringList _rules;
+};
+
+class ShortenNamesCommand : public AbstractCommand
+{
+public:
+    ShortenNamesCommand(MainWindow* mainWindow);
+    void undo() {}
+    void redo();
+
+protected:
+    MainWindow::ActionName getActionName()     const { return MainWindow::ShortenNames; }
+    QColor                 getHighlightColor() const { return Qt::lightGray; }
 };
 
 class GenerateKeysCommand : public AbstractCommand

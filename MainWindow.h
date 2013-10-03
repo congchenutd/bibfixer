@@ -13,7 +13,7 @@ class MainWindow : public QMainWindow
 
 public:
     typedef enum {Open, Save, RunAll, Clean, Capitalize, Protect,
-                  Abbreviate, GenerateKeys, Init, Size} ActionName;
+                  Abbreviate, ShortenNames, GenerateKeys, Init, Size} ActionName;
 public:
 	MainWindow(QWidget* parent = 0);
 	TextEdit* getTextEdit() const { return ui.teOutput; }
@@ -28,10 +28,11 @@ private slots:
 	void onNewFile();
 	void onOpen();
     void onPaste();
-    void onClean     (bool redo = true);
-    void onCapitalize(bool redo = true);
-    void onProtect   (bool redo = true);
-    void onAbbreviate(bool redo = true);
+    void onClean       (bool redo = true);
+    void onCapitalize  (bool redo = true);
+    void onProtect     (bool redo = true);
+    void onAbbreviate  (bool redo = true);
+    void onShortenNames();
     void onGenerateKeys();
     void onRunAll();
 	void onSave();
