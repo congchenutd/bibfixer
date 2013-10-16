@@ -20,11 +20,11 @@ public:
     bool isEmpty()    const { return !isValid() || _fields.isEmpty(); }
     void setType (const QString& type) { if(!type.isEmpty()) _type = type; }
     void setKey  (const QString& key)  { if(!key.isEmpty())  _key  = key;  }
-    void addField(const QString& fieldName, const QString& fieldValue);
     void convert(const QString& fieldName, const IConvertor* convertor); // convert a field
     void generateKey(const QString& rule);
 	QString toString() const;
-    QString getFieldValue(const QString& fieldName) const;
+    QString getValue(const QString& fieldName) const;
+    void    setValue(const QString& fieldName, const QString& fieldValue);
 
 	// for highlighting
     QStringList getChangedText() const { return _changedText; }
@@ -53,6 +53,9 @@ public:
     // for hightlighting
     QStringList getChangedText() const;
     void clearChangedText();
+
+    ReferenceList backup(const QString& fieldName);  // backup only for one field
+    void restore(const ReferenceList& backup);
 
 private:
     Records _records;

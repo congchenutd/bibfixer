@@ -29,7 +29,7 @@ Reference BibParser::parseRecord(const QString& content) const
 	Reference result;
 
 	// type and id
-    QRegExp rxTypeAndID("@(\\w+)\\{([^=]*),");
+    QRegExp rxTypeAndID("@(\\w+)\\{");
 	int idxTypeAndID = rxTypeAndID.indexIn(content);
 	if(idxTypeAndID < 0)
 		return result;
@@ -47,7 +47,7 @@ Reference BibParser::parseRecord(const QString& content) const
         {
             QString fieldValue = ProtectionConvertor().undo(  // remove protective {}
                                       rxField.cap(2).simplified());
-            result.addField(fieldName, fieldValue);
+            result.setValue(fieldName, fieldValue);
         }
 		idxField = rxField.indexIn(content, idxField + rxField.matchedLength());  // next field
 	}

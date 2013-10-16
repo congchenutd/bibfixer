@@ -47,15 +47,15 @@ QString CaseConvertor::redo(const QString& input) const
         return QString();
 
 	QStringList convertedWords;
-    QStringList wordList = input.simplified().split(' ');
+    QStringList wordList = input.simplified().split(' ');   // split the sentence
 	QString lastWord;
     foreach(QString word, wordList)
 	{
-        if(_lowercaseWords.contains(word, Qt::CaseInsensitive)
-                && !containsPunctuation(lastWord))
-            convertedWords << word.toLower();  // lower case unless it follows a punctuation
+        if(_lowercaseWords.contains(word, Qt::CaseInsensitive) &&  // reserved
+		   !endsWithPunctuation(lastWord))                         // follows a punctuation
+            convertedWords << word.toLower();             // lower case
 		else
-            convertedWords << makeFirstCharUpper(word);   // convert to upper case
+            convertedWords << makeFirstCharUpper(word);   // upper case
 		lastWord = word;
 	}
 
@@ -67,17 +67,21 @@ QString CaseConvertor::undo(const QString& input) const {
     return makeFirstCharUpper(input.toLower());
 }
 
-QString CaseConvertor::makeFirstCharUpper(const QString& word) const {
-    return word.isEmpty() ? word
-                          : word.at(0).toUpper() + word.right(word.length() - 1);
+QString CaseConvertor::makeFirstCharUpper(const QString& word) const
+{
+	if(word.isEmpty())
+		return word;
+
+	// find 1st letter
+	int i = 0;
+	for(; i < word.length(); ++i)
+		if(word.at(i).isLetter())
+			break;
+    return word.left(i) + word.at(i).toUpper() + word.right(word.length() - i - 1);
 }
 
-bool CaseConvertor::containsPunctuation(const QString& word) const
-{
-    foreach(const QChar& ch, word)
-        if(ch.isPunct())
-            return true;
-    return false;
+bool CaseConvertor::endsWithPunctuation(const QString& word) const {
+    return word.at(word.length() - 1).isPunct();
 }
 
 //////////////////////////////////////////////////////////////////////////////////

@@ -55,29 +55,28 @@ QString Reference::toString() const
     return result;
 }
 
-QString Reference::getFieldValue(const QString& fieldName) const {
+QString Reference::getValue(const QString& fieldName) const {
     return _fields.contains(fieldName) ? _fields[fieldName] : QString();
 }
 
-void Reference::addField(const QString& fieldName, const QString& value)
+void Reference::setValue(const QString& fieldName, const QString& fieldValue)
 {
-	// correct wrong page delimiters
-	QString fieldValue = value;
-	if(fieldName == "pages")
-	{
-        QRegExp rxPages("(\\d+)(\\D+)?(\\d+)?");  // number something else number
-		if(rxPages.indexIn(fieldValue) > -1)
-		{
-			QString startPage = rxPages.cap(1);
-			QString endPage   = rxPages.cap(3);
-			fieldValue = startPage;
+    // correct wrong page delimiters
+    QString fixedValue = fieldValue;
+    if(fieldName == "pages")
+    {
+        QRegExp rxPages("(\\d+)(\\D+)?(\\d+)?");  // number something else number, e.g., 1-3
+        if(rxPages.indexIn(fixedValue) > -1)
+        {
+            QString startPage = rxPages.cap(1);
+            QString endPage   = rxPages.cap(3);
+            fixedValue = startPage;
             if(!endPage.isEmpty())                // may only have a start page
-				fieldValue += "-" + endPage;
-		}
-	}
-    _fields.insert(fieldName, fieldValue);
+                fixedValue += "-" + endPage;
+        }
+    }
+    _fields[fieldName] = fixedValue;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////
 QString ReferenceList::toString() const
@@ -99,6 +98,28 @@ QStringList ReferenceList::getChangedText() const
 void ReferenceList::clearChangedText() {
     for(Records::Iterator it = _records.begin(); it != _records.end(); ++ it)
         it->clearChangedText();
+}
+
+ReferenceList ReferenceList::backup(const QString& fieldName)
+{
+    ReferenceList result;
+    foreach(const Reference& record, _records)                   // for each record
+    {
+        Reference backup;                                        // create an empty ref
+        backup.setKey(record.getKey());                          // copy the key
+        backup.setValue(fieldName, record.getValue(fieldName));  // copy the field
+        result.addRecord(backup);                                // add to the backup
+    }
+    return result;
+}
+
+void ReferenceList::restore(const ReferenceList& backup)
+{
+    foreach(const Reference& record, backup)
+    {
+        QString key = record.getKey();
+
+    }
 }
 
 void ReferenceList::addRecord(const Reference& record) {
