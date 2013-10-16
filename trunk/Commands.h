@@ -97,7 +97,7 @@ class ShortenNamesCommand : public AbstractCommand
 {
 public:
     ShortenNamesCommand(MainWindow* mainWindow);
-    void undo() {}
+    void undo();
     void redo();
 
 protected:

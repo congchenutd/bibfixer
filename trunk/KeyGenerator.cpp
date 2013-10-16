@@ -35,7 +35,7 @@ QString KeyGenerator::parseSubRule(const Reference& ref, const QString& subRule)
             return firstWord.isEmpty() ? QString() : firstWord.at(0);
         }
         else
-            return ref.getFieldValue("title");
+            return ref.getValue("title");
     }
 
     else if(subRule.startsWith("author"))
@@ -67,7 +67,7 @@ QString KeyGenerator::parseSubRule(const Reference& ref, const QString& subRule)
 
 QString KeyGenerator::getAuthor(const Reference& ref, int order) const
 {
-    QString authors = ref.getFieldValue("author");
+    QString authors = ref.getValue("author");
     if(authors.isEmpty())
         return QString();
 
@@ -101,13 +101,13 @@ QString KeyGenerator::getFirstLetter(const Reference& ref) const
 
 QString KeyGenerator::getFirstWord(const Reference& ref) const
 {
-    QString title = ProtectionConvertor().undo(ref.getFieldValue("title"));
+    QString title = ProtectionConvertor().undo(ref.getValue("title"));
     return title.isEmpty() ? QString() : title.split(" ").front().simplified();
 }
 
 QString KeyGenerator::getYear(const Reference& ref) const
 {
-    QString year = ref.getFieldValue("year");
+    QString year = ref.getValue("year");
     return year.isEmpty() ? QString() : year;
 }
 

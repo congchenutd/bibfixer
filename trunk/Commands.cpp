@@ -131,6 +131,11 @@ void AbbreviateCommand::redo()
 ShortenNamesCommand::ShortenNamesCommand(MainWindow* mainWindow)
     : AbstractCommand(mainWindow) {}
 
+void ShortenNamesCommand::undo()
+{
+
+}
+
 void ShortenNamesCommand::redo()
 {
     run(new ShortenNamesConvertor(this), QStringList() << "author");

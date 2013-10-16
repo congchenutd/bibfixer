@@ -29,7 +29,7 @@ private:
     const IConvertor* _convertor;
 };
 
-// convert all words' first letter to upper case
+// convert to title case
 class CaseConvertor : public IConvertor, public QObject
 {
 public:
@@ -39,7 +39,7 @@ public:
 
 private:
     QString makeFirstCharUpper (const QString& word) const;
-    bool    containsPunctuation(const QString& word) const;
+    bool    endsWithPunctuation(const QString& word) const;
 
 private:
     QStringList _lowercaseWords;
