@@ -115,11 +115,11 @@ ReferenceList ReferenceList::backup(const QString& fieldName)
 
 void ReferenceList::restore(const ReferenceList& backup)
 {
-    foreach(const Reference& record, backup)
-    {
-        QString key = record.getKey();
+//    foreach(const Reference& record, backup)
+//    {
+//        QString key = record.getKey();
 
-    }
+//    }
 }
 
 void ReferenceList::addRecord(const Reference& record) {

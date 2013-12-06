@@ -5,7 +5,7 @@ TARGET = BibFixer
 TEMPLATE = app
 
 INCLUDEPATH +=	../EnglishName \
-				../MySetting \
+				../MySettings \
 				../ImageColorBoolModel
 
 include(qtsingleapplication/src/qtsingleapplication.pri)
@@ -46,7 +46,7 @@ HEADERS  += MainWindow.h \
     WidgetValidFields.h \
     Commands.h \
     ../EnglishName/EnglishName.h \
-    ../MySetting/MySetting.h \
+	../MySettings/MySetting.h \
     WidgetKeyGen.h \
     KeyGenerator.h
 
