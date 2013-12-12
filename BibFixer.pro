@@ -1,5 +1,4 @@
-QT += core network
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core network widgets
 
 TARGET = BibFixer
 TEMPLATE = app

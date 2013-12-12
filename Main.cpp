@@ -1,9 +1,27 @@
 #include "MainWindow.h"
 #include <QtSingleApplication>
+#include <QDir>
+
+// workaround for a bug on Mavericks
+// Finder returns / as the working path of an app bundle
+// but if the app is run from terminal, the path is correct
+// This method calcluates the path of the bundle from the application's path
+QString getCurrentPath()
+{
+    QDir dir(QApplication::applicationDirPath());
+    dir.cdUp();
+    dir.cdUp();
+    dir.cdUp();
+    return dir.absolutePath();
+}
 
 int main(int argc, char *argv[])
 {
     QtSingleApplication app(argc, argv);
+
+#ifdef Q_OS_OSX
+    QDir::setCurrent(getCurrentPath());
+#endif
 
     // Check another running instance.
     // Returns true if the message (url of the bibfile) is received
