@@ -57,6 +57,9 @@ public:
     ReferenceList backup(const QString& fieldName);  // backup only for one field
     void restore(const ReferenceList& backup);
 
+    int count() const;
+    Reference findReference(const QString& key);
+
 private:
     Records _records;
 };

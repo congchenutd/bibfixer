@@ -12,7 +12,7 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-    typedef enum {Open, Save, RunAll, Clean, Capitalize, Protect,
+    typedef enum {Open, Import, Save, RunAll, Clean, Capitalize, Protect,
                   Abbreviate, ShortenNames, GenerateKeys, Init, Size} ActionName;
 public:
 	MainWindow(QWidget* parent = 0);
@@ -20,13 +20,14 @@ public:
 
     // called when a command is executed
     void updateActionStatus(ActionName actionName, bool triggered);
+    void resetActionStatus();
 
-public slots:
     void openBibFile(const QString& filePath);     // called by external program
 
 private slots:
 	void onNewFile();
 	void onOpen();
+    void onImport();
     void onPaste();
     void onClean       (bool redo = true);
     void onCapitalize  (bool redo = true);
@@ -40,12 +41,11 @@ private slots:
 	void onAbout();
 
 private:
-    void resetActionStatus();
     void initActions();
     void setActionTriggered(ActionName actionName, bool triggered);
     bool isTriggered(ActionName actionName) const { return _triggered[actionName]; }
 
-    bool canRunAll() const { return _triggered[Open] &&
+    bool canRunAll() const { return (_triggered[Open] || _triggered[Import]) &&
                                     (!_triggered[Clean]      ||
                                      !_triggered[Capitalize] ||
                                      !_triggered[Protect]    ||

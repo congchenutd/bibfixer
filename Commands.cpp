@@ -7,6 +7,8 @@
 
 namespace BibFixer {
 
+ICommand::~ICommand() {}
+
 AbstractCommand::AbstractCommand(MainWindow* mainWindow)
     : QObject(mainWindow), _mainWnd(mainWindow) {}
 
@@ -50,6 +52,26 @@ void AbstractCommand::highlight()
 ReferenceList AbstractCommand::_reference;
 
 //////////////////////////////////////////////////////////////////////////////////////////
+ImportCommand::ImportCommand(const QString& filePath, MainWindow* mainWindow)
+    : AbstractCommand(mainWindow),
+      _filePath (filePath)
+{}
+
+void ImportCommand::undo() {
+}
+
+void ImportCommand::redo()
+{
+    auto parser = BibParser::getInstance();
+    parser->setValidFields(Setting::getInstance("Rules.ini")->getSelectedFields());
+
+    output(parser->import(_filePath).toString());
+    _reference.clearChangedText();
+    _mainWnd->resetActionStatus();
+    _mainWnd->updateActionStatus(getActionName(), true);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 QString CleanCommand::_originalText;
 
 CleanCommand::CleanCommand(MainWindow* mainWindow)
@@ -65,8 +87,9 @@ void CleanCommand::redo()
 {
     _originalText = _mainWnd->getTextEdit()->toPlainText();  // backup
 
-    QStringList validFields = Setting::getInstance("Rules.ini")->getSelectedFields();
-    _reference = BibParser(validFields).parse(_originalText);
+    auto parser = BibParser::getInstance();
+    parser->setValidFields(Setting::getInstance("Rules.ini")->getSelectedFields());
+    _reference = parser->parse(_originalText);
 
     _mainWnd->updateActionStatus(getActionName(), true);     // set the action checked
     output(_reference.toString());
@@ -131,10 +154,7 @@ void AbbreviateCommand::redo()
 ShortenNamesCommand::ShortenNamesCommand(MainWindow* mainWindow)
     : AbstractCommand(mainWindow) {}
 
-void ShortenNamesCommand::undo()
-{
-
-}
+void ShortenNamesCommand::undo() {}
 
 void ShortenNamesCommand::redo()
 {
@@ -153,5 +173,4 @@ void GenerateKeysCommand::redo()
     AbstractCommand::redo();
 }
 
-
-}
+} // namespace

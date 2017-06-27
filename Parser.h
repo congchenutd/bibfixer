@@ -9,15 +9,18 @@ namespace BibFixer {
 class IParser
 {
 public:
-    virtual ~IParser() {}
+    virtual ~IParser();
 	virtual ReferenceList parse(const QString& content) const = 0;
 };
 
 class BibParser : public IParser
 {
 public:
-    BibParser(const QStringList& validFields);            // invalid fields will be ignored
-    ReferenceList parse(const QString& content) const;    // may contain multi references
+    static BibParser* getInstance();
+
+    void setValidFields(const QStringList& validFields);
+    ReferenceList parse (const QString& content) const;    // may contain multi references
+    ReferenceList import(const QString& latexFilePath) const;
 
 private:
 	int findRecordStart(const QString& content, int startFrom = 0) const;
@@ -26,6 +29,8 @@ private:
 
 private:
     QStringList _validFields;
+
+    static BibParser* _instance;
 };
 
 }

@@ -7,7 +7,7 @@ INCLUDEPATH +=	../EnglishName \
 				../MySettings \
 				../ImageColorBoolModel
 
-include(qtsingleapplication/src/qtsingleapplication.pri)
+#include(qtsingleapplication/src/qtsingleapplication.pri)
 
 win32 {
 	RC_FILE = Resource.rc

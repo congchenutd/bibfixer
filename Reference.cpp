@@ -119,7 +119,15 @@ void ReferenceList::restore(const ReferenceList& backup)
 //    {
 //        QString key = record.getKey();
 
-//    }
+    //    }
+}
+
+int ReferenceList::count() const    {
+    return _records.size();
+}
+
+Reference ReferenceList::findReference(const QString& key) {
+    return _records.contains(key) ? _records[key] : Reference();
 }
 
 void ReferenceList::addRecord(const Reference& record) {

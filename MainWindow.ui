@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>733</width>
+    <width>839</width>
     <height>439</height>
    </rect>
   </property>
@@ -29,7 +29,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>733</width>
+     <width>839</width>
      <height>22</height>
     </rect>
    </property>
@@ -80,6 +80,7 @@
    </attribute>
    <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
+   <addaction name="actionImport"/>
    <addaction name="actionSave"/>
    <addaction name="actionRunAll"/>
    <addaction name="actionClean"/>
@@ -212,6 +213,18 @@
    </property>
    <property name="toolTip">
     <string>Shorten Names</string>
+   </property>
+  </action>
+  <action name="actionImport">
+   <property name="icon">
+    <iconset resource="Resource.qrc">
+     <normaloff>:/Images/Bibtex.png</normaloff>:/Images/Bibtex.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import</string>
+   </property>
+   <property name="toolTip">
+    <string>Import from a Latex file</string>
    </property>
   </action>
  </widget>

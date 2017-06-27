@@ -12,7 +12,7 @@ class TextEdit;
 class ICommand
 {
 public:
-    virtual ~ICommand() {}
+    virtual ~ICommand();
     virtual void undo() = 0;
     virtual void redo() = 0;
     virtual MainWindow::ActionName getActionName()     const = 0; // associated action
@@ -37,6 +37,21 @@ protected:
     MainWindow* _mainWnd;
 
     static ReferenceList _reference;  // the reference all the commands work on
+};
+
+class ImportCommand: public AbstractCommand
+{
+public:
+    ImportCommand(const QString& filePath, MainWindow* mainWindow);
+    void undo();
+    void redo();
+
+protected:
+    MainWindow::ActionName getActionName()     const { return MainWindow::Import; }
+    QColor                 getHighlightColor() const { return QColor(); }
+
+private:
+    QString _filePath;
 };
 
 class CleanCommand : public AbstractCommand

@@ -17,5 +17,6 @@
         <file>Images/Key.png</file>
         <file>Images/New.png</file>
         <file>Images/Heads.png</file>
+        <file>Images/Bibtex.png</file>
     </qresource>
 </RCC>

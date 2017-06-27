@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "DlgSettings.h"
 #include "Commands.h"
+#include "Parser.h"
 #include <QStyle>
 #include <QTextStream>
 #include <QFileDialog>
@@ -16,24 +17,26 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     initActions();
     resetActionStatus();
 
-    connect(ui.actionNew,          SIGNAL(triggered()), this, SLOT(onNewFile()));
-    connect(ui.actionOpen,         SIGNAL(triggered()), this, SLOT(onOpen()));
-    connect(ui.actionSave,         SIGNAL(triggered()), this, SLOT(onSave()));
-    connect(ui.actionSettings,     SIGNAL(triggered()), this, SLOT(onSettings()));
-    connect(ui.actionRunAll,       SIGNAL(triggered()), this, SLOT(onRunAll()));
-    connect(ui.actionClean,        SIGNAL(triggered(bool)), this, SLOT(onClean       (bool)));
-    connect(ui.actionCapitalize,   SIGNAL(triggered(bool)), this, SLOT(onCapitalize  (bool)));
-    connect(ui.actionProtect,      SIGNAL(triggered(bool)), this, SLOT(onProtect     (bool)));
-    connect(ui.actionAbbreviate,   SIGNAL(triggered(bool)), this, SLOT(onAbbreviate  (bool)));
-    connect(ui.actionShortenNames, SIGNAL(triggered()), this, SLOT(onShortenNames()));
-    connect(ui.actionGenerateKeys, SIGNAL(triggered()), this, SLOT(onGenerateKeys()));
-    connect(ui.actionAbout,        SIGNAL(triggered()), this, SLOT(onAbout()));
-    connect(ui.teOutput,           SIGNAL(pasted()),    this, SLOT(onPaste()));
+    connect(ui.actionNew,           SIGNAL(triggered()),        this, SLOT(onNewFile()));
+    connect(ui.actionOpen,          SIGNAL(triggered()),        this, SLOT(onOpen()));
+    connect(ui.actionImport,        SIGNAL(triggered()),        this, SLOT(onImport()));
+    connect(ui.actionSave,          SIGNAL(triggered()),        this, SLOT(onSave()));
+    connect(ui.actionSettings,      SIGNAL(triggered()),        this, SLOT(onSettings()));
+    connect(ui.actionRunAll,        SIGNAL(triggered()),        this, SLOT(onRunAll()));
+    connect(ui.actionClean,         SIGNAL(triggered(bool)),    this, SLOT(onClean       (bool)));
+    connect(ui.actionCapitalize,    SIGNAL(triggered(bool)),    this, SLOT(onCapitalize  (bool)));
+    connect(ui.actionProtect,       SIGNAL(triggered(bool)),    this, SLOT(onProtect     (bool)));
+    connect(ui.actionAbbreviate,    SIGNAL(triggered(bool)),    this, SLOT(onAbbreviate  (bool)));
+    connect(ui.actionShortenNames,  SIGNAL(triggered()),        this, SLOT(onShortenNames()));
+    connect(ui.actionGenerateKeys,  SIGNAL(triggered()),        this, SLOT(onGenerateKeys()));
+    connect(ui.actionAbout,         SIGNAL(triggered()),        this, SLOT(onAbout()));
+    connect(ui.teOutput,            SIGNAL(pasted()),           this, SLOT(onPaste()));
 }
 
 void MainWindow::resetActionStatus()
 {
     updateActionStatus(Init,         true);
+    updateActionStatus(Import,       false);
     updateActionStatus(Open,         false);
     updateActionStatus(Clean,        false);
     updateActionStatus(Capitalize,   false);
@@ -65,8 +68,8 @@ void MainWindow::updateActionStatus(MainWindow::ActionName actionName, bool trig
         setActionTriggered(GenerateKeys,false);
     }
 
-    ui.actionSave        ->setEnabled(isTriggered(Open));
-    ui.actionClean       ->setEnabled(isTriggered(Open));
+    ui.actionSave        ->setEnabled(isTriggered(Open) || isTriggered(Import));
+    ui.actionClean       ->setEnabled(isTriggered(Open) || isTriggered(Import));
     ui.actionRunAll      ->setEnabled(canRunAll());
     ui.actionCapitalize  ->setEnabled(isTriggered(Clean));
     ui.actionProtect     ->setEnabled(isTriggered(Clean));
@@ -78,7 +81,7 @@ void MainWindow::updateActionStatus(MainWindow::ActionName actionName, bool trig
 void MainWindow::initActions()
 {
     ui.actionOpen->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
-    _actions << ui.actionOpen  << ui.actionSave       << ui.actionRunAll
+    _actions << ui.actionImport << ui.actionOpen  << ui.actionSave << ui.actionRunAll
              << ui.actionClean << ui.actionCapitalize << ui.actionProtect
              << ui.actionAbbreviate << ui.actionShortenNames << ui.actionGenerateKeys
              << new QAction(this);   // placeholder for Init
@@ -117,6 +120,16 @@ void MainWindow::onOpen()
 		return;
 
     openBibFile(filePath);
+}
+
+void MainWindow::onImport()
+{
+    QString filePath = QFileDialog::getOpenFileName(this,
+        tr("Open Latex file"), ".", tr("Latex (*.tex);;All files (*.*)"));
+    if(filePath.isEmpty())
+        return;
+
+    runCommand(Import, true, new ImportCommand(filePath, this));
 }
 
 // same as onOpen()
@@ -173,7 +186,8 @@ void MainWindow::onGenerateKeys() {
 void MainWindow::runCommand(MainWindow::ActionName actionName, bool redo, AbstractCommand* command)
 {
     if(redo) {
-        if(!isTriggered(actionName))
+        // TODO: is this line necessary?
+//        if(!isTriggered(actionName))
             command->redo();
     }
     else

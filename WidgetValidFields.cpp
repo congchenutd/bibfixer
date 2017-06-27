@@ -12,12 +12,8 @@ WidgetValidFields::WidgetValidFields(QWidget* parent) :	QWidget(parent)
 
     loadValidFields();
     _ui.tvFields->setModel(&_model);
-
-#if QT_VERSION >= 0x050000
     _ui.tvFields->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-#else
-    _ui.tvFields->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-#endif
+    _ui.tvFields->horizontalHeader()->sectionResizeMode(QHeaderView::Stretch);
 
     ImageColorBoolProxy* proxy = new ImageColorBoolProxy(this);
     proxy->setColumnType(SELECTED, ImageColorBoolProxy::BoolColumn);
